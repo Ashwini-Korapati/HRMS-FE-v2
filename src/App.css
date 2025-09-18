@@ -1,0 +1,66 @@
+.App {
+  text-align: center;
+}
+
+.App-logo {
+  height: 40vmin;
+  pointer-events: none;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .App-logo {
+    animation: App-logo-spin infinite 20s linear;
+  }
+}
+
+.App-header {
+  background-color: #282c34;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  font-size: calc(10px + 2vmin);
+  color: white;
+}
+
+.App-link {
+  color: #61dafb;
+}
+
+/* Public Auth Area (disables dark mode influence) */
+.auth-public-root {
+  background: linear-gradient(135deg,#ffffff 0%,#f5f7fa 100%);
+  min-height: 100vh;
+  color: #1a1d21;
+  font-family: system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif;
+}
+.auth-public-root .auth-card {
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  background: rgba(255,255,255,0.9);
+  box-shadow: 0 4px 24px -4px rgba(0,0,0,0.12),0 2px 8px -2px rgba(0,0,0,0.08);
+}
+.auth-company-badge {
+  display:inline-flex;
+  align-items:center;
+  gap:6px;
+  background:linear-gradient(135deg,#ffedd5,#fed7aa);
+  color:#9a3412;
+  padding:4px 10px;
+  border-radius:999px;
+  font-size:12px;
+  font-weight:600;
+  box-shadow:0 0 0 1px #fdba74 inset;
+}
+.auth-company-badge svg { stroke-width:1.5; }
+.auth-stable-height { min-height: 360px; }
+
+@keyframes App-logo-spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}

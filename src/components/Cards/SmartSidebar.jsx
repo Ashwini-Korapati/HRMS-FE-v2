@@ -245,27 +245,27 @@ export default function SmartSidebar({ items, className = "", onSelect, basePath
 							const isActiveParent = parent.key === active || children.some(c => c.key === active)
 							const ParentIcon = parent.icon || Folder
 							return (
-								<div key={key} className="mb-0.5">
-									<button
-										onClick={(e) => {
-											e.preventDefault()
-											setOpenGroups(o => ({ ...o, [key]: !o[key] }))
-										}}
-										className={`w-full flex items-center justify-between px-2.5 py-1.5 text-xs transition-colors ${isActiveParent ? 'text-orange-700 dark:text-orange-400' : 'text-neutral-600 hover:text-orange-700 dark:text-neutral-400 dark:hover:text-orange-400'}`}
-										data-group={key}
-									>
-										<span className={`inline-flex items-center gap-3`}>
+								<div key={key} className="mb-0.5" data-group={key}>
+									<div className={`w-full flex items-center justify-between px-2.5 py-1.5 text-xs transition-colors ${isActiveParent ? 'text-orange-700 dark:text-orange-400' : 'text-neutral-600 hover:text-orange-700 dark:text-neutral-400 dark:hover:text-orange-400'}`}>
+										<button
+											onClick={() => handleSelect(parent.key)}
+											className="inline-flex items-center gap-3 flex-1 text-left focus:outline-none"
+										>
 											<span className={`w-8 h-8 grid place-items-center rounded-md text-current transition-colors ${isActiveParent ? 'bg-orange-500/10 dark:bg-transparent' : 'group-hover:bg-orange-500/5'}`}>
 												<ParentIcon size={16} />
 											</span>
-											<span className="whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity duration-200">{parent.label}</span>
-										</span>
-										<span className={`transition-transform duration-300 ${isOpen ? 'rotate-180' : ''}`}><ChevronDown size={14} /></span>
-									</button>
-									<div className="pl-4 pr-1">
-										<div
-											className={`overflow-hidden transition-all duration-300 ease-out ${isOpen ? 'max-h-96' : 'max-h-0'}`}
+											<span className="whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity duration-200 truncate">{parent.label}</span>
+										</button>
+										<button
+											onClick={(e) => { e.stopPropagation(); setOpenGroups(o => ({ ...o, [key]: !o[key] })) }}
+											className={`p-1 rounded-md transition-colors ${isActiveParent ? 'text-orange-600 dark:text-orange-400' : 'text-neutral-500 hover:text-orange-600 dark:text-neutral-400 dark:hover:text-orange-400'}`}
+											aria-label={isOpen ? 'Collapse section' : 'Expand section'}
 										>
+											<span className={`transition-transform duration-300 block ${isOpen ? 'rotate-180' : ''}`}><ChevronDown size={14} /></span>
+										</button>
+									</div>
+									<div className="pl-4 pr-1">
+										<div className={`overflow-hidden transition-all duration-300 ease-out ${isOpen ? 'max-h-96' : 'max-h-0'}`}>
 											<ul className="py-0.5 flex flex-col gap-0.5">
 												{children.map(child => {
 													const ChildIcon = child.icon || Folder

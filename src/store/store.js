@@ -1,6 +1,7 @@
 import { configureStore, isRejectedWithValue } from '@reduxjs/toolkit'
 import plansReducer from '../Redux/Public/plansSlice'
 import authChallengeReducer from '../Redux/Public/authChallengeSlice'
+import projectsReducer from '../Redux/Public/projectsSlice'
 import authReducer, { authSubscribe, initAuthScheduling } from '../Redux/Public/authSlice'
 import themeReducer from '../Redux/Public/themeSlice'
 import { attachAuthStore } from '../auth/auth'
@@ -31,6 +32,7 @@ export const store = configureStore({
   authChallenge: authChallengeReducer,
   auth: authReducer,
   theme: themeReducer,
+  projects: projectsReducer,
   },
   middleware: getDefault => getDefault({ serializableCheck: false }).concat(actionLogger, errorReporter)
 })

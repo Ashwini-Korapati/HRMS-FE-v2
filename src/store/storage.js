@@ -42,5 +42,6 @@ export const persistKeys = {
   authUser: 'hr_auth_user',
   authCompany: 'hr_auth_company',
   authRoutes: 'hr_auth_routes',
+  authRouteTree: 'hr_auth_route_tree',
   tokenExpiry: 'hr_access_expiry'
 }

@@ -1,0 +1,280 @@
+{
+    "success": true,
+    "message": "Token exchange successful",
+    "data": {
+        "access_token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiIyMjcyNzhhYS1mZDhjLTRjZWMtODBkNy1mNjQ3NmFiMWZmZmYiLCJlbWFpbCI6ImtyaXNobmFzYXZlZXRoYTE5MTcxMTI1NEBnbWFpbC5jb20iLCJyb2xlIjoiVVNFUiIsImNvbXBhbnlJZCI6IjlmYmJlNTZjLWRlMjgtNDVlNi1iZTU5LTAyYjZjZTg5M2NmZiIsInN1YmRvbWFpbiI6Imlubm92ZXgiLCJpYXQiOjE3NTgyNjY4ODMsImV4cCI6MTc1ODI3MDQ4M30.pC7JwbhiRbStT5cVH5BfOFR_QG8D2JDClTTCU8sHmmY",
+        "refresh_token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiIyMjcyNzhhYS1mZDhjLTRjZWMtODBkNy1mNjQ3NmFiMWZmZmYiLCJjb21wYW55SWQiOiI5ZmJiZTU2Yy1kZTI4LTQ1ZTYtYmU1OS0wMmI2Y2U4OTNjZmYiLCJpYXQiOjE3NTgyNjY4ODMsImV4cCI6MTc1ODg3MTY4M30.y37rcYqxQqDDy12Rx7Dhk-9W717qm9qMaRpG4RBLI1s",
+        "id_token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIyMjcyNzhhYS1mZDhjLTRjZWMtODBkNy1mNjQ3NmFiMWZmZmYiLCJlbWFpbCI6ImtyaXNobmFzYXZlZXRoYTE5MTcxMTI1NEBnbWFpbC5jb20iLCJuYW1lIjoia3Jpc2huYSBpb3NzbWpobW1uTm9tYSIsImNvbXBhbnkiOiJJbm5vdmV4IEluYyIsInJvbGUiOiJVU0VSIiwiaXNzIjoiaHR0cHM6Ly9ocm9mZmljZS5jb20iLCJhdWQiOiJocm9mZmljZS1hcHAiLCJpYXQiOjE3NTgyNjY4ODMsImV4cCI6MTc1ODI3MDQ4M30.TJ8t_nztHAAymmk01dQXOUdvzb592BXzc0o13MOvzSc",
+        "token_type": "Bearer",
+        "expires_in": 3600,
+        "scope": "openid profile email",
+        "routes": [
+            {
+                "label": "My Dashboard",
+                "path": "/overview",
+                "icon": "LayoutDashboard",
+                "url": "http://localhost:3000/9fbbe56c-de28-45e6-be59-02b6ce893cff/auth/227278aa-fd8c-4cec-80d7-f6476ab1ffff/overview",
+                "children": [],
+                "id": "7cc6f071-e5d8-432f-ae44-0d4f1769359f",
+                "role": "USER",
+                "type": "USER",
+                "breadcrumb": [
+                    {
+                        "label": "My Dashboard",
+                        "path": "/overview",
+                        "url": "http://localhost:3000/9fbbe56c-de28-45e6-be59-02b6ce893cff/auth/227278aa-fd8c-4cec-80d7-f6476ab1ffff/overview"
+                    }
+                ]
+            },
+            {
+                "label": "My Profile",
+                "path": "/profile",
+                "icon": "User",
+                "url": "http://localhost:3000/9fbbe56c-de28-45e6-be59-02b6ce893cff/auth/227278aa-fd8c-4cec-80d7-f6476ab1ffff/profile",
+                "children": [
+                    {
+                        "label": "Settings",
+                        "path": "/profile/settings",
+                        "url": "http://localhost:3000/9fbbe56c-de28-45e6-be59-02b6ce893cff/auth/227278aa-fd8c-4cec-80d7-f6476ab1ffff/profile/settings",
+                        "priority": 0,
+                        "children": [],
+                        "id": "6f843381-81d8-4cb1-9680-f6a4e71ccde2",
+                        "role": "USER",
+                        "type": "USER",
+                        "breadcrumb": [
+                            {
+                                "label": "My Profile",
+                                "path": "/profile",
+                                "url": "http://localhost:3000/9fbbe56c-de28-45e6-be59-02b6ce893cff/auth/227278aa-fd8c-4cec-80d7-f6476ab1ffff/profile"
+                            },
+                            {
+                                "label": "Settings",
+                                "path": "/profile/settings",
+                                "url": "http://localhost:3000/9fbbe56c-de28-45e6-be59-02b6ce893cff/auth/227278aa-fd8c-4cec-80d7-f6476ab1ffff/profile/settings"
+                            }
+                        ]
+                    },
+                    {
+                        "label": "Security",
+                        "path": "/profile/security",
+                        "url": "http://localhost:3000/9fbbe56c-de28-45e6-be59-02b6ce893cff/auth/227278aa-fd8c-4cec-80d7-f6476ab1ffff/profile/security",
+                        "priority": 1,
+                        "children": [],
+                        "id": "270be04b-0c95-491b-8ddf-49f180d8fb35",
+                        "role": "USER",
+                        "type": "USER",
+                        "breadcrumb": [
+                            {
+                                "label": "My Profile",
+                                "path": "/profile",
+                                "url": "http://localhost:3000/9fbbe56c-de28-45e6-be59-02b6ce893cff/auth/227278aa-fd8c-4cec-80d7-f6476ab1ffff/profile"
+                            },
+                            {
+                                "label": "Security",
+                                "path": "/profile/security",
+                                "url": "http://localhost:3000/9fbbe56c-de28-45e6-be59-02b6ce893cff/auth/227278aa-fd8c-4cec-80d7-f6476ab1ffff/profile/security"
+                            }
+                        ]
+                    }
+                ],
+                "id": "34339356-9185-4dad-b2f0-25065b67cb32",
+                "role": "USER",
+                "type": "USER",
+                "breadcrumb": [
+                    {
+                        "label": "My Profile",
+                        "path": "/profile",
+                        "url": "http://localhost:3000/9fbbe56c-de28-45e6-be59-02b6ce893cff/auth/227278aa-fd8c-4cec-80d7-f6476ab1ffff/profile"
+                    }
+                ]
+            },
+            {
+                "label": "My Team",
+                "path": "/team",
+                "icon": "Users",
+                "url": "http://localhost:3000/9fbbe56c-de28-45e6-be59-02b6ce893cff/auth/227278aa-fd8c-4cec-80d7-f6476ab1ffff/team",
+                "children": [],
+                "id": "7c2129cf-1b4e-4ab1-a033-ecf2d68668ec",
+                "role": "USER",
+                "type": "USER",
+                "breadcrumb": [
+                    {
+                        "label": "My Team",
+                        "path": "/team",
+                        "url": "http://localhost:3000/9fbbe56c-de28-45e6-be59-02b6ce893cff/auth/227278aa-fd8c-4cec-80d7-f6476ab1ffff/team"
+                    }
+                ]
+            },
+            {
+                "label": "My Leaves",
+                "path": "/leaves",
+                "icon": "Calendar",
+                "url": "http://localhost:3000/9fbbe56c-de28-45e6-be59-02b6ce893cff/auth/227278aa-fd8c-4cec-80d7-f6476ab1ffff/leaves",
+                "children": [
+                    {
+                        "label": "History",
+                        "path": "/leaves/history",
+                        "url": "http://localhost:3000/9fbbe56c-de28-45e6-be59-02b6ce893cff/auth/227278aa-fd8c-4cec-80d7-f6476ab1ffff/leaves/history",
+                        "priority": 0,
+                        "children": [],
+                        "id": "39048192-1934-4ae6-8966-2d54d4300a0a",
+                        "role": "USER",
+                        "type": "USER",
+                        "breadcrumb": [
+                            {
+                                "label": "My Leaves",
+                                "path": "/leaves",
+                                "url": "http://localhost:3000/9fbbe56c-de28-45e6-be59-02b6ce893cff/auth/227278aa-fd8c-4cec-80d7-f6476ab1ffff/leaves"
+                            },
+                            {
+                                "label": "History",
+                                "path": "/leaves/history",
+                                "url": "http://localhost:3000/9fbbe56c-de28-45e6-be59-02b6ce893cff/auth/227278aa-fd8c-4cec-80d7-f6476ab1ffff/leaves/history"
+                            }
+                        ]
+                    },
+                    {
+                        "label": "Apply Leave",
+                        "path": "/leaves/apply",
+                        "url": "http://localhost:3000/9fbbe56c-de28-45e6-be59-02b6ce893cff/auth/227278aa-fd8c-4cec-80d7-f6476ab1ffff/leaves/apply",
+                        "priority": 1,
+                        "children": [],
+                        "id": "4a35f165-85e1-4312-9717-43a8c94e1470",
+                        "role": "USER",
+                        "type": "USER",
+                        "breadcrumb": [
+                            {
+                                "label": "My Leaves",
+                                "path": "/leaves",
+                                "url": "http://localhost:3000/9fbbe56c-de28-45e6-be59-02b6ce893cff/auth/227278aa-fd8c-4cec-80d7-f6476ab1ffff/leaves"
+                            },
+                            {
+                                "label": "Apply Leave",
+                                "path": "/leaves/apply",
+                                "url": "http://localhost:3000/9fbbe56c-de28-45e6-be59-02b6ce893cff/auth/227278aa-fd8c-4cec-80d7-f6476ab1ffff/leaves/apply"
+                            }
+                        ]
+                    }
+                ],
+                "id": "e0f09e96-7318-417e-b4cc-89c438d1c845",
+                "role": "USER",
+                "type": "USER",
+                "breadcrumb": [
+                    {
+                        "label": "My Leaves",
+                        "path": "/leaves",
+                        "url": "http://localhost:3000/9fbbe56c-de28-45e6-be59-02b6ce893cff/auth/227278aa-fd8c-4cec-80d7-f6476ab1ffff/leaves"
+                    }
+                ]
+            },
+            {
+                "label": "My Attendance",
+                "path": "/attendance",
+                "icon": "Clock",
+                "url": "http://localhost:3000/9fbbe56c-de28-45e6-be59-02b6ce893cff/auth/227278aa-fd8c-4cec-80d7-f6476ab1ffff/attendance",
+                "children": [],
+                "id": "447fdbb2-5edb-4907-97e9-26559a44b923",
+                "role": "USER",
+                "type": "USER",
+                "breadcrumb": [
+                    {
+                        "label": "My Attendance",
+                        "path": "/attendance",
+                        "url": "http://localhost:3000/9fbbe56c-de28-45e6-be59-02b6ce893cff/auth/227278aa-fd8c-4cec-80d7-f6476ab1ffff/attendance"
+                    }
+                ]
+            },
+            {
+                "label": "My Payroll",
+                "path": "/payroll",
+                "icon": "DollarSign",
+                "url": "http://localhost:3000/9fbbe56c-de28-45e6-be59-02b6ce893cff/auth/227278aa-fd8c-4cec-80d7-f6476ab1ffff/payroll",
+                "children": [],
+                "id": "b6982d96-7f60-4a79-bc8b-765b894d5932",
+                "role": "USER",
+                "type": "USER",
+                "breadcrumb": [
+                    {
+                        "label": "My Payroll",
+                        "path": "/payroll",
+                        "url": "http://localhost:3000/9fbbe56c-de28-45e6-be59-02b6ce893cff/auth/227278aa-fd8c-4cec-80d7-f6476ab1ffff/payroll"
+                    }
+                ]
+            },
+            {
+                "label": "My Tasks",
+                "path": "/tasks",
+                "icon": "CheckSquare",
+                "url": "http://localhost:3000/9fbbe56c-de28-45e6-be59-02b6ce893cff/auth/227278aa-fd8c-4cec-80d7-f6476ab1ffff/tasks",
+                "children": [
+                    {
+                        "label": "Assigned",
+                        "path": "/tasks/assigned",
+                        "url": "http://localhost:3000/9fbbe56c-de28-45e6-be59-02b6ce893cff/auth/227278aa-fd8c-4cec-80d7-f6476ab1ffff/tasks/assigned",
+                        "priority": 0,
+                        "children": [],
+                        "id": "0d2c3465-136f-430c-8cbe-ae13dc6373df",
+                        "role": "USER",
+                        "type": "USER",
+                        "breadcrumb": [
+                            {
+                                "label": "My Tasks",
+                                "path": "/tasks",
+                                "url": "http://localhost:3000/9fbbe56c-de28-45e6-be59-02b6ce893cff/auth/227278aa-fd8c-4cec-80d7-f6476ab1ffff/tasks"
+                            },
+                            {
+                                "label": "Assigned",
+                                "path": "/tasks/assigned",
+                                "url": "http://localhost:3000/9fbbe56c-de28-45e6-be59-02b6ce893cff/auth/227278aa-fd8c-4cec-80d7-f6476ab1ffff/tasks/assigned"
+                            }
+                        ]
+                    },
+                    {
+                        "label": "Completed",
+                        "path": "/tasks/completed",
+                        "url": "http://localhost:3000/9fbbe56c-de28-45e6-be59-02b6ce893cff/auth/227278aa-fd8c-4cec-80d7-f6476ab1ffff/tasks/completed",
+                        "priority": 1,
+                        "children": [],
+                        "id": "4e01c21f-beeb-490f-a5d5-244676ad5c00",
+                        "role": "USER",
+                        "type": "USER",
+                        "breadcrumb": [
+                            {
+                                "label": "My Tasks",
+                                "path": "/tasks",
+                                "url": "http://localhost:3000/9fbbe56c-de28-45e6-be59-02b6ce893cff/auth/227278aa-fd8c-4cec-80d7-f6476ab1ffff/tasks"
+                            },
+                            {
+                                "label": "Completed",
+                                "path": "/tasks/completed",
+                                "url": "http://localhost:3000/9fbbe56c-de28-45e6-be59-02b6ce893cff/auth/227278aa-fd8c-4cec-80d7-f6476ab1ffff/tasks/completed"
+                            }
+                        ]
+                    }
+                ],
+                "id": "21357968-52b6-4f0b-aa58-5753e25683e0",
+                "role": "USER",
+                "type": "USER",
+                "breadcrumb": [
+                    {
+                        "label": "My Tasks",
+                        "path": "/tasks",
+                        "url": "http://localhost:3000/9fbbe56c-de28-45e6-be59-02b6ce893cff/auth/227278aa-fd8c-4cec-80d7-f6476ab1ffff/tasks"
+                    }
+                ]
+            }
+        ],
+        "user": {
+            "id": "227278aa-fd8c-4cec-80d7-f6476ab1ffff",
+            "email": "krishnasaveetha191711254@gmail.com",
+            "role": "USER",
+            "name": "krishna iossmjhmmnNoma"
+        },
+        "company": {
+            "id": "9fbbe56c-de28-45e6-be59-02b6ce893cff",
+            "name": "Innovex Inc",
+            "subdomain": "innovex"
+        }
+    },
+    "timestamp": "2025-09-19T07:28:03.490Z"
+}

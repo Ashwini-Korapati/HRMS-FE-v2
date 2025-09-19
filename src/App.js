@@ -15,6 +15,11 @@ import UserTeamPage from './Modules/User/UserTeamPage'
 import UserTasksPage from './Modules/User/UserTasksPage'
 import UserProfilePage from './Modules/User/UserProfilePage'
 import UserLeavesPage from './Modules/User/UserLeavesPage'
+import UserProfileSettingsPage from './Modules/User/UserProfileSettingsPage'
+import UserProfileSecurityPage from './Modules/User/UserProfileSecurityPage'
+import UserLeavesHistoryPage from './Modules/User/UserLeavesHistoryPage'
+import UserLeaveApplyPage from './Modules/User/UserLeaveApplyPage'
+import UserTasksAssignedPage from './Modules/User/UserTasksAssignedPage'
 import PlatformOverviewPage from './Modules/Superadmin/PlatformOverviewPage'
 import PlatformCompaniesPage from './Modules/Superadmin/PlatformCompaniesPage'
 import PlatformSystemAdminPage from './Modules/Superadmin/PlatformSystemAdminPage'
@@ -35,6 +40,17 @@ import AttendancePage from './Modules/Admin/AttendancePage'
 import PayrollPage from './Modules/Admin/PayrollPage'
 import ProjectsPage from './Modules/Admin/ProjectsPage'
 import TasksPage from './Modules/Admin/TasksPage'
+import UsersListPage from './Modules/Admin/UsersListPage'
+import CreateUserPage from './Modules/Admin/CreateUserPage'
+import ImportUsersPage from './Modules/Admin/ImportUsersPage'
+import DepartmentsListPage from './Modules/Admin/DepartmentsListPage'
+import CreateDepartmentPage from './Modules/Admin/CreateDepartmentPage'
+import DesignationsListPage from './Modules/Admin/DesignationsListPage'
+import CreateDesignationPage from './Modules/Admin/CreateDesignationPage'
+import ProjectsListPage from './Modules/Admin/ProjectsListPage'
+import CreateProjectPage from './Modules/Admin/CreateProjectPage'
+import TasksAssignedPage from './Modules/Admin/TasksAssignedPage'
+import CreateTaskPage from './Modules/Admin/CreateTaskPage'
 import HolidaysPage from './Modules/Admin/HolidaysPage'
 import AnnouncementsPage from './Modules/Admin/AnnouncementsPage'
 import ReportsPage from './Modules/Admin/ReportsPage'
@@ -118,13 +134,24 @@ function AppRoutes() {
         <Route path=":companyUuid" element={<AdminLayout />}> 
           <Route path="overview" element={<OverviewPage />} />
           <Route path="users" element={<UsersPage />} />
+          <Route path="users/list" element={<UsersListPage />} />
+          <Route path="users/create" element={<CreateUserPage />} />
+          <Route path="users/import" element={<ImportUsersPage />} />
           <Route path="departments" element={<DepartmentsPage />} />
+          <Route path="departments/list" element={<DepartmentsListPage />} />
+          <Route path="departments/create" element={<CreateDepartmentPage />} />
           <Route path="designations" element={<DesignationsPage />} />
+          <Route path="designations/list" element={<DesignationsListPage />} />
+          <Route path="designations/create" element={<CreateDesignationPage />} />
           <Route path="leaves" element={<LeavesPage />} />
           <Route path="attendance" element={<AttendancePage />} />
           <Route path="payroll" element={<PayrollPage />} />
           <Route path="projects" element={<ProjectsPage />} />
+          <Route path="projects/list" element={<ProjectsListPage />} />
+          <Route path="projects/create" element={<CreateProjectPage />} />
           <Route path="tasks" element={<TasksPage />} />
+          <Route path="tasks/assigned" element={<TasksAssignedPage />} />
+          <Route path="tasks/create" element={<CreateTaskPage />} />
           <Route path="holidays" element={<HolidaysPage />} />
           <Route path="announcements" element={<AnnouncementsPage />} />
           <Route path="reports" element={<ReportsPage />} />
@@ -157,8 +184,13 @@ function AppRoutes() {
           <Route path="payroll" element={<UserPayrollPage />} />
           <Route path="team" element={<UserTeamPage />} />
           <Route path="tasks" element={<UserTasksPage />} />
+          <Route path="tasks/assigned" element={<UserTasksAssignedPage />} />
           <Route path="profile" element={<UserProfilePage />} />
+          <Route path="profile/settings" element={<UserProfileSettingsPage />} />
+          <Route path="profile/security" element={<UserProfileSecurityPage />} />
           <Route path="leaves" element={<UserLeavesPage />} />
+          <Route path="leaves/history" element={<UserLeavesHistoryPage />} />
+          <Route path="leaves/apply" element={<UserLeaveApplyPage />} />
           <Route index element={<UserOverviewPage />} />
         </Route>
       </Route>

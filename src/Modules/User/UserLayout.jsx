@@ -3,6 +3,7 @@ import SmartNavbar from '../../components/Cards/SmartNavbar'
 import SmartSidebar from '../../components/Cards/SmartSidebar'
 import { useTheme } from '../../theme/ThemeProvider'
 import { Outlet } from 'react-router-dom'
+import BreadcrumbBar from '../../components/Cards/BreadcrumbBar'
 import { useSelector } from 'react-redux'
 import { selectAuthUser, selectBasePath } from '../../Redux/Public/authSlice'
 
@@ -20,6 +21,7 @@ function LayoutShell() {
       <div className="flex flex-1 min-h-0">
         <SmartSidebar basePath={basePath} />
         <main className="flex-1 p-6 overflow-auto">
+          <BreadcrumbBar />
           <Outlet />
         </main>
       </div>

@@ -8,7 +8,7 @@ const REFRESH_SKEW_MS = 30 * 1000 // refresh 30s before expiry
 
 function persistAuth(state) {
   const {
-    accessToken, refreshToken, idToken, user, company, routes, accessTokenExpiresAt
+    accessToken, refreshToken, idToken, user, company, routes, accessTokenExpiresAt, routeTree
   } = state
   storage.session.set(persistKeys.accessToken, accessToken)
   storage.session.set(persistKeys.refreshToken, refreshToken)
@@ -16,6 +16,7 @@ function persistAuth(state) {
   storage.session.set(persistKeys.authUser, user)
   storage.session.set(persistKeys.authCompany, company)
   storage.session.set(persistKeys.authRoutes, routes)
+  storage.session.set(persistKeys.authRouteTree, routeTree)
   storage.session.set(persistKeys.tokenExpiry, accessTokenExpiresAt)
   // also local for longer persistence (optional, can tweak remember_me logic)
   storage.local.set(persistKeys.accessToken, accessToken)
@@ -24,6 +25,7 @@ function persistAuth(state) {
   storage.local.set(persistKeys.authUser, user)
   storage.local.set(persistKeys.authCompany, company)
   storage.local.set(persistKeys.authRoutes, routes)
+  storage.local.set(persistKeys.authRouteTree, routeTree)
   storage.local.set(persistKeys.tokenExpiry, accessTokenExpiresAt)
 
   storage.cookie.set('hr_access_token', accessToken, 1)
@@ -32,7 +34,7 @@ function persistAuth(state) {
 }
 
 function clearPersistedAuth() {
-  [persistKeys.accessToken, persistKeys.refreshToken, persistKeys.idToken, persistKeys.authUser, persistKeys.authCompany, persistKeys.authRoutes, persistKeys.tokenExpiry].forEach(k => {
+  [persistKeys.accessToken, persistKeys.refreshToken, persistKeys.idToken, persistKeys.authUser, persistKeys.authCompany, persistKeys.authRoutes, persistKeys.authRouteTree, persistKeys.tokenExpiry].forEach(k => {
     storage.session.remove(k)
     storage.local.remove(k)
   })
@@ -51,6 +53,7 @@ function loadPersisted() {
     user: storage.session.get(persistKeys.authUser) || storage.local.get(persistKeys.authUser),
     company: storage.session.get(persistKeys.authCompany) || storage.local.get(persistKeys.authCompany),
     routes: storage.session.get(persistKeys.authRoutes) || storage.local.get(persistKeys.authRoutes) || [],
+    routeTree: storage.session.get(persistKeys.authRouteTree) || storage.local.get(persistKeys.authRouteTree) || [],
     accessTokenExpiresAt: storage.session.get(persistKeys.tokenExpiry) || storage.local.get(persistKeys.tokenExpiry)
   }
 }
@@ -147,6 +150,36 @@ function scheduleRefresh(dispatch, expiresAt) {
 
 const persisted = loadPersisted()
 
+// Attempt to reconstruct hierarchical tree from either persisted tree or flat routes.
+function rebuildTreeFromFlat(flat = [], existingTree = []) {
+  if (existingTree && existingTree.length) return existingTree
+  if (!Array.isArray(flat) || !flat.length) return []
+  // Group by first segment as top-level; second segment (if exists) as parent; rest as children
+  const topMap = {}
+  flat.forEach(r => {
+    if (!r?.path) return
+    const segs = r.path.split('/').filter(Boolean)
+    if (!segs.length) return
+    const topSeg = segs[0]
+    if (!topMap[topSeg]) topMap[topSeg] = { label: topSeg, path: `/${topSeg}`, children: [] }
+    if (segs.length === 1) return // top-level only
+    // Build parent path (first two segments) for depth>=2; children depth>2 attach under that parent
+    if (segs.length === 2) {
+      // treat second segment route as direct child of top segment
+      topMap[topSeg].children.push({ label: r.label || segs[1], path: r.path, children: [] })
+    } else if (segs.length > 2) {
+      const parentPath = '/' + segs.slice(0, 2).join('/')
+      let parentNode = topMap[topSeg].children.find(c => c.path === parentPath)
+      if (!parentNode) {
+        parentNode = { label: segs[1], path: parentPath, children: [] }
+        topMap[topSeg].children.push(parentNode)
+      }
+      parentNode.children.push({ label: r.label || segs[segs.length - 1], path: r.path, children: [] })
+    }
+  })
+  return Object.values(topMap)
+}
+
 const initialState = {
   status: 'idle', // overall login status
   error: null,
@@ -160,6 +193,7 @@ const initialState = {
   user: persisted?.user || null,
   company: persisted?.company || null,
   routes: persisted?.routes || [],
+  routeTree: rebuildTreeFromFlat(persisted?.routes, persisted?.routeTree) || [],
   version: nanoid(6),
   derivedBasePath: ''
 }
@@ -249,6 +283,7 @@ const authSlice = createSlice({
   },
   extraReducers: builder => {
     builder
+      /* LOGIN WITH PASSWORD (AUTH CODE STEP) */
       .addCase(loginWithPassword.pending, (state) => {
         state.status = 'loading'
         state.step = 'logging-in'
@@ -259,21 +294,15 @@ const authSlice = createSlice({
         state.step = 'code-obtained'
         state.authorizationCode = action.payload.authorizationCode
         state.redirectUrl = action.payload.redirectUrl
-        // keep preliminary user/company if desired
         state.user = action.payload.user || state.user
         state.company = action.payload.company || state.company
-        // eslint-disable-next-line no-console
-        console.debug('[auth] loginWithPassword.fulfilled', {
-          authorizationCode: state.authorizationCode,
-          redirectUrl: state.redirectUrl,
-          user: state.user?.role,
-          company: state.company?.id
-        })
       })
       .addCase(loginWithPassword.rejected, (state, action) => {
         state.status = 'failed'
         state.error = action.payload?.message || 'Login failed'
       })
+
+      /* TOKEN EXCHANGE */
       .addCase(exchangeToken.pending, (state) => {
         state.status = 'loading'
         state.step = 'exchanging'
@@ -287,32 +316,72 @@ const authSlice = createSlice({
         state.idToken = action.payload.id_token
         state.user = action.payload.user || state.user
         state.company = action.payload.company || state.company
-        state.routes = action.payload.routes || []
+
+        // Build hierarchical routeTree from routes (and support legacy roleRoutes if present)
+        let sourceRoutes = action.payload.routes || []
+        if ((!sourceRoutes.length) && action.payload.roleRoutes) {
+          const rr = action.payload.roleRoutes
+          if (Array.isArray(rr.Admin)) sourceRoutes = rr.Admin
+          else if (Array.isArray(rr.adminTree)) sourceRoutes = rr.adminTree
+          else if (Array.isArray(rr.admin)) sourceRoutes = rr.admin
+        }
+
+        const normalizeRoute = (node) => {
+          if (!node) return null
+          const cleanPath = (node.path || '').replace(/\/$/, '')
+          return {
+            label: node.label || cleanPath.split('/').pop() || 'item',
+            path: cleanPath ? (cleanPath.startsWith('/') ? cleanPath : `/${cleanPath}`) : '',
+            url: node.url || null,
+            icon: node.icon || null,
+            children: Array.isArray(node.children) ? node.children.map(ch => normalizeRoute(ch)).filter(Boolean) : []
+          }
+        }
+        const routeTree = sourceRoutes.map(normalizeRoute).filter(Boolean)
+        const flat = []
+        const collect = (n) => { flat.push({ label: n.label, path: n.path, url: n.url, icon: n.icon }); n.children.forEach(collect) }
+        routeTree.forEach(collect)
+        state.routeTree = routeTree
+        state.routes = flat
+
         state.accessTokenExpiresAt = Date.now() + (action.payload.expires_in * 1000)
         state.derivedBasePath = computeBasePath(state.user, state.company, state.routes)
         persistAuth(state)
-        // eslint-disable-next-line no-console
-        console.debug('[auth] exchangeToken.fulfilled', {
-          basePath: state.derivedBasePath,
-          userRole: state.user?.role,
-          companyId: state.company?.id,
-          routes: state.routes?.map(r => r.path)
-        })
       })
       .addCase(exchangeToken.rejected, (state, action) => {
         state.status = 'failed'
         state.error = action.payload?.message || 'Token exchange failed'
       })
+
+      /* REFRESH TOKEN */
       .addCase(refreshAccessToken.fulfilled, (state, action) => {
         state.accessToken = action.payload.access_token
         state.refreshToken = action.payload.refresh_token || state.refreshToken
         state.idToken = action.payload.id_token || state.idToken
-        state.routes = action.payload.routes || state.routes
+        if (action.payload.routes && action.payload.routes.length) {
+          const normalizeRoute = (node) => {
+            if (!node) return null
+            const cleanPath = (node.path || '').replace(/\/$/, '')
+            return {
+              label: node.label || cleanPath.split('/').pop() || 'item',
+              path: cleanPath ? (cleanPath.startsWith('/') ? cleanPath : `/${cleanPath}`) : '',
+              url: node.url || null,
+              icon: node.icon || null,
+              children: Array.isArray(node.children) ? node.children.map(ch => normalizeRoute(ch)).filter(Boolean) : []
+            }
+          }
+          const tree = action.payload.routes.map(normalizeRoute).filter(Boolean)
+          const flat = []
+          const collect = (n) => { flat.push({ label: n.label, path: n.path, url: n.url, icon: n.icon }); n.children.forEach(collect) }
+          tree.forEach(collect)
+          state.routeTree = tree
+          state.routes = flat
+        }
         state.accessTokenExpiresAt = Date.now() + (action.payload.expires_in * 1000)
+        state.derivedBasePath = computeBasePath(state.user, state.company, state.routes)
         persistAuth(state)
       })
       .addCase(refreshAccessToken.rejected, (state, action) => {
-        // on refresh failure, force logout
         state.error = action.payload?.message || 'Session expired'
         clearPersistedAuth()
         state.accessToken = null
@@ -322,7 +391,8 @@ const authSlice = createSlice({
         state.step = 'init'
         state.status = 'idle'
       })
-      // PLATFORM LOGIN
+
+      /* PLATFORM LOGIN */
       .addCase(platformLogin.pending, (state) => {
         state.status = 'loading'
         state.error = null
@@ -334,8 +404,24 @@ const authSlice = createSlice({
         state.refreshToken = action.payload.refresh_token
         state.idToken = action.payload.id_token
         state.user = action.payload.user
-        state.company = action.payload.company // may remain null
-        state.routes = action.payload.routes || []
+        state.company = action.payload.company
+        const normalizeRoute = (node) => {
+          if (!node) return null
+          const cleanPath = (node.path || '').replace(/\/$/, '')
+          return {
+            label: node.label || cleanPath.split('/').pop() || 'item',
+            path: cleanPath ? (cleanPath.startsWith('/') ? cleanPath : `/${cleanPath}`) : '',
+            url: node.url || null,
+            icon: node.icon || null,
+            children: Array.isArray(node.children) ? node.children.map(ch => normalizeRoute(ch)).filter(Boolean) : []
+          }
+        }
+        const routeTree = (action.payload.routes || []).map(normalizeRoute).filter(Boolean)
+        const flat = []
+        const collect = (r) => { flat.push({ label: r.label, path: r.path, url: r.url, icon: r.icon }); r.children.forEach(collect) }
+        routeTree.forEach(collect)
+        state.routeTree = routeTree
+        state.routes = flat
         state.accessTokenExpiresAt = Date.now() + (action.payload.expires_in * 1000)
         state.derivedBasePath = computeBasePath(state.user, state.company, state.routes)
         persistAuth(state)
@@ -353,7 +439,9 @@ export const { logout } = authSlice.actions
 export const selectAuthState = s => s.auth
 export const selectIsAuthenticated = s => !!s.auth.accessToken
 export const selectAuthUser = s => s.auth.user
+export const selectAuthCompany = s => s.auth.company
 export const selectAuthRoutes = s => s.auth.routes || []
+export const selectAuthRouteTree = s => s.auth.routeTree || []
 export const selectAccessToken = s => s.auth.accessToken
 export const selectBasePath = s => s.auth.derivedBasePath || computeBasePath(s.auth.user, s.auth.company, s.auth.routes)
 

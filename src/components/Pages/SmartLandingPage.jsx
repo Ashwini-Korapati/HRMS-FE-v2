@@ -6,6 +6,7 @@ import { selectBasePath, selectIsAuthenticated } from '../../Redux/Public/authSl
 import { useDispatch, useSelector } from 'react-redux'
 import { fetchPlans, selectPlans, selectPlanStatus, selectPlansState } from '../../Redux/Public/plansSlice'
 import { Check, X, Users, Briefcase, Clock, BarChart3, ShieldCheck, Settings, ArrowRight, Building2, Globe, Github, Twitter, Linkedin } from "lucide-react"
+import MultiStepSubscriptionForm from "../Forms/MultiStepSubscriptionForm"
 
 
 function formatPrice(p, currency) {
@@ -53,7 +54,7 @@ const footerLinks = {
 	legal: ["Privacy", "Terms", "DPA", "Cookies"],
 }
 
-function PlanCard({ plan, delay = 0 }) {
+function PlanCard({ plan, delay = 0, onSelect }) {
 	const modules = plan.features?.modules || {}
 	const limits = plan.features?.limits || {}
 	const support = plan.features?.support || {}
@@ -97,6 +98,7 @@ function PlanCard({ plan, delay = 0 }) {
 			</div>
 			<div className="pt-2">
 				<button
+					onClick={() => onSelect?.(plan)}
 					className="w-full inline-flex items-center justify-center rounded-xl px-4 py-2 text-sm font-medium text-white bg-gradient-to-r from-orange-500 via-rose-500 to-fuchsia-600 hover:from-orange-400 hover:via-rose-400 hover:to-fuchsia-500 transition-all shadow hover:shadow-lg active:scale-[0.97]"
 				>
 					{plan.price === 0 ? "Start Trial" : "Get Started"}
@@ -108,6 +110,8 @@ function PlanCard({ plan, delay = 0 }) {
 
 export default function SmartLandingPage() {
 	const [view, setView] = useState("home")
+	const [showSubscription, setShowSubscription] = useState(false)
+	const [selectedPlan, setSelectedPlan] = useState(null)
 	// Removed modal-based login; we route to /login instead
 	const dispatch = useDispatch()
 	const plans = useSelector(selectPlans)
@@ -398,7 +402,12 @@ export default function SmartLandingPage() {
 								<div className="col-span-full text-sm text-neutral-300">No plans available.</div>
 							)}
 							{plans.map((p, i) => (
-								<PlanCard key={p.id} plan={p} delay={i * 80} />
+								<PlanCard
+									key={p.id}
+									plan={p}
+									delay={i * 80}
+									onSelect={(plan) => { setSelectedPlan(plan); setShowSubscription(true) }}
+								/>
 							))}
 						</div>
 						{status === 'succeeded' && cacheSource === 'cache' && (
@@ -407,6 +416,13 @@ export default function SmartLandingPage() {
 					</>
 				)}
 			</section>
+
+						{showSubscription && (
+							<MultiStepSubscriptionForm
+								plan={selectedPlan}
+								onClose={() => setShowSubscription(false)}
+							/>
+						)}
 
 			{/* Footer */}
 			<footer className="relative z-10 border-t border-white/10 py-16 text-[12px] text-neutral-400">

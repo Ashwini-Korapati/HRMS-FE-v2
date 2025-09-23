@@ -143,6 +143,7 @@ export function httpGetService(url, options = {}) {
     })
 }
 
+
 export function httpPatchService(url, data, options = {}) {
   const apiURL = `${serverURL}/${url}`
   const headers = injectAuthHeader({ "Content-Type": "application/json", ...options.headers })

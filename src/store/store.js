@@ -4,6 +4,8 @@ import authChallengeReducer from '../Redux/Public/authChallengeSlice'
 import projectsReducer from '../Redux/Public/projectsSlice'
 import authReducer, { authSubscribe, initAuthScheduling } from '../Redux/Public/authSlice'
 import themeReducer from '../Redux/Public/themeSlice'
+import departmentReducer from '../Redux/Public/departmentSlice'
+import designationReducer from '../Redux/Public/designationSlice'
 import { attachAuthStore } from '../auth/auth'
 import { attachStore } from '../config/httphandler'
 
@@ -33,6 +35,9 @@ export const store = configureStore({
   auth: authReducer,
   theme: themeReducer,
   projects: projectsReducer,
+  departments: departmentReducer,
+  designations: designationReducer, // Add this line
+
   },
   middleware: getDefault => getDefault({ serializableCheck: false }).concat(actionLogger, errorReporter)
 })

@@ -7,7 +7,7 @@ import { useNavigate } from 'react-router-dom'
 const makeDefaultData = (planId) => ({
   company: {
     name: 'Innovex Inc',
-    email: 'krishnacancan143@gmail.com',
+    email: 'korapatiashwini@gmail.com',
     phone: '9966714320',
     address: '100 Main St, City, Country',
     website: 'https://innovexinc.example',
@@ -19,9 +19,9 @@ const makeDefaultData = (planId) => ({
   admin: {
     firstName: 'harish',
     lastName: 'M',
-    email: 'krishnacancan143@gmail.com',
+    email: 'korapatiashwini@gmail.com',
     phone: '9966714320',
-    password: 'Str0ngP@ssw0rd!',
+    password: 'Domain@123',
     dateOfBirth: '1990-01-01',
     gender: 'MALE'
   },

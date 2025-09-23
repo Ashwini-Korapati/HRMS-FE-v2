@@ -21,7 +21,7 @@ const makeDefaultData = (planId) => ({
     lastName: 'M',
     email: 'korapatiashwini@gmail.com',
     phone: '9966714320',
-    password: 'Domain@123',
+    password: 'Admin@123',
     dateOfBirth: '1990-01-01',
     gender: 'MALE'
   },

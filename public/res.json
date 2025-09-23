@@ -1,0 +1,517 @@
+{
+    "success": true,
+    "message": "Token exchange successful",
+    "data": {
+        "access_token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiJiMTE4OTk2Ni0zMTk3LTQxMzUtOTA1ZC1kNTg5Mzg2MWY3NjciLCJlbWFpbCI6ImtyaXNobmFjYW5jYW4xNDNAZ21haWwuY29tIiwicm9sZSI6IkFETUlOIiwiY29tcGFueUlkIjoiZWJiYjhiN2ItNzZkMy00N2E4LWI4NTgtMWNhNjYyMTk5MWZmIiwic3ViZG9tYWluIjoiaW5ub3ZleCIsImlhdCI6MTc1ODM3MzQ5NSwiZXhwIjoxNzU4Mzc3MDk1fQ.xhFLwGgOiVJHS5z9aB2vyKAJ5aFTErwx7rsJUjv2wfk",
+        "refresh_token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiJiMTE4OTk2Ni0zMTk3LTQxMzUtOTA1ZC1kNTg5Mzg2MWY3NjciLCJjb21wYW55SWQiOiJlYmJiOGI3Yi03NmQzLTQ3YTgtYjg1OC0xY2E2NjIxOTkxZmYiLCJpYXQiOjE3NTgzNzM0OTUsImV4cCI6MTc1ODk3ODI5NX0.jknDQ31MW7ZjEObFnBNL--ze4VAYeg9SgSr3ojWY504",
+        "id_token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJiMTE4OTk2Ni0zMTk3LTQxMzUtOTA1ZC1kNTg5Mzg2MWY3NjciLCJlbWFpbCI6ImtyaXNobmFjYW5jYW4xNDNAZ21haWwuY29tIiwibmFtZSI6ImhhcmlzaCBNIiwiY29tcGFueSI6Iklubm92ZXggSW5jIiwicm9sZSI6IkFETUlOIiwiaXNzIjoiaHR0cHM6Ly9ocm9mZmljZS5jb20iLCJhdWQiOiJocm9mZmljZS1hcHAiLCJpYXQiOjE3NTgzNzM0OTUsImV4cCI6MTc1ODM3NzA5NX0.QXEJCUoWg51ORaqOrXm5rBIJYRhhJni99BftQOIz2v8",
+        "token_type": "Bearer",
+        "expires_in": 3600,
+        "scope": "openid profile email",
+        "routes": [
+            {
+                "label": "Dashboard",
+                "path": "/overview",
+                "icon": "LayoutDashboard",
+                "url": "http://localhost:3000/ebbb8b7b-76d3-47a8-b858-1ca6621991ff/overview",
+                "children": [],
+                "id": "8dd12da1-b166-46ba-b241-2d18c70debfb",
+                "role": "ADMIN",
+                "type": "USER",
+                "breadcrumb": [
+                    {
+                        "label": "Dashboard",
+                        "path": "/overview",
+                        "url": "http://localhost:3000/ebbb8b7b-76d3-47a8-b858-1ca6621991ff/overview"
+                    }
+                ]
+            },
+            {
+                "label": "Employees",
+                "path": "/users",
+                "icon": "Users",
+                "url": "http://localhost:3000/ebbb8b7b-76d3-47a8-b858-1ca6621991ff/users",
+                "children": [
+                    {
+                        "label": "List Users",
+                        "path": "/users/list",
+                        "url": "http://localhost:3000/ebbb8b7b-76d3-47a8-b858-1ca6621991ff/users/list",
+                        "priority": 0,
+                        "children": [],
+                        "id": "14aabc45-fd46-4a1a-8519-dc8fcc43cba2",
+                        "role": "ADMIN",
+                        "type": "USER",
+                        "breadcrumb": [
+                            {
+                                "label": "Employees",
+                                "path": "/users",
+                                "url": "http://localhost:3000/ebbb8b7b-76d3-47a8-b858-1ca6621991ff/users"
+                            },
+                            {
+                                "label": "List Users",
+                                "path": "/users/list",
+                                "url": "http://localhost:3000/ebbb8b7b-76d3-47a8-b858-1ca6621991ff/users/list"
+                            }
+                        ]
+                    },
+                    {
+                        "label": "Create User",
+                        "path": "/users/create",
+                        "url": "http://localhost:3000/ebbb8b7b-76d3-47a8-b858-1ca6621991ff/users/create",
+                        "priority": 1,
+                        "children": [],
+                        "id": "815d24d0-97aa-4d8b-9448-48b4bc2ce100",
+                        "role": "ADMIN",
+                        "type": "USER",
+                        "breadcrumb": [
+                            {
+                                "label": "Employees",
+                                "path": "/users",
+                                "url": "http://localhost:3000/ebbb8b7b-76d3-47a8-b858-1ca6621991ff/users"
+                            },
+                            {
+                                "label": "Create User",
+                                "path": "/users/create",
+                                "url": "http://localhost:3000/ebbb8b7b-76d3-47a8-b858-1ca6621991ff/users/create"
+                            }
+                        ]
+                    },
+                    {
+                        "label": "Import Users",
+                        "path": "/users/import",
+                        "url": "http://localhost:3000/ebbb8b7b-76d3-47a8-b858-1ca6621991ff/users/import",
+                        "priority": 2,
+                        "children": [],
+                        "id": "080187d1-a5e8-46df-901f-062d8d8f15f5",
+                        "role": "ADMIN",
+                        "type": "USER",
+                        "breadcrumb": [
+                            {
+                                "label": "Employees",
+                                "path": "/users",
+                                "url": "http://localhost:3000/ebbb8b7b-76d3-47a8-b858-1ca6621991ff/users"
+                            },
+                            {
+                                "label": "Import Users",
+                                "path": "/users/import",
+                                "url": "http://localhost:3000/ebbb8b7b-76d3-47a8-b858-1ca6621991ff/users/import"
+                            }
+                        ]
+                    }
+                ],
+                "id": "7c251c3d-bffb-48bf-8efe-abd1442bb4b0",
+                "role": "ADMIN",
+                "type": "USER",
+                "breadcrumb": [
+                    {
+                        "label": "Employees",
+                        "path": "/users",
+                        "url": "http://localhost:3000/ebbb8b7b-76d3-47a8-b858-1ca6621991ff/users"
+                    }
+                ]
+            },
+            {
+                "label": "Departments",
+                "path": "/departments",
+                "icon": "Building2",
+                "url": "http://localhost:3000/ebbb8b7b-76d3-47a8-b858-1ca6621991ff/departments",
+                "children": [
+                    {
+                        "label": "List Departments",
+                        "path": "/departments/list",
+                        "url": "http://localhost:3000/ebbb8b7b-76d3-47a8-b858-1ca6621991ff/departments/list",
+                        "priority": 0,
+                        "children": [],
+                        "id": "5197ff96-a928-478d-b22f-97fe067164d1",
+                        "role": "ADMIN",
+                        "type": "USER",
+                        "breadcrumb": [
+                            {
+                                "label": "Departments",
+                                "path": "/departments",
+                                "url": "http://localhost:3000/ebbb8b7b-76d3-47a8-b858-1ca6621991ff/departments"
+                            },
+                            {
+                                "label": "List Departments",
+                                "path": "/departments/list",
+                                "url": "http://localhost:3000/ebbb8b7b-76d3-47a8-b858-1ca6621991ff/departments/list"
+                            }
+                        ]
+                    },
+                    {
+                        "label": "Create Department",
+                        "path": "/departments/create",
+                        "url": "http://localhost:3000/ebbb8b7b-76d3-47a8-b858-1ca6621991ff/departments/create",
+                        "priority": 1,
+                        "children": [],
+                        "id": "66831aca-f531-491d-a36f-1add69d050e2",
+                        "role": "ADMIN",
+                        "type": "USER",
+                        "breadcrumb": [
+                            {
+                                "label": "Departments",
+                                "path": "/departments",
+                                "url": "http://localhost:3000/ebbb8b7b-76d3-47a8-b858-1ca6621991ff/departments"
+                            },
+                            {
+                                "label": "Create Department",
+                                "path": "/departments/create",
+                                "url": "http://localhost:3000/ebbb8b7b-76d3-47a8-b858-1ca6621991ff/departments/create"
+                            }
+                        ]
+                    }
+                ],
+                "id": "34192552-631b-41e7-9395-1850d67f1331",
+                "role": "ADMIN",
+                "type": "USER",
+                "breadcrumb": [
+                    {
+                        "label": "Departments",
+                        "path": "/departments",
+                        "url": "http://localhost:3000/ebbb8b7b-76d3-47a8-b858-1ca6621991ff/departments"
+                    }
+                ]
+            },
+            {
+                "label": "Designations",
+                "path": "/designations",
+                "icon": "Briefcase",
+                "url": "http://localhost:3000/ebbb8b7b-76d3-47a8-b858-1ca6621991ff/designations",
+                "children": [
+                    {
+                        "label": "List Designations",
+                        "path": "/designations/list",
+                        "url": "http://localhost:3000/ebbb8b7b-76d3-47a8-b858-1ca6621991ff/designations/list",
+                        "priority": 0,
+                        "children": [],
+                        "id": "91dcfe32-126f-4468-951f-da6a3f1e9be5",
+                        "role": "ADMIN",
+                        "type": "USER",
+                        "breadcrumb": [
+                            {
+                                "label": "Designations",
+                                "path": "/designations",
+                                "url": "http://localhost:3000/ebbb8b7b-76d3-47a8-b858-1ca6621991ff/designations"
+                            },
+                            {
+                                "label": "List Designations",
+                                "path": "/designations/list",
+                                "url": "http://localhost:3000/ebbb8b7b-76d3-47a8-b858-1ca6621991ff/designations/list"
+                            }
+                        ]
+                    },
+                    {
+                        "label": "Create Designation",
+                        "path": "/designations/create",
+                        "url": "http://localhost:3000/ebbb8b7b-76d3-47a8-b858-1ca6621991ff/designations/create",
+                        "priority": 1,
+                        "children": [],
+                        "id": "0cb815a2-f45d-4f41-be94-539a8dcb1e02",
+                        "role": "ADMIN",
+                        "type": "USER",
+                        "breadcrumb": [
+                            {
+                                "label": "Designations",
+                                "path": "/designations",
+                                "url": "http://localhost:3000/ebbb8b7b-76d3-47a8-b858-1ca6621991ff/designations"
+                            },
+                            {
+                                "label": "Create Designation",
+                                "path": "/designations/create",
+                                "url": "http://localhost:3000/ebbb8b7b-76d3-47a8-b858-1ca6621991ff/designations/create"
+                            }
+                        ]
+                    }
+                ],
+                "id": "f4eb98e4-573a-4c5b-87f6-ab593cbae05f",
+                "role": "ADMIN",
+                "type": "USER",
+                "breadcrumb": [
+                    {
+                        "label": "Designations",
+                        "path": "/designations",
+                        "url": "http://localhost:3000/ebbb8b7b-76d3-47a8-b858-1ca6621991ff/designations"
+                    }
+                ]
+            },
+            {
+                "label": "Leaves",
+                "path": "/leaves",
+                "icon": "Calendar",
+                "url": "http://localhost:3000/ebbb8b7b-76d3-47a8-b858-1ca6621991ff/leaves",
+                "children": [],
+                "id": "6cab76ef-1422-43fc-9784-8cfa1f5dae40",
+                "role": "ADMIN",
+                "type": "USER",
+                "breadcrumb": [
+                    {
+                        "label": "Leaves",
+                        "path": "/leaves",
+                        "url": "http://localhost:3000/ebbb8b7b-76d3-47a8-b858-1ca6621991ff/leaves"
+                    }
+                ]
+            },
+            {
+                "label": "Attendance",
+                "path": "/attendance",
+                "icon": "Clock",
+                "url": "http://localhost:3000/ebbb8b7b-76d3-47a8-b858-1ca6621991ff/attendance",
+                "children": [],
+                "id": "7ee64855-7d04-489d-b56d-31ac62bee4c3",
+                "role": "ADMIN",
+                "type": "USER",
+                "breadcrumb": [
+                    {
+                        "label": "Attendance",
+                        "path": "/attendance",
+                        "url": "http://localhost:3000/ebbb8b7b-76d3-47a8-b858-1ca6621991ff/attendance"
+                    }
+                ]
+            },
+            {
+                "label": "Payroll",
+                "path": "/payroll",
+                "icon": "DollarSign",
+                "url": "http://localhost:3000/ebbb8b7b-76d3-47a8-b858-1ca6621991ff/payroll",
+                "children": [],
+                "id": "4ef88a8f-0af3-4f36-9159-115765750784",
+                "role": "ADMIN",
+                "type": "USER",
+                "breadcrumb": [
+                    {
+                        "label": "Payroll",
+                        "path": "/payroll",
+                        "url": "http://localhost:3000/ebbb8b7b-76d3-47a8-b858-1ca6621991ff/payroll"
+                    }
+                ]
+            },
+            {
+                "label": "Projects",
+                "path": "/projects",
+                "icon": "FolderOpen",
+                "url": "http://localhost:3000/ebbb8b7b-76d3-47a8-b858-1ca6621991ff/projects",
+                "children": [
+                    {
+                        "label": "Project List",
+                        "path": "/projects/list",
+                        "url": "http://localhost:3000/ebbb8b7b-76d3-47a8-b858-1ca6621991ff/projects/list",
+                        "priority": 0,
+                        "children": [],
+                        "id": "03b6916e-188e-45c9-813c-84e4cb358407",
+                        "role": "ADMIN",
+                        "type": "USER",
+                        "breadcrumb": [
+                            {
+                                "label": "Projects",
+                                "path": "/projects",
+                                "url": "http://localhost:3000/ebbb8b7b-76d3-47a8-b858-1ca6621991ff/projects"
+                            },
+                            {
+                                "label": "Project List",
+                                "path": "/projects/list",
+                                "url": "http://localhost:3000/ebbb8b7b-76d3-47a8-b858-1ca6621991ff/projects/list"
+                            }
+                        ]
+                    },
+                    {
+                        "label": "Create Project",
+                        "path": "/projects/create",
+                        "url": "http://localhost:3000/ebbb8b7b-76d3-47a8-b858-1ca6621991ff/projects/create",
+                        "priority": 1,
+                        "children": [],
+                        "id": "559b2a9c-5be9-43b2-8e4a-5e00cadb3cef",
+                        "role": "ADMIN",
+                        "type": "USER",
+                        "breadcrumb": [
+                            {
+                                "label": "Projects",
+                                "path": "/projects",
+                                "url": "http://localhost:3000/ebbb8b7b-76d3-47a8-b858-1ca6621991ff/projects"
+                            },
+                            {
+                                "label": "Create Project",
+                                "path": "/projects/create",
+                                "url": "http://localhost:3000/ebbb8b7b-76d3-47a8-b858-1ca6621991ff/projects/create"
+                            }
+                        ]
+                    }
+                ],
+                "id": "f9495426-739c-48ca-91cc-eb6634e2dfba",
+                "role": "ADMIN",
+                "type": "USER",
+                "breadcrumb": [
+                    {
+                        "label": "Projects",
+                        "path": "/projects",
+                        "url": "http://localhost:3000/ebbb8b7b-76d3-47a8-b858-1ca6621991ff/projects"
+                    }
+                ]
+            },
+            {
+                "label": "Tasks",
+                "path": "/tasks",
+                "icon": "CheckSquare",
+                "url": "http://localhost:3000/ebbb8b7b-76d3-47a8-b858-1ca6621991ff/tasks",
+                "children": [
+                    {
+                        "label": "Assigned Tasks",
+                        "path": "/tasks/assigned",
+                        "url": "http://localhost:3000/ebbb8b7b-76d3-47a8-b858-1ca6621991ff/tasks/assigned",
+                        "priority": 0,
+                        "children": [],
+                        "id": "44ba86e0-1371-46c8-8af5-d790b7a7851c",
+                        "role": "ADMIN",
+                        "type": "USER",
+                        "breadcrumb": [
+                            {
+                                "label": "Tasks",
+                                "path": "/tasks",
+                                "url": "http://localhost:3000/ebbb8b7b-76d3-47a8-b858-1ca6621991ff/tasks"
+                            },
+                            {
+                                "label": "Assigned Tasks",
+                                "path": "/tasks/assigned",
+                                "url": "http://localhost:3000/ebbb8b7b-76d3-47a8-b858-1ca6621991ff/tasks/assigned"
+                            }
+                        ]
+                    },
+                    {
+                        "label": "Completed Tasks",
+                        "path": "/tasks/completed",
+                        "url": "http://localhost:3000/ebbb8b7b-76d3-47a8-b858-1ca6621991ff/tasks/completed",
+                        "priority": 1,
+                        "children": [],
+                        "id": "943be716-a6b7-4841-affb-823883cf07df",
+                        "role": "ADMIN",
+                        "type": "USER",
+                        "breadcrumb": [
+                            {
+                                "label": "Tasks",
+                                "path": "/tasks",
+                                "url": "http://localhost:3000/ebbb8b7b-76d3-47a8-b858-1ca6621991ff/tasks"
+                            },
+                            {
+                                "label": "Completed Tasks",
+                                "path": "/tasks/completed",
+                                "url": "http://localhost:3000/ebbb8b7b-76d3-47a8-b858-1ca6621991ff/tasks/completed"
+                            }
+                        ]
+                    },
+                    {
+                        "label": "Create Task",
+                        "path": "/tasks/create",
+                        "url": "http://localhost:3000/ebbb8b7b-76d3-47a8-b858-1ca6621991ff/tasks/create",
+                        "priority": 2,
+                        "children": [],
+                        "id": "7e1dbd02-1d67-47ca-acc4-53d322e2b9bd",
+                        "role": "ADMIN",
+                        "type": "USER",
+                        "breadcrumb": [
+                            {
+                                "label": "Tasks",
+                                "path": "/tasks",
+                                "url": "http://localhost:3000/ebbb8b7b-76d3-47a8-b858-1ca6621991ff/tasks"
+                            },
+                            {
+                                "label": "Create Task",
+                                "path": "/tasks/create",
+                                "url": "http://localhost:3000/ebbb8b7b-76d3-47a8-b858-1ca6621991ff/tasks/create"
+                            }
+                        ]
+                    }
+                ],
+                "id": "55a2c9b7-c371-4dee-a220-b78f3a38b82f",
+                "role": "ADMIN",
+                "type": "USER",
+                "breadcrumb": [
+                    {
+                        "label": "Tasks",
+                        "path": "/tasks",
+                        "url": "http://localhost:3000/ebbb8b7b-76d3-47a8-b858-1ca6621991ff/tasks"
+                    }
+                ]
+            },
+            {
+                "label": "Holidays",
+                "path": "/holidays",
+                "icon": "CalendarDays",
+                "url": "http://localhost:3000/ebbb8b7b-76d3-47a8-b858-1ca6621991ff/holidays",
+                "children": [],
+                "id": "5c5e267c-8897-4d8f-a2ac-0da634585fb0",
+                "role": "ADMIN",
+                "type": "USER",
+                "breadcrumb": [
+                    {
+                        "label": "Holidays",
+                        "path": "/holidays",
+                        "url": "http://localhost:3000/ebbb8b7b-76d3-47a8-b858-1ca6621991ff/holidays"
+                    }
+                ]
+            },
+            {
+                "label": "Announcements",
+                "path": "/announcements",
+                "icon": "Megaphone",
+                "url": "http://localhost:3000/ebbb8b7b-76d3-47a8-b858-1ca6621991ff/announcements",
+                "children": [],
+                "id": "8d634735-7104-4875-a407-92a6d5dbb390",
+                "role": "ADMIN",
+                "type": "USER",
+                "breadcrumb": [
+                    {
+                        "label": "Announcements",
+                        "path": "/announcements",
+                        "url": "http://localhost:3000/ebbb8b7b-76d3-47a8-b858-1ca6621991ff/announcements"
+                    }
+                ]
+            },
+            {
+                "label": "Reports",
+                "path": "/reports",
+                "icon": "FileText",
+                "url": "http://localhost:3000/ebbb8b7b-76d3-47a8-b858-1ca6621991ff/reports",
+                "children": [],
+                "id": "4e21ea68-c541-48bb-91b1-b1554d1bfed8",
+                "role": "ADMIN",
+                "type": "USER",
+                "breadcrumb": [
+                    {
+                        "label": "Reports",
+                        "path": "/reports",
+                        "url": "http://localhost:3000/ebbb8b7b-76d3-47a8-b858-1ca6621991ff/reports"
+                    }
+                ]
+            },
+            {
+                "label": "Analytics",
+                "path": "/analytics",
+                "icon": "BarChart3",
+                "url": "http://localhost:3000/ebbb8b7b-76d3-47a8-b858-1ca6621991ff/analytics",
+                "children": [],
+                "id": "619e0361-daa3-4725-bdfb-87987b5279f9",
+                "role": "ADMIN",
+                "type": "USER",
+                "breadcrumb": [
+                    {
+                        "label": "Analytics",
+                        "path": "/analytics",
+                        "url": "http://localhost:3000/ebbb8b7b-76d3-47a8-b858-1ca6621991ff/analytics"
+                    }
+                ]
+            }
+        ],
+        "projectFolderRoutes": [],
+        "user": {
+            "id": "b1189966-3197-4135-905d-d5893861f767",
+            "email": "krishnacancan143@gmail.com",
+            "role": "ADMIN",
+            "name": "harish M"
+        },
+        "company": {
+            "id": "ebbb8b7b-76d3-47a8-b858-1ca6621991ff",
+            "name": "Innovex Inc",
+            "subdomain": "innovex"
+        }
+    },
+    "timestamp": "2025-09-20T13:04:55.748Z"
+}

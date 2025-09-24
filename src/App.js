@@ -51,6 +51,7 @@ import DesignationsListPage from "./Modules/Admin/DesignationsListPage";
 import CreateDesignationPage from "./Modules/Admin/CreateDesignationPage";
 import ProjectsListPage from "./Modules/Admin/ProjectsListPage";
 import CreateProjectPage from "./Modules/Admin/CreateProjectPage";
+import AdminAddProjectMember from "./Modules/Admin/AdminAddProjectMember";
 import TasksAssignedPage from "./Modules/Admin/TasksAssignedPage";
 import CreateTaskPage from "./Modules/Admin/CreateTaskPage";
 import HolidaysPage from "./Modules/Admin/HolidaysPage";
@@ -198,6 +199,8 @@ function AppRoutes() {
           <Route path="projects" element={<ProjectsPage />} />
           <Route path="projects/list" element={<ProjectsListPage />} />
           <Route path="projects/create" element={<CreateProjectPage />} />
+          <Route path="projects/add-member" element={<AdminAddProjectMember />} />
+          <Route path="projects/add-member/:projectId" element={<AdminAddProjectMember />} />
           <Route path="tasks" element={<TasksPage />} />
           <Route path="tasks/assigned" element={<TasksAssignedPage />} />
           <Route path="tasks/create" element={<CreateTaskPage />} />

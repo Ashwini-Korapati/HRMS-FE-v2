@@ -193,7 +193,37 @@ const projectsSlice = createSlice({
         const payload = action.payload || {}
         const pag = payload.pagination || null
         const list = payload.items || payload.projects || payload || []
-        state.items = Array.isArray(list) ? list : Array.isArray(list?.items) ? list.items : []
+        const rawItems = Array.isArray(list) ? list : Array.isArray(list?.items) ? list.items : []
+        // Derive folderCounts when absent using folderTree
+        state.items = rawItems.map(p => {
+          if (!p || p.folderCounts || !Array.isArray(p.folderTree)) return p
+          const roots = p.folderTree.filter(f => !f.parentId)
+          const total = p.folderTree.length
+            // Calculate depth via DFS
+          const childrenMap = new Map()
+          p.folderTree.forEach(f => {
+            if (f.parentId) {
+              if (!childrenMap.has(f.parentId)) childrenMap.set(f.parentId, [])
+              childrenMap.get(f.parentId).push(f)
+            }
+          })
+          let maxDepth = 0
+          function dfs(node, depth){
+            if (depth > maxDepth) maxDepth = depth
+            const kids = childrenMap.get(node.id) || []
+            kids.forEach(k => dfs(k, depth+1))
+          }
+          roots.forEach(r => dfs(r, 1))
+          return {
+            ...p,
+            folderCounts: {
+              total,
+              root: roots.length,
+              subfolders: total - roots.length,
+              depth: maxDepth || (total ? 1 : 0)
+            }
+          }
+        })
         state.pagination = pag
         state.itemsLoaded = true
       })

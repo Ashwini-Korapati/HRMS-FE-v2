@@ -1,0 +1,294 @@
+{
+    "success": true,
+    "message": "Projects with folder tree retrieved successfully",
+    "data": {
+        "pagination": {
+            "page": 1,
+            "limit": 25,
+            "total": 1,
+            "pages": 1
+        },
+        "items": [
+            {
+                "id": "1a31fe39-a30a-4eec-8096-14f740e56e5f",
+                "companyId": "928ff6eb-dd21-425b-91b2-0d3febbeeeed",
+                "name": "Domain",
+                "description": "Demo",
+                "projectCode": "PRJ-COMPANY930342066-5DMB7L",
+                "startDate": "2025-09-23T00:00:00.000Z",
+                "endDate": "2025-09-30T00:00:00.000Z",
+                "status": "PLANNING",
+                "budget": null,
+                "currency": "USD",
+                "clientName": null,
+                "createdById": "fe692390-8a6e-4cd3-88a7-c3b64c171770",
+                "isActive": true,
+                "metadata": null,
+                "createdAt": "2025-09-23T10:15:53.648Z",
+                "updatedAt": "2025-09-23T10:15:53.648Z",
+                "rootFolderId": null,
+                "createdBy": {
+                    "user_id": "fe692390-8a6e-4cd3-88a7-c3b64c171770",
+                    "firstName": "harish",
+                    "lastName": "M",
+                    "email": "krishnacancan143@gmail.com",
+                    "role": "ADMIN"
+                },
+                "folderTree": [
+                    {
+                        "id": "0246bcc6-7d33-4fbe-86b5-56d049031fb0",
+                        "projectId": "1a31fe39-a30a-4eec-8096-14f740e56e5f",
+                        "parentId": null,
+                        "name": "Assets",
+                        "path": "/assets",
+                        "createdAt": "2025-09-23T10:15:53.689Z",
+                        "updatedAt": "2025-09-23T10:15:53.692Z",
+                        "urn": "urn:hrms.bentrod:fs.folder:co.16bc681d140927215c72aa34",
+                        "parentUrn": null,
+                        "title": "Domain Assets",
+                        "docType": "project.folder",
+                        "deleted": false,
+                        "folderType": "normal",
+                        "isRoot": true,
+                        "configurations": {
+                            "allowedTypes": [
+                                "*"
+                            ],
+                            "visibleTypes": [
+                                "*"
+                            ],
+                            "maxFileSize": "100MB",
+                            "autoSync": true
+                        },
+                        "lastModifiedTimestamp": "1758622553640",
+                        "lastModifiedTime": "2025-09-23T10:15:53.640Z",
+                        "createUserId": "fe692390-8a6e-4cd3-88a7-c3b64c171770",
+                        "createUserName": "krishnacancan143@gmail.com",
+                        "lastModifiedUserId": "fe692390-8a6e-4cd3-88a7-c3b64c171770",
+                        "lastModifiedUserName": "krishnacancan143@gmail.com",
+                        "hidden": false,
+                        "userPreferences": {
+                            "subscribed": false,
+                            "viewMode": "grid",
+                            "sortBy": "name",
+                            "sortOrder": "asc"
+                        },
+                        "viewOption": "LMV",
+                        "permissionActions": [
+                            "view",
+                            "upload",
+                            "download",
+                            "delete",
+                            "rename",
+                            "share"
+                        ],
+                        "kebabActions": [
+                            "add_subfolder",
+                            "upload_files",
+                            "share",
+                            "rename",
+                            "delete",
+                            "move",
+                            "copy",
+                            "view_details",
+                            "download_all"
+                        ],
+                        "isSystemFolder": false,
+                        "description": "Assets folder for project Domain",
+                        "hasSubfolders": false,
+                        "permissions": [
+                            {
+                                "id": "120b8881-9945-48e4-8677-73d7f2ed8a43",
+                                "folderId": "0246bcc6-7d33-4fbe-86b5-56d049031fb0",
+                                "role": "ADMIN",
+                                "actions": [
+                                    "view",
+                                    "upload",
+                                    "download",
+                                    "delete",
+                                    "rename",
+                                    "share"
+                                ],
+                                "createdAt": "2025-09-23T10:15:53.703Z"
+                            },
+                            {
+                                "id": "49633e1c-de7f-4f03-927c-9ce6e465bb4b",
+                                "folderId": "0246bcc6-7d33-4fbe-86b5-56d049031fb0",
+                                "role": "USER",
+                                "actions": [
+                                    "view",
+                                    "upload",
+                                    "download",
+                                    "delete",
+                                    "rename",
+                                    "share"
+                                ],
+                                "createdAt": "2025-09-23T10:15:53.703Z"
+                            },
+                            {
+                                "id": "a818fd40-067e-48a7-b589-089e40a7f1c5",
+                                "folderId": "0246bcc6-7d33-4fbe-86b5-56d049031fb0",
+                                "role": "IT",
+                                "actions": [
+                                    "view",
+                                    "upload",
+                                    "download",
+                                    "delete",
+                                    "rename",
+                                    "share"
+                                ],
+                                "createdAt": "2025-09-23T10:15:53.703Z"
+                            },
+                            {
+                                "id": "f518e95b-24fe-4cc3-85d2-b0f948466f39",
+                                "folderId": "0246bcc6-7d33-4fbe-86b5-56d049031fb0",
+                                "role": "SUPER_ADMIN",
+                                "actions": [
+                                    "view",
+                                    "upload",
+                                    "download",
+                                    "delete",
+                                    "rename",
+                                    "share"
+                                ],
+                                "createdAt": "2025-09-23T10:15:53.703Z"
+                            }
+                        ],
+                        "children": []
+                    },
+                    {
+                        "id": "74dc22cf-45f6-4877-a711-46c886cf1edc",
+                        "projectId": "1a31fe39-a30a-4eec-8096-14f740e56e5f",
+                        "parentId": null,
+                        "name": "Documents",
+                        "path": "/documents",
+                        "createdAt": "2025-09-23T10:15:53.665Z",
+                        "updatedAt": "2025-09-23T10:15:53.677Z",
+                        "urn": "urn:hrms.bentrod:fs.folder:co.6e1599304a35135c3f4f3fac",
+                        "parentUrn": null,
+                        "title": "Domain Documents",
+                        "docType": "project.folder",
+                        "deleted": false,
+                        "folderType": "normal",
+                        "isRoot": true,
+                        "configurations": {
+                            "allowedTypes": [
+                                "*"
+                            ],
+                            "visibleTypes": [
+                                "*"
+                            ],
+                            "maxFileSize": "100MB",
+                            "autoSync": true
+                        },
+                        "lastModifiedTimestamp": "1758622553640",
+                        "lastModifiedTime": "2025-09-23T10:15:53.640Z",
+                        "createUserId": "fe692390-8a6e-4cd3-88a7-c3b64c171770",
+                        "createUserName": "krishnacancan143@gmail.com",
+                        "lastModifiedUserId": "fe692390-8a6e-4cd3-88a7-c3b64c171770",
+                        "lastModifiedUserName": "krishnacancan143@gmail.com",
+                        "hidden": false,
+                        "userPreferences": {
+                            "subscribed": false,
+                            "viewMode": "grid",
+                            "sortBy": "name",
+                            "sortOrder": "asc"
+                        },
+                        "viewOption": "LMV",
+                        "permissionActions": [
+                            "view",
+                            "upload",
+                            "download",
+                            "delete",
+                            "rename",
+                            "share"
+                        ],
+                        "kebabActions": [
+                            "add_subfolder",
+                            "upload_files",
+                            "share",
+                            "rename",
+                            "delete",
+                            "move",
+                            "copy",
+                            "view_details",
+                            "download_all"
+                        ],
+                        "isSystemFolder": false,
+                        "description": "Documents folder for project Domain",
+                        "hasSubfolders": false,
+                        "permissions": [
+                            {
+                                "id": "3b11fddb-7ee7-45d4-b57c-6ae8ca79d81e",
+                                "folderId": "74dc22cf-45f6-4877-a711-46c886cf1edc",
+                                "role": "ADMIN",
+                                "actions": [
+                                    "view",
+                                    "upload",
+                                    "download",
+                                    "delete",
+                                    "rename",
+                                    "share"
+                                ],
+                                "createdAt": "2025-09-23T10:15:53.703Z"
+                            },
+                            {
+                                "id": "70cf200c-0139-439a-b803-57d2244dd8c3",
+                                "folderId": "74dc22cf-45f6-4877-a711-46c886cf1edc",
+                                "role": "SUPER_ADMIN",
+                                "actions": [
+                                    "view",
+                                    "upload",
+                                    "download",
+                                    "delete",
+                                    "rename",
+                                    "share"
+                                ],
+                                "createdAt": "2025-09-23T10:15:53.703Z"
+                            },
+                            {
+                                "id": "b6296640-d3fe-4a6f-b693-fb4b3905ea46",
+                                "folderId": "74dc22cf-45f6-4877-a711-46c886cf1edc",
+                                "role": "USER",
+                                "actions": [
+                                    "view",
+                                    "upload",
+                                    "download",
+                                    "delete",
+                                    "rename",
+                                    "share"
+                                ],
+                                "createdAt": "2025-09-23T10:15:53.703Z"
+                            },
+                            {
+                                "id": "c49c637a-1f2e-4d19-8e63-d1a73dc2d663",
+                                "folderId": "74dc22cf-45f6-4877-a711-46c886cf1edc",
+                                "role": "IT",
+                                "actions": [
+                                    "view",
+                                    "upload",
+                                    "download",
+                                    "delete",
+                                    "rename",
+                                    "share"
+                                ],
+                                "createdAt": "2025-09-23T10:15:53.703Z"
+                            }
+                        ],
+                        "children": []
+                    }
+                ],
+                "folderCounts": {
+                    "total": 2,
+                    "root": 2,
+                    "subfolders": 0,
+                    "depth": 1
+                }
+            }
+        ],
+        "meta": {
+            "folderTree": true
+        }
+    },
+    "timestamp": "2025-09-23T12:36:46.432Z"
+}

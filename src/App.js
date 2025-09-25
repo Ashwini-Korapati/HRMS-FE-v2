@@ -198,6 +198,8 @@ function AppRoutes() {
           <Route path="payroll" element={<PayrollPage />} />
           <Route path="projects" element={<ProjectsPage />} />
           <Route path="projects/list" element={<ProjectsListPage />} />
+          <Route path="projects/list/:projectId" element={<ProjectsListPage />} />
+          <Route path="projects/list/:projectId/folders/:urn" element={<ProjectsListPage />} />
           <Route path="projects/create" element={<CreateProjectPage />} />
           <Route path="projects/add-member" element={<AdminAddProjectMember />} />
           <Route path="projects/add-member/:projectId" element={<AdminAddProjectMember />} />
@@ -255,6 +257,8 @@ function AppRoutes() {
           {/* <Route path="projects" element={<UserProjectList />} /> */}
           <Route path="projects" element={<UserProject />} />
           <Route path="projects/list" element={<UserProjectList />} />
+          <Route path="projects/list/:projectId" element={<UserProjectList />} />
+          <Route path="projects/list/:projectId/folders/:urn" element={<UserProjectList />} />
           <Route path="projects/create" element={<UserCreateProject />} />
           <Route index element={<UserOverviewPage />} />
         </Route>

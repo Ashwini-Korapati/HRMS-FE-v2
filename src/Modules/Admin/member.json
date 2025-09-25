@@ -1,166 +1,243 @@
 {
     "success": true,
-    "message": "Employees retrieved",
+    "message": "Project folder tree retrieved successfully",
     "data": {
+        "project": {
+            "id": "3f313e24-2757-40e9-a0bf-a4145db71d02",
+            "name": "Mobile App",
+            "projectCode": "PRJ-COMPANY930342066-LXN1WP"
+        },
+        "mode": "admin",
         "total": 2,
-        "items": [
+        "roots": 2,
+        "tree": [
             {
-                "user_id": "c54cfc8d-f364-4776-aa9c-478a39fe70f7",
-                "companyId": "928ff6eb-dd21-425b-91b2-0d3febbeeeed",
-                "employeeId": "INNKRAX0002",
-                "firstName": "krishna",
-                "lastName": "A",
-                "email": "krishnaakkarapalli2104@gmail.com",
-                "phone": "7397482090",
-                "password": "$2a$12$hzrJzao6k2Kl8Obak4HVhOaII9cRpKuRhWLQ319RE/YljlqwsBuby",
-                "avatar": null,
-                "role": "USER",
-                "platform": "hroffice",
-                "platformId": null,
-                "isActive": true,
-                "isVerified": false,
-                "lastLogin": "2025-09-23T05:45:27.251Z",
-                "passwordChangedAt": null,
-                "dateOfBirth": null,
-                "gender": null,
-                "address": null,
-                "emergencyContact": null,
-                "joiningDate": null,
-                "exitDate": null,
-                "salary": null,
-                "designationId": "b21eb5ac-dd21-40d5-814e-c4ed6ad50852",
-                "departmentId": null,
-                "managerId": null,
-                "settings": null,
-                "createdAt": "2025-09-23T05:43:25.495Z",
-                "updatedAt": "2025-09-23T05:45:27.253Z",
-                "isActiveInProject": false,
-                "company": {
-                    "tenent_id": "928ff6eb-dd21-425b-91b2-0d3febbeeeed",
-                    "name": "Innovex Inc",
-                    "email": "krishnacancan143@gmail.com",
-                    "phone": "9966714320",
-                    "address": "100 Main St, City, Country",
-                    "website": "https://innovexinc.example",
-                    "logo": null,
-                    "taxId": "TAX-123789",
-                    "companyCode": "COMPANY930342066",
-                    "subdomain": "innovex",
-                    "domain": null,
-                    "timezone": "UTC",
-                    "workingDays": "[1,2,3,4,5]",
-                    "workingHours": "{\"start\":\"09:00\",\"end\":\"18:00\"}",
-                    "status": "ACTIVE",
-                    "settings": null,
-                    "createdAt": "2025-09-23T05:38:50.357Z",
-                    "updatedAt": "2025-09-23T05:38:50.367Z",
-                    "platformId": null
-                },
-                "designation": {
-                    "id": "b21eb5ac-dd21-40d5-814e-c4ed6ad50852",
-                    "companyId": "928ff6eb-dd21-425b-91b2-0d3febbeeeed",
-                    "title": "Team Lead",
-                    "description": null,
-                    "level": null,
-                    "enabledRoutes": [
-                        "tasks"
+                "id": "e1066029-d787-4499-9d67-e44ec294695d",
+                "projectId": "3f313e24-2757-40e9-a0bf-a4145db71d02",
+                "parentId": null,
+                "name": "Assets",
+                "path": "/assets",
+                "createdAt": "2025-09-24T05:11:44.747Z",
+                "updatedAt": "2025-09-24T05:11:44.755Z",
+                "urn": "urn:hrms.bentrod:fs.folder:co.d1e98959792818e807a393ed",
+                "parentUrn": null,
+                "title": "Mobile App Assets",
+                "docType": "project.folder",
+                "deleted": false,
+                "folderType": "normal",
+                "isRoot": true,
+                "configurations": {
+                    "allowedTypes": [
+                        "*"
                     ],
-                    "isActive": true,
-                    "createdAt": "2025-09-23T05:42:49.345Z",
-                    "updatedAt": "2025-09-23T05:42:49.345Z",
-                    "enabledRouteStates": [
-                        {
-                            "id": "75cb82e1-af08-4d8b-b681-72550994967f",
-                            "designationId": "b21eb5ac-dd21-40d5-814e-c4ed6ad50852",
-                            "feature": "projects",
-                            "isActive": false,
-                            "createdAt": "2025-09-23T05:42:49.349Z",
-                            "updatedAt": "2025-09-23T05:42:49.349Z"
-                        },
-                        {
-                            "id": "a6860963-6bf5-4600-b825-fba3d772091b",
-                            "designationId": "b21eb5ac-dd21-40d5-814e-c4ed6ad50852",
-                            "feature": "tasks",
-                            "isActive": true,
-                            "createdAt": "2025-09-23T05:42:49.354Z",
-                            "updatedAt": "2025-09-23T05:42:49.354Z"
-                        }
-                    ]
+                    "visibleTypes": [
+                        "*"
+                    ],
+                    "maxFileSize": "100MB",
+                    "autoSync": true
                 },
-                "enabledRoutesStatus": {
-                    "projects": false,
-                    "tasks": true
-                }
+                "lastModifiedTimestamp": "1758690704665",
+                "lastModifiedTime": "2025-09-24T05:11:44.665Z",
+                "createUserId": "fe692390-8a6e-4cd3-88a7-c3b64c171770",
+                "createUserName": "krishnacancan143@gmail.com",
+                "lastModifiedUserId": "fe692390-8a6e-4cd3-88a7-c3b64c171770",
+                "lastModifiedUserName": "krishnacancan143@gmail.com",
+                "hidden": false,
+                "userPreferences": {
+                    "subscribed": false,
+                    "viewMode": "grid",
+                    "sortBy": "name",
+                    "sortOrder": "asc"
+                },
+                "viewOption": "LMV",
+                "permissionActions": [
+                    "view",
+                    "upload",
+                    "download",
+                    "delete",
+                    "rename",
+                    "share"
+                ],
+                "kebabActions": [
+                    "add_subfolder",
+                    "upload_files",
+                    "share",
+                    "rename",
+                    "delete",
+                    "move",
+                    "copy",
+                    "view_details",
+                    "download_all"
+                ],
+                "isSystemFolder": false,
+                "description": "Assets folder for project Mobile App",
+                "hasSubfolders": false,
+                "permissions": [
+                    {
+                        "id": "3d386511-fa2c-460a-b35a-e22668c83f6e",
+                        "role": "ADMIN",
+                        "actions": [
+                            "view",
+                            "upload",
+                            "download",
+                            "delete",
+                            "rename",
+                            "share"
+                        ]
+                    },
+                    {
+                        "id": "89917139-374b-43c8-9d17-e555eba1a3d8",
+                        "role": "SUPER_ADMIN",
+                        "actions": [
+                            "view",
+                            "upload",
+                            "download",
+                            "delete",
+                            "rename",
+                            "share"
+                        ]
+                    },
+                    {
+                        "id": "99fbbd21-76df-461c-876b-a6bb3a93b263",
+                        "role": "IT",
+                        "actions": [
+                            "view",
+                            "upload",
+                            "download",
+                            "delete",
+                            "rename",
+                            "share"
+                        ]
+                    },
+                    {
+                        "id": "e71ddc73-d8b3-4edd-a2f8-1fbef56218e7",
+                        "role": "USER",
+                        "actions": [
+                            "view",
+                            "upload",
+                            "download",
+                            "delete",
+                            "rename",
+                            "share"
+                        ]
+                    }
+                ],
+                "children": []
             },
             {
-                "user_id": "fe692390-8a6e-4cd3-88a7-c3b64c171770",
-                "companyId": "928ff6eb-dd21-425b-91b2-0d3febbeeeed",
-                "employeeId": "COMPANY930342066EMP001",
-                "firstName": "harish",
-                "lastName": "M",
-                "email": "krishnacancan143@gmail.com",
-                "phone": "9966714320",
-                "password": "$2a$12$9bikmnC/TYU0HNIm9EJWkOdA7zvnpktNDpXZcBlZb.afOur2LT2Qe",
-                "avatar": null,
-                "role": "ADMIN",
-                "platform": "hroffice",
-                "platformId": "f5dd2fe5-095f-492f-bdf0-34e88db7e36c",
-                "isActive": true,
-                "isVerified": true,
-                "lastLogin": "2025-09-24T10:23:01.240Z",
-                "passwordChangedAt": null,
-                "dateOfBirth": "1990-01-01T00:00:00.000Z",
-                "gender": "MALE",
-                "address": null,
-                "emergencyContact": null,
-                "joiningDate": "2025-09-23T05:38:51.311Z",
-                "exitDate": null,
-                "salary": null,
-                "designationId": "7595926f-8cfe-4398-b7cb-a7bf6b80e352",
-                "departmentId": "d4b201c7-d7d5-4f0f-a0ce-8173702b6af7",
-                "managerId": null,
-                "settings": null,
-                "createdAt": "2025-09-23T05:38:51.313Z",
-                "updatedAt": "2025-09-24T10:23:01.243Z",
-                "isActiveInProject": false,
-                "company": {
-                    "tenent_id": "928ff6eb-dd21-425b-91b2-0d3febbeeeed",
-                    "name": "Innovex Inc",
-                    "email": "krishnacancan143@gmail.com",
-                    "phone": "9966714320",
-                    "address": "100 Main St, City, Country",
-                    "website": "https://innovexinc.example",
-                    "logo": null,
-                    "taxId": "TAX-123789",
-                    "companyCode": "COMPANY930342066",
-                    "subdomain": "innovex",
-                    "domain": null,
-                    "timezone": "UTC",
-                    "workingDays": "[1,2,3,4,5]",
-                    "workingHours": "{\"start\":\"09:00\",\"end\":\"18:00\"}",
-                    "status": "ACTIVE",
-                    "settings": null,
-                    "createdAt": "2025-09-23T05:38:50.357Z",
-                    "updatedAt": "2025-09-23T05:38:50.367Z",
-                    "platformId": null
+                "id": "c00e36f6-807e-4dfb-ab80-1be1c1f6bc14",
+                "projectId": "3f313e24-2757-40e9-a0bf-a4145db71d02",
+                "parentId": null,
+                "name": "Documents",
+                "path": "/documents",
+                "createdAt": "2025-09-24T05:11:44.709Z",
+                "updatedAt": "2025-09-24T05:11:44.729Z",
+                "urn": "urn:hrms.bentrod:fs.folder:co.6d0cc80f52c7b598d94cf837",
+                "parentUrn": null,
+                "title": "Mobile App Documents",
+                "docType": "project.folder",
+                "deleted": false,
+                "folderType": "normal",
+                "isRoot": true,
+                "configurations": {
+                    "allowedTypes": [
+                        "*"
+                    ],
+                    "visibleTypes": [
+                        "*"
+                    ],
+                    "maxFileSize": "100MB",
+                    "autoSync": true
                 },
-                "designation": {
-                    "id": "7595926f-8cfe-4398-b7cb-a7bf6b80e352",
-                    "companyId": "928ff6eb-dd21-425b-91b2-0d3febbeeeed",
-                    "title": "Administrator",
-                    "description": "System administrator role",
-                    "level": 1,
-                    "enabledRoutes": null,
-                    "isActive": true,
-                    "createdAt": "2025-09-23T05:38:51.329Z",
-                    "updatedAt": "2025-09-23T05:38:51.329Z",
-                    "enabledRouteStates": []
+                "lastModifiedTimestamp": "1758690704665",
+                "lastModifiedTime": "2025-09-24T05:11:44.665Z",
+                "createUserId": "fe692390-8a6e-4cd3-88a7-c3b64c171770",
+                "createUserName": "krishnacancan143@gmail.com",
+                "lastModifiedUserId": "fe692390-8a6e-4cd3-88a7-c3b64c171770",
+                "lastModifiedUserName": "krishnacancan143@gmail.com",
+                "hidden": false,
+                "userPreferences": {
+                    "subscribed": false,
+                    "viewMode": "grid",
+                    "sortBy": "name",
+                    "sortOrder": "asc"
                 },
-                "enabledRoutesStatus": {}
+                "viewOption": "LMV",
+                "permissionActions": [
+                    "view",
+                    "upload",
+                    "download",
+                    "delete",
+                    "rename",
+                    "share"
+                ],
+                "kebabActions": [
+                    "add_subfolder",
+                    "upload_files",
+                    "share",
+                    "rename",
+                    "delete",
+                    "move",
+                    "copy",
+                    "view_details",
+                    "download_all"
+                ],
+                "isSystemFolder": false,
+                "description": "Documents folder for project Mobile App",
+                "hasSubfolders": false,
+                "permissions": [
+                    {
+                        "id": "2efa99f2-5461-4042-9ec7-7c6288712bde",
+                        "role": "IT",
+                        "actions": [
+                            "view",
+                            "upload",
+                            "download",
+                            "delete",
+                            "rename",
+                            "share"
+                        ]
+                    },
+                    {
+                        "id": "3e3f6bfd-4834-4ec3-b475-4968ff8f8ed4",
+                        "role": "USER",
+                        "actions": [
+                            "view",
+                            "upload",
+                            "download",
+                            "delete",
+                            "rename",
+                            "share"
+                        ]
+                    },
+                    {
+                        "id": "a4447fae-2fca-4d4b-a36b-ee412ec4d6a5",
+                        "role": "SUPER_ADMIN",
+                        "actions": [
+                            "view",
+                            "upload",
+                            "download",
+                            "delete",
+                            "rename",
+                            "share"
+                        ]
+                    },
+                    {
+                        "id": "e24c6432-4172-4ef1-87b7-deb16d9cc07e",
+                        "role": "ADMIN",
+                        "actions": [
+                            "view",
+                            "upload",
+                            "download",
+                            "delete",
+                            "rename",
+                            "share"
+                        ]
+                    }
+                ],
+                "children": []
             }
-        ],
-        "page": 1,
-        "pageSize": 10
+        ]
     },
-    "timestamp": "2025-09-24T10:25:42.057Z"
+    "timestamp": "2025-09-25T06:54:37.346Z"
 }

@@ -187,5 +187,30 @@ export function httpDeleteService(url, options = {}) {
     })
 }
 
+// Multipart form POST (e.g., file uploads). Pass a FormData instance as `formData`.
+export function httpPostFormService(url, formData, options = {}) {
+  const apiURL = `${serverURL}/${url}`
+  // IMPORTANT: Do NOT set Content-Type for FormData; browser will set proper boundary
+  const headers = injectAuthHeader({ ...options.headers })
+
+  if (window.loadingContext) window.loadingContext.showLoading()
+
+  return fetch(apiURL, {
+    method: 'POST',
+    headers,
+    body: formData,
+  })
+    .then(async (response) => {
+      const json = await response.json().catch(() => ({}))
+      if (window.loadingContext) window.loadingContext.hideLoading()
+      return { status: response.status, data: json }
+    })
+    .catch((err) => {
+      console.error(err)
+      if (window.loadingContext) window.loadingContext.hideLoading()
+      return { status: 500, data: { message: 'Something went wrong' } }
+    })
+}
+
 export { axiosInstance }
  

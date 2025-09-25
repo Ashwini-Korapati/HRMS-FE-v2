@@ -71,7 +71,9 @@ export default function SmartRightBarSection({
   onCreate,
   onRefreshList,
   listLoading,
-  selectedProject // kept for backward compatibility (unused after refactor)
+  selectedProject, // optional: currently focused project
+  onProjectClick,  // (project) => void
+  onFolderClick    // ({ project, folder }) => void
 }) {
 
   const projects = useSelector(selectProjects)
@@ -113,7 +115,10 @@ export default function SmartRightBarSection({
               return (
                 <div key={p.id} className="rounded-md border border-orange-500/20 dark:border-orange-500/30 bg-white/60 dark:bg-neutral-900/40">
                   <button
-                    onClick={() => toggleProject(p.id)}
+                    onClick={() => {
+                      toggleProject(p.id)
+                      onProjectClick?.(p)
+                    }}
                     className="w-full flex items-center gap-2 text-left px-2 py-1.5 hover:bg-orange-500/10 rounded-t-md"
                   >
                     {isOpen ? <ChevronDown size={12} className="text-orange-500" /> : <ChevronRight size={12} className="text-orange-500" />}
@@ -123,7 +128,9 @@ export default function SmartRightBarSection({
                   {isOpen && folderTree.length > 0 && (
                     <div className="pb-1">
                       {folderTree.map(f => (
-                        <FolderNode key={f.id} node={f} depth={0} onAction={handleFolderAction} />
+                        <div key={f.id} onClick={() => onFolderClick?.({ project: p, folder: f })}>
+                          <FolderNode node={f} depth={0} onAction={handleFolderAction} />
+                        </div>
                       ))}
                     </div>
                   )}

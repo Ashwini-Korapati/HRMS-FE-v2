@@ -1,10 +1,14 @@
 import React, { useEffect } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
+import { useNavigate, useParams } from 'react-router-dom'
 import { fetchProjects, selectProjects, selectProjectsListLoading, selectProjectsListError } from '../../Redux/Public/projectsSlice'
+import { fetchProjectFolderTree } from '../../Redux/Public/foldersSlice'
 import { FolderKanban, RefreshCw } from 'lucide-react'
 
 export default function UserProjectList() {
   const dispatch = useDispatch()
+  const navigate = useNavigate()
+  const { companyUuid } = useParams()
   const projects = useSelector(selectProjects)
   const loading = useSelector(selectProjectsListLoading)
   const error = useSelector(selectProjectsListError)
@@ -29,7 +33,7 @@ export default function UserProjectList() {
         {loading === 'loading' && <div className="p-4 text-xs text-neutral-500 animate-pulse">Loading…</div>}
         {loading === 'succeeded' && projects.length === 0 && <div className="p-4 text-xs text-neutral-500">You have no projects.</div>}
         {loading === 'succeeded' && projects.map(p => (
-          <div key={p.id} className="grid items-center text-xs border-t border-neutral-200 dark:border-neutral-800/60 hover:bg-orange-500/5 dark:hover:bg-orange-500/10 transition-colors" style={{ gridTemplateColumns: '1.4fr 1fr 1fr' }}>
+          <div key={p.id} onClick={() => { if (companyUuid) navigate(`/${companyUuid}/projects/list/${p.id}`); dispatch(fetchProjectFolderTree(p.id)) }} className="grid items-center text-xs border-t border-neutral-200 dark:border-neutral-800/60 hover:bg-orange-500/5 dark:hover:bg-orange-500/10 transition-colors cursor-pointer" style={{ gridTemplateColumns: '1.4fr 1fr 1fr' }}>
             <div className="px-2 py-2 flex items-center gap-2"><FolderKanban size={14} className="text-orange-500" /> <span className="font-medium text-neutral-700 dark:text-neutral-200 truncate">{p.name}</span></div>
             <div className="px-2 py-2 text-neutral-500 dark:text-neutral-400 truncate">{p.projectCode || '—'}</div>
             <div className="px-2 py-2"><span className="inline-flex px-2 py-0.5 rounded-md text-[10px] font-medium bg-orange-500/10 border border-orange-500/30 text-orange-600 dark:text-orange-400">{p.status || '—'}</span></div>

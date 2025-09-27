@@ -5,8 +5,7 @@ import {
   fetchProjects, 
   deleteProjectsBulk, 
   selectProjects, 
-  selectProjectsListLoading, 
-  selectProjectsListError, 
+  selectProjectsListLoading,
   selectProjectDeleting,
   fetchProjectsInsights
 } from '../../Redux/Public/projectsSlice'

@@ -8,6 +8,7 @@ import departmentReducer from '../Redux/Public/departmentSlice'
 import designationReducer from '../Redux/Public/designationSlice'
 import employeesReducer from '../Redux/Public/employeesSlice'
 import foldersReducer from '../Redux/Public/foldersSlice'
+import onboardingUserReducer from '../Redux/Public/onboardinguserSlice'
 import { attachAuthStore } from '../auth/auth'
 import { attachStore } from '../config/httphandler'
 
@@ -41,6 +42,7 @@ export const store = configureStore({
   designations: designationReducer, // Add this line
   employees: employeesReducer,
   folders: foldersReducer,
+  onboardingUser: onboardingUserReducer,
 
   },
   middleware: getDefault => getDefault({ serializableCheck: false }).concat(actionLogger, errorReporter)

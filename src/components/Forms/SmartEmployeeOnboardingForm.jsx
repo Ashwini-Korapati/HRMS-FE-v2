@@ -43,12 +43,12 @@ const blankForm = {
 	avatar: "",
 	dateOfBirth: "",
 	gender: "",
-	address: "",
+	address: { line1: "", city: "", state: "", postalCode: "", country: "" },
 	emergencyContact: { name: "", phone: "", relation: "" },
 	joiningDate: "",
 	exitDate: "",
 	salary: "",
-	settings: { locale: "", tz: "" },
+	settings: { language: "", timezone: "" },
 }
 
 const stepDefs = [
@@ -130,7 +130,11 @@ function getStepErrors(step, f) {
 		if (!f.dateOfBirth) errors.dateOfBirth = "Required"
 		if (!f.gender) errors.gender = "Required"
 		if (!f.avatar) errors.avatar = "Required"
-		if (!f.address) errors.address = "Required"
+		if (!f.address?.line1) errors.address_line1 = "Required"
+		if (!f.address?.city) errors.address_city = "Required"
+		if (!f.address?.state) errors.address_state = "Required"
+		if (!f.address?.postalCode) errors.address_postalCode = "Required"
+		if (!f.address?.country) errors.address_country = "Required"
 	} else if (step === 1) {
 		if (!f.designationId) errors.designationId = "Required"
 		if (!f.departmentId) errors.departmentId = "Required"
@@ -142,8 +146,8 @@ function getStepErrors(step, f) {
 		if (!f.emergencyContact?.name) errors.ec_name = "Required"
 		if (!isPhone(f.emergencyContact?.phone || "")) errors.ec_phone = "Invalid phone"
 		if (!f.emergencyContact?.relation) errors.ec_relation = "Required"
-		if (!f.settings?.locale) errors.locale = "Required"
-		if (!f.settings?.tz) errors.tz = "Required"
+		if (!f.settings?.language) errors.language = "Required"
+		if (!f.settings?.timezone) errors.timezone = "Required"
 	}
 	return errors
 }
@@ -241,7 +245,11 @@ export default function SmartEmployeeOnboardingForm({ initialData, onSubmit, cla
 					<option value="OTHER">Other</option>
 				</Select>
 				<Input label="Avatar URL" value={form.avatar} onChange={(e) => update("avatar", e.target.value)} onBlur={() => markTouched("avatar")} error={touched.avatar && errs.avatar} className="md:col-span-2" required />
-				<TextArea label="Address" rows={3} value={form.address} onChange={(e) => update("address", e.target.value)} onBlur={() => markTouched("address")} error={touched.address && errs.address} className="md:col-span-2" required />
+				<Input label="Address Line 1" value={form.address.line1} onChange={(e) => update(["address", "line1"], e.target.value)} onBlur={() => markTouched("address_line1")} error={touched.address_line1 && errs.address_line1} className="md:col-span-2" required />
+				<Input label="City" value={form.address.city} onChange={(e) => update(["address", "city"], e.target.value)} onBlur={() => markTouched("address_city")} error={touched.address_city && errs.address_city} required />
+				<Input label="State" value={form.address.state} onChange={(e) => update(["address", "state"], e.target.value)} onBlur={() => markTouched("address_state")} error={touched.address_state && errs.address_state} required />
+				<Input label="Postal Code" value={form.address.postalCode} onChange={(e) => update(["address", "postalCode"], e.target.value)} onBlur={() => markTouched("address_postalCode")} error={touched.address_postalCode && errs.address_postalCode} required />
+				<Input label="Country" value={form.address.country} onChange={(e) => update(["address", "country"], e.target.value)} onBlur={() => markTouched("address_country")} error={touched.address_country && errs.address_country} required />
 			</div>
 		)
 	}
@@ -353,11 +361,11 @@ export default function SmartEmployeeOnboardingForm({ initialData, onSubmit, cla
 					required
 				/>
 				<Select
-					label="Locale"
-					value={form.settings.locale}
-					onChange={(e) => update(["settings", "locale"], e.target.value)}
-					onBlur={() => markTouched("locale")}
-					error={touched.locale && errs.locale}
+					label="Language"
+					value={form.settings.language}
+					onChange={(e) => update(["settings", "language"], e.target.value)}
+					onBlur={() => markTouched("language")}
+					error={touched.language && errs.language}
 					required
 				>
 					<option value="">Select…</option>
@@ -369,10 +377,10 @@ export default function SmartEmployeeOnboardingForm({ initialData, onSubmit, cla
 				</Select>
 				<Select
 					label="Timezone"
-					value={form.settings.tz}
-					onChange={(e) => update(["settings", "tz"], e.target.value)}
-					onBlur={() => markTouched("tz")}
-					error={touched.tz && errs.tz}
+					value={form.settings.timezone}
+					onChange={(e) => update(["settings", "timezone"], e.target.value)}
+					onBlur={() => markTouched("timezone")}
+					error={touched.timezone && errs.timezone}
 					required
 				>
 					<option value="">Select…</option>
@@ -406,7 +414,11 @@ export default function SmartEmployeeOnboardingForm({ initialData, onSubmit, cla
 						<option value="OTHER">Other</option>
 					</Select>
 					<Input label="Avatar URL" value={form.avatar} readOnly disabled className="md:col-span-2" />
-					<TextArea label="Address" value={form.address} rows={3} disabled className="md:col-span-2" />
+					<Input label="Address Line 1" value={form.address.line1} readOnly disabled className="md:col-span-2" />
+					<Input label="City" value={form.address.city} readOnly disabled />
+					<Input label="State" value={form.address.state} readOnly disabled />
+					<Input label="Postal Code" value={form.address.postalCode} readOnly disabled />
+					<Input label="Country" value={form.address.country} readOnly disabled />
 				</div>
 			</div>
 
@@ -445,13 +457,13 @@ export default function SmartEmployeeOnboardingForm({ initialData, onSubmit, cla
 					<Input label="Emergency contact name" value={form.emergencyContact.name} readOnly disabled />
 					<Input label="Emergency contact phone" value={form.emergencyContact.phone} readOnly disabled />
 					<Input label="Relation" value={form.emergencyContact.relation} readOnly disabled />
-					<Select label="Locale" value={form.settings.locale} disabled>
+					<Select label="Language" value={form.settings.language} disabled>
 						<option value="">Select…</option>
 						{LOCALES.map((l) => (
 							<option key={l} value={l}>{l}</option>
 						))}
 					</Select>
-					<Select label="Timezone" value={form.settings.tz} disabled>
+					<Select label="Timezone" value={form.settings.timezone} disabled>
 						<option value="">Select…</option>
 						{TIMEZONES.map((t) => (
 							<option key={t} value={t}>{t}</option>

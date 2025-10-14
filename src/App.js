@@ -66,6 +66,7 @@ import { useDispatch } from "react-redux";
 import { platformLogin } from "./Redux/Public/authSlice";
 import { ThemeProvider } from "./theme/ThemeProvider";
 import UserProject from "./Modules/User/UserProject";
+import completedTasks from "./Modules/Admin/completedTasks";
 
 function UAS() {
   return (
@@ -208,6 +209,7 @@ function AppRoutes() {
           <Route path="tasks/create" element={<CreateTaskPage />} />
           <Route path="holidays" element={<HolidaysPage />} />
           <Route path="announcements" element={<AnnouncementsPage />} />
+          <Route path="tasks/completed" element={<completedTasks />} />
           <Route path="reports" element={<ReportsPage />} />
           <Route path="analytics" element={<AnalyticsPage />} />
           <Route index element={<OverviewPage />} />

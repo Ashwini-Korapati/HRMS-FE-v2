@@ -11,6 +11,8 @@ import foldersReducer from '../Redux/Public/foldersSlice'
 import onboardingUserReducer from '../Redux/Public/onboardinguserSlice'
 import { attachAuthStore } from '../auth/auth'
 import { attachStore } from '../config/httphandler'
+import userleaveReducer from '../Redux/Public/UserleaveSlice'
+import leaveTypesReducer from '../Redux/Public/leaveTypesSlice'
 
 // Simple action logger (dev only)
 const actionLogger = store => next => action => {
@@ -43,6 +45,9 @@ export const store = configureStore({
   employees: employeesReducer,
   folders: foldersReducer,
   onboardingUser: onboardingUserReducer,
+  userleave: userleaveReducer, // Add userleave slice to store
+  leaveTypes: leaveTypesReducer, // Add this
+
 
   },
   middleware: getDefault => getDefault({ serializableCheck: false }).concat(actionLogger, errorReporter)

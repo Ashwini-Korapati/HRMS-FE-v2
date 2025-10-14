@@ -118,23 +118,7 @@ const CreateDesignationPage = () => {
 
   return (
     <div className="min-h-screen bg-slate-50">
-      {/* Top nav */}
-      <header className="bg-[#0B4276] text-white">
-        <div className="max-w-7xl mx-auto px-4 py-3 flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <div className="w-8 h-8 rounded bg-white/10 flex items-center justify-center font-bold">
-              AC
-            </div>
-            <div className="font-semibold">Project Admin</div>
-          </div>
-          <div className="flex items-center gap-4">
-            <span className="text-sm opacity-90">maheshwara n</span>
-            <div className="w-8 h-8 rounded-full bg-white/20 flex items-center justify-center text-sm">
-              MN
-            </div>
-          </div>
-        </div>
-      </header>
+ 
 
       <main className="max-w-7xl mx-auto px-4 py-6">
         <PageHeading

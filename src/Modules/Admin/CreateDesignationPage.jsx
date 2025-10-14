@@ -1,3 +1,4 @@
+
 // CreateDesignationPage.jsx
 import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
@@ -7,8 +8,10 @@ import {
   selectDesignationCreateError,
   selectLastCreatedDesignation,
   resetDesignationState,
+  fetchDesignations,
+  selectDesignations,
 } from "../../Redux/Public/designationSlice";
-import { ChevronDown, CheckCircle2, Settings, Ban, Lock, Unlock, X, Plus, Sparkles, Shield, Activity } from 'lucide-react';
+import { ChevronDown, CheckCircle2, Settings, Ban, Lock, Unlock, X, Plus, Sparkles, Shield, Activity, Users } from 'lucide-react';
 import { PageHeading } from "./components";
 
 // Enhanced Input Component with animations
@@ -95,11 +98,13 @@ const CreateDesignationPage = () => {
   const creating = useSelector(selectDesignationCreating);
   const error = useSelector(selectDesignationCreateError);
   const lastCreated = useSelector(selectLastCreatedDesignation);
+  const designations = useSelector(selectDesignations);
 
   const initialForm = {
     title: "",
     description: "",
     level: "",
+    parentId: "",
     enabledRoutes: {
       Project: "Inactive",
       Task: "Inactive",
@@ -110,6 +115,11 @@ const CreateDesignationPage = () => {
   const [showSuccess, setShowSuccess] = useState(false);
   const [successMessage, setSuccessMessage] = useState("");
 
+  // Fetch designations on component mount
+  useEffect(() => {
+    dispatch(fetchDesignations());
+  }, [dispatch]);
+
   useEffect(() => {
     if (creating === "succeeded") {
       const message = `Designation "${lastCreated?.title || formData.title}" created successfully!`;
@@ -118,6 +128,9 @@ const CreateDesignationPage = () => {
 
       // reset form
       setFormData(initialForm);
+
+      // Refresh designations list
+      dispatch(fetchDesignations());
 
       // auto-hide and reset slice state
       const t = setTimeout(() => {
@@ -163,7 +176,20 @@ const CreateDesignationPage = () => {
   const handleSubmit = (e) => {
     e.preventDefault();
     if (!formData.title.trim()) return;
-    dispatch(createDesignation(formData));
+    
+    // Prepare the data for API
+    const submitData = {
+      title: formData.title.trim(),
+      description: formData.description.trim(),
+      level: formData.level ? Number(formData.level) : undefined,
+      parentId: formData.parentId || undefined,
+      enabledRoutes: Object.entries(formData.enabledRoutes)
+        .filter(([_, status]) => status === "Active")
+        .map(([route]) => route.toLowerCase())
+        .join(",") || undefined
+    };
+
+    dispatch(createDesignation(submitData));
   };
 
   const handleCloseSuccess = () => {
@@ -198,6 +224,13 @@ const CreateDesignationPage = () => {
   ];
   
   const levelLabel = (v) => LEVEL_OPTIONS.find(o => o.value === v)?.label || 'N/A';
+
+  // Get parent designation title for display
+  const getParentTitle = (parentId) => {
+    if (!parentId) return 'None';
+    const parent = designations.find(d => d.id === parentId);
+    return parent ? parent.title : 'Unknown';
+  };
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-white via-orange-50/30 to-white dark:from-neutral-950 dark:via-neutral-900 dark:to-neutral-950">
@@ -313,6 +346,21 @@ const CreateDesignationPage = () => {
                       ))}
                     </Select>
                   </div>
+
+                  {/* Parent Designation Dropdown */}
+                  <Select
+                    label="Parent Designation"
+                    value={formData.parentId}
+                    onChange={(e) => handleInputChange('parentId', e.target.value)}
+                    icon={Users}
+                  >
+                    <option value="">No parent designation</option>
+                    {designations.map((designation) => (
+                      <option key={designation.id} value={designation.id}>
+                        {designation.title}
+                      </option>
+                    ))}
+                  </Select>
                   
                   <TextArea
                     rows={3}
@@ -427,6 +475,13 @@ const CreateDesignationPage = () => {
                     <div className="text-xs font-semibold text-neutral-500 dark:text-neutral-400 mb-1 uppercase tracking-wider">Level</div>
                     <div className="text-base font-semibold text-neutral-900 dark:text-white bg-neutral-50 dark:bg-neutral-800 px-3 py-2 rounded-lg transition-colors group-hover:bg-neutral-100 dark:group-hover:bg-neutral-700">
                       {formData.level === '' ? 'Not set' : levelLabel(formData.level)}
+                    </div>
+                  </div>
+
+                  <div className="group">
+                    <div className="text-xs font-semibold text-neutral-500 dark:text-neutral-400 mb-1 uppercase tracking-wider">Parent Designation</div>
+                    <div className="text-base font-semibold text-neutral-900 dark:text-white bg-neutral-50 dark:bg-neutral-800 px-3 py-2 rounded-lg transition-colors group-hover:bg-neutral-100 dark:group-hover:bg-neutral-700">
+                      {getParentTitle(formData.parentId)}
                     </div>
                   </div>
                   

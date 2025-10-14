@@ -22,13 +22,13 @@ function Input({ label, error, required, className = "", icon: Icon, ...props })
       </span>
       <div className="relative">
         {Icon && (
-          <Icon className={`absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 transition-all duration-300 ${isFocused ? 'text-cyan-500' : 'text-neutral-400'}`} />
+          <Icon className={`absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 transition-all duration-300 ${isFocused ? 'text-orange-500' : 'text-neutral-400'}`} />
         )}
         <input
           {...props}
           onFocus={() => setIsFocused(true)}
           onBlur={() => setIsFocused(false)}
-          className={`w-full bg-white dark:bg-neutral-900 border rounded-xl ${Icon ? 'pl-10' : 'pl-3'} pr-3 py-2.5 text-sm text-neutral-900 dark:text-neutral-100 placeholder-neutral-400 outline-none transition-all duration-300 ${error ? 'border-rose-400 shadow-rose-100 dark:shadow-rose-900/20 shadow-lg' : isFocused ? 'border-cyan-500 shadow-lg shadow-cyan-100 dark:shadow-cyan-900/20 ring-4 ring-cyan-500/10' : 'border-neutral-200 dark:border-neutral-700 hover:border-neutral-300 dark:hover:border-neutral-600'} ${className}`}
+          className={`w-full bg-white dark:bg-neutral-900 border rounded-xl ${Icon ? 'pl-10' : 'pl-3'} pr-3 py-2.5 text-sm text-neutral-900 dark:text-neutral-100 placeholder-neutral-400 outline-none transition-all duration-300 ${error ? 'border-rose-400 shadow-rose-100 dark:shadow-rose-900/20 shadow-lg' : isFocused ? 'border-orange-500 shadow-lg shadow-orange-100 dark:shadow-orange-900/20 ring-4 ring-orange-500/10' : 'border-neutral-200 dark:border-neutral-700 hover:border-neutral-300 dark:hover:border-neutral-600'} ${className}`}
         />
       </div>
       {error && (
@@ -51,7 +51,7 @@ function TextArea({ label, error, required, className = "", ...props }) {
         {...props}
         onFocus={() => setIsFocused(true)}
         onBlur={() => setIsFocused(false)}
-        className={`w-full bg-white dark:bg-neutral-900 border rounded-xl px-3 py-2.5 text-sm text-neutral-900 dark:text-neutral-100 placeholder-neutral-400 outline-none resize-none transition-all duration-300 ${error ? 'border-rose-400 shadow-rose-100 dark:shadow-rose-900/20 shadow-lg' : isFocused ? 'border-cyan-500 shadow-lg shadow-cyan-100 dark:shadow-cyan-900/20 ring-4 ring-cyan-500/10' : 'border-neutral-200 dark:border-neutral-700 hover:border-neutral-300 dark:hover:border-neutral-600'} ${className}`}
+        className={`w-full bg-white dark:bg-neutral-900 border rounded-xl px-3 py-2.5 text-sm text-neutral-900 dark:text-neutral-100 placeholder-neutral-400 outline-none resize-none transition-all duration-300 ${error ? 'border-rose-400 shadow-rose-100 dark:shadow-rose-900/20 shadow-lg' : isFocused ? 'border-orange-500 shadow-lg shadow-orange-100 dark:shadow-orange-900/20 ring-4 ring-orange-500/10' : 'border-neutral-200 dark:border-neutral-700 hover:border-neutral-300 dark:hover:border-neutral-600'} ${className}`}
       />
       {error && (
         <span className="text-xs text-rose-500 animate-in slide-in-from-top-1 duration-300">{error}</span>
@@ -71,17 +71,17 @@ function Select({ label, error, required, className = "", children, icon: Icon, 
       </span>
       <div className="relative">
         {Icon && (
-          <Icon className={`absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 transition-all duration-300 pointer-events-none z-10 ${isFocused ? 'text-cyan-500' : 'text-neutral-400'}`} />
+          <Icon className={`absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 transition-all duration-300 pointer-events-none z-10 ${isFocused ? 'text-orange-500' : 'text-neutral-400'}`} />
         )}
         <select
           {...props}
           onFocus={() => setIsFocused(true)}
           onBlur={() => setIsFocused(false)}
-          className={`w-full bg-white dark:bg-neutral-900 border rounded-xl ${Icon ? 'pl-10' : 'pl-3'} pr-10 py-2.5 text-sm text-neutral-900 dark:text-neutral-100 appearance-none outline-none transition-all duration-300 ${error ? 'border-rose-400 shadow-rose-100 dark:shadow-rose-900/20 shadow-lg' : isFocused ? 'border-cyan-500 shadow-lg shadow-cyan-100 dark:shadow-cyan-900/20 ring-4 ring-cyan-500/10' : 'border-neutral-200 dark:border-neutral-700 hover:border-neutral-300 dark:hover:border-neutral-600'} ${className}`}
+          className={`w-full bg-white dark:bg-neutral-900 border rounded-xl ${Icon ? 'pl-10' : 'pl-3'} pr-10 py-2.5 text-sm text-neutral-900 dark:text-neutral-100 appearance-none outline-none transition-all duration-300 ${error ? 'border-rose-400 shadow-rose-100 dark:shadow-rose-900/20 shadow-lg' : isFocused ? 'border-orange-500 shadow-lg shadow-orange-100 dark:shadow-orange-900/20 ring-4 ring-orange-500/10' : 'border-neutral-200 dark:border-neutral-700 hover:border-neutral-300 dark:hover:border-neutral-600'} ${className}`}
         >
           {children}
         </select>
-        <ChevronDown className={`absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 pointer-events-none transition-all duration-300 ${isFocused ? 'text-cyan-500 rotate-180' : 'text-neutral-400'}`} />
+        <ChevronDown className={`absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 pointer-events-none transition-all duration-300 ${isFocused ? 'text-orange-500 rotate-180' : 'text-neutral-400'}`} />
       </div>
       {error && (
         <span className="text-xs text-rose-500 animate-in slide-in-from-top-1 duration-300">{error}</span>
@@ -183,7 +183,7 @@ const CreateDesignationPage = () => {
 
   const getStatusIcon = (status) =>
     status === "Active" ? (
-      <CheckCircle2 className="text-emerald-600 w-4 h-4" />
+      <CheckCircle2 className="text-orange-600 w-4 h-4" />
     ) : (
       <Ban className="text-neutral-400 w-4 h-4" />
     );
@@ -200,12 +200,12 @@ const CreateDesignationPage = () => {
   const levelLabel = (v) => LEVEL_OPTIONS.find(o => o.value === v)?.label || 'N/A';
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-neutral-50 to-slate-100 dark:from-neutral-950 dark:via-neutral-900 dark:to-neutral-950">
+    <div className="min-h-screen bg-gradient-to-br from-white via-orange-50/30 to-white dark:from-neutral-950 dark:via-neutral-900 dark:to-neutral-950">
       <main className="max-w-7xl mx-auto px-4 py-8">
         {/* Enhanced Page Header */}
         <div className="mb-8 animate-in slide-in-from-top-4 duration-700">
           <div className="flex items-center gap-3 mb-2">
-            <div className="p-2.5 bg-gradient-to-br from-cyan-500 to-blue-600 rounded-xl shadow-lg shadow-cyan-500/25">
+            <div className="p-2.5 bg-gradient-to-br from-orange-500 to-orange-600 rounded-xl shadow-lg shadow-orange-500/25">
               <Sparkles className="w-6 h-6 text-white" />
             </div>
             <div>
@@ -225,7 +225,7 @@ const CreateDesignationPage = () => {
             <div className="flex items-center justify-between flex-wrap gap-4">
               <div className="flex items-center gap-6">
                 <div className="flex items-center gap-3">
-                  <div className="p-2 bg-gradient-to-br from-emerald-500 to-green-600 rounded-lg">
+                  <div className="p-2 bg-gradient-to-br from-orange-500 to-orange-600 rounded-lg">
                     <Activity className="w-5 h-5 text-white" />
                   </div>
                   <div>
@@ -241,13 +241,13 @@ const CreateDesignationPage = () => {
                 <div className="flex-1">
                   <div className="flex items-center gap-2 mb-1.5">
                     <span className="text-xs font-medium text-neutral-600 dark:text-neutral-400">Progress</span>
-                    <span className="text-xs font-bold text-cyan-600 dark:text-cyan-400">
+                    <span className="text-xs font-bold text-orange-600 dark:text-orange-400">
                       {totalRoutesCount > 0 ? Math.round((activeRoutesCount / totalRoutesCount) * 100) : 0}%
                     </span>
                   </div>
                   <div className="h-2 bg-neutral-100 dark:bg-neutral-800 rounded-full overflow-hidden">
                     <div 
-                      className="h-full bg-gradient-to-r from-cyan-500 to-blue-500 rounded-full transition-all duration-500 ease-out"
+                      className="h-full bg-gradient-to-r from-orange-500 to-orange-400 rounded-full transition-all duration-500 ease-out"
                       style={{ width: `${totalRoutesCount > 0 ? (activeRoutesCount / totalRoutesCount) * 100 : 0}%` }}
                     ></div>
                   </div>
@@ -257,7 +257,7 @@ const CreateDesignationPage = () => {
               <div className="flex items-center gap-2">
                 <button
                   onClick={() => handleToggleAll("Active")}
-                  className="group inline-flex items-center gap-2 px-4 py-2 rounded-xl border border-emerald-200 dark:border-emerald-900 bg-emerald-50 dark:bg-emerald-950 text-emerald-700 dark:text-emerald-300 hover:bg-emerald-100 dark:hover:bg-emerald-900 hover:border-emerald-300 dark:hover:border-emerald-800 transition-all duration-300 hover:shadow-lg hover:shadow-emerald-500/20 hover:-translate-y-0.5"
+                  className="group inline-flex items-center gap-2 px-4 py-2 rounded-xl border border-orange-200 dark:border-orange-900 bg-orange-50 dark:bg-orange-950 text-orange-700 dark:text-orange-300 hover:bg-orange-100 dark:hover:bg-orange-900 hover:border-orange-300 dark:hover:border-orange-800 transition-all duration-300 hover:shadow-lg hover:shadow-orange-500/20 hover:-translate-y-0.5"
                   type="button"
                 >
                   <Unlock className="w-4 h-4 transition-transform duration-300 group-hover:scale-110" />
@@ -280,10 +280,10 @@ const CreateDesignationPage = () => {
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           {/* Form Section */}
           <section className="lg:col-span-2 animate-in slide-in-from-left-6 duration-700 delay-200">
-            <div className="bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 rounded-2xl shadow-xl overflow-hidden">
+            <div className="bg-white dark:bg-neutral-900 border border-orange-500/20 dark:border-orange-500/40 rounded-2xl shadow-xl overflow-hidden">
               <form onSubmit={handleSubmit}>
                 {/* Form Header */}
-                <div className="bg-gradient-to-r from-cyan-500 to-blue-600 px-6 py-4">
+                <div className="bg-gradient-to-r from-orange-500 to-orange-600 px-6 py-4">
                   <h2 className="text-lg font-semibold text-white flex items-center gap-2">
                     <Shield className="w-5 h-5" />
                     Designation Details
@@ -327,9 +327,9 @@ const CreateDesignationPage = () => {
                     <button
                       type="submit"
                       disabled={!isFormValid || creating === 'loading'}
-                      className={`group relative inline-flex items-center gap-2 px-6 py-3 rounded-xl text-sm font-semibold transition-all duration-300 overflow-hidden ${isFormValid ? 'bg-gradient-to-r from-orange-500 to-rose-500 text-white shadow-lg shadow-orange-500/30 hover:shadow-xl hover:shadow-orange-500/40 hover:-translate-y-0.5' : 'bg-neutral-100 dark:bg-neutral-800 text-neutral-400 cursor-not-allowed'}`}
+                      className={`group relative inline-flex items-center gap-2 px-6 py-3 rounded-xl text-sm font-semibold transition-all duration-300 overflow-hidden ${isFormValid ? 'bg-orange-600 text-white shadow-lg shadow-orange-500/30 hover:bg-orange-500 hover:shadow-xl hover:shadow-orange-500/40 hover:-translate-y-0.5' : 'bg-neutral-100 dark:bg-neutral-800 text-neutral-400 cursor-not-allowed'}`}
                     >
-                      <div className={`absolute inset-0 bg-gradient-to-r from-orange-600 to-rose-600 transition-opacity duration-300 ${isFormValid ? 'opacity-0 group-hover:opacity-100' : 'opacity-0'}`}></div>
+                      <div className={`absolute inset-0 transition-opacity duration-300 ${isFormValid ? 'opacity-0 group-hover:opacity-0' : 'opacity-0'}`}></div>
                       <Plus className={`w-4 h-4 relative z-10 transition-transform duration-300 ${isFormValid ? 'group-hover:rotate-90' : ''}`} />
                       <span className="relative z-10">{creating === 'loading' ? 'Creating…' : 'Create Designation'}</span>
                     </button>
@@ -347,10 +347,10 @@ const CreateDesignationPage = () => {
                 </div>
 
                 {/* Permissions Table */}
-                <div className="border-t border-neutral-200 dark:border-neutral-800">
+                <div className="border-t border-orange-500/20 dark:border-orange-500/40">
                   <div className="px-6 py-4 bg-neutral-50 dark:bg-neutral-900/50">
                     <h3 className="text-sm font-semibold text-neutral-900 dark:text-white flex items-center gap-2">
-                      <Settings className="w-4 h-4 text-cyan-600" />
+                      <Settings className="w-4 h-4 text-orange-600" />
                       Route Permissions
                     </h3>
                   </div>
@@ -375,7 +375,7 @@ const CreateDesignationPage = () => {
                                 </div>
                               </td>
                               <td className="px-6 py-4 whitespace-nowrap">
-                                <span className={`inline-flex items-center gap-2 px-3 py-1.5 rounded-full text-xs font-semibold transition-all duration-300 ${isActive ? 'bg-emerald-100 dark:bg-emerald-950 text-emerald-700 dark:text-emerald-300 shadow-sm' : 'bg-neutral-100 dark:bg-neutral-800 text-neutral-600 dark:text-neutral-400'}`}>
+                                    <span className={`inline-flex items-center gap-2 px-3 py-1.5 rounded-full text-xs font-semibold transition-all duration-300 ${isActive ? 'bg-orange-100 dark:bg-orange-950 text-orange-700 dark:text-orange-300 shadow-sm' : 'bg-neutral-100 dark:bg-neutral-800 text-neutral-600 dark:text-neutral-400'}`}>
                                   {getStatusIcon(status)} 
                                   <span>{status}</span>
                                 </span>
@@ -384,7 +384,7 @@ const CreateDesignationPage = () => {
                                 <button
                                   type="button"
                                   onClick={() => handleToggleChange(route)}
-                                  className={`group/btn relative inline-flex items-center justify-center p-2.5 rounded-xl transition-all duration-300 ${isActive ? 'bg-emerald-50 dark:bg-emerald-950 hover:bg-emerald-100 dark:hover:bg-emerald-900 text-emerald-600 dark:text-emerald-400 hover:shadow-lg hover:shadow-emerald-500/20' : 'bg-neutral-100 dark:bg-neutral-800 hover:bg-neutral-200 dark:hover:bg-neutral-700 text-neutral-500 dark:text-neutral-400 hover:text-neutral-700 dark:hover:text-neutral-300'} hover:-translate-y-0.5`}
+                                  className={`group/btn relative inline-flex items-center justify-center p-2.5 rounded-xl transition-all duration-300 ${isActive ? 'bg-orange-50 dark:bg-orange-950 hover:bg-orange-100 dark:hover:bg-orange-900 text-orange-600 dark:text-orange-400 hover:shadow-lg hover:shadow-orange-500/20' : 'bg-neutral-100 dark:bg-neutral-800 hover:bg-neutral-200 dark:hover:bg-neutral-700 text-neutral-500 dark:text-neutral-400 hover:text-neutral-700 dark:hover:text-neutral-300'} hover:-translate-y-0.5`}
                                 >
                                   {isActive ? (
                                     <Settings className="w-5 h-5 transition-transform duration-300 group-hover/btn:rotate-90" />
@@ -406,8 +406,8 @@ const CreateDesignationPage = () => {
 
           {/* Preview Card */}
           <aside className="animate-in slide-in-from-right-6 duration-700 delay-300 space-y-4">
-            <div className="sticky top-6 bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 rounded-2xl shadow-xl overflow-hidden">
-              <div className="bg-gradient-to-r from-purple-500 to-pink-600 px-6 py-4">
+            <div className="sticky top-6 bg-white dark:bg-neutral-900 border border-orange-500/20 dark:border-orange-500/40 rounded-2xl shadow-xl overflow-hidden">
+              <div className="bg-gradient-to-r from-orange-500 to-orange-600 px-6 py-4">
                 <h3 className="text-lg font-semibold text-white flex items-center gap-2">
                   <Activity className="w-5 h-5" />
                   Live Preview
@@ -443,7 +443,7 @@ const CreateDesignationPage = () => {
                     <div className="text-xs font-semibold text-neutral-500 dark:text-neutral-400 uppercase tracking-wider">
                       Permissions
                     </div>
-                    <div className="text-xs font-bold text-cyan-600 dark:text-cyan-400 bg-cyan-50 dark:bg-cyan-950 px-2 py-1 rounded-full">
+                    <div className="text-xs font-bold text-orange-600 dark:text-orange-400 bg-orange-50 dark:bg-orange-950 px-2 py-1 rounded-full">
                       {activeRoutesCount}/{totalRoutesCount}
                     </div>
                   </div>
@@ -452,13 +452,13 @@ const CreateDesignationPage = () => {
                       <li key={k} className="group flex items-center justify-between gap-2 text-sm bg-neutral-50 dark:bg-neutral-800 px-3 py-2.5 rounded-lg transition-all duration-300 hover:bg-neutral-100 dark:hover:bg-neutral-700 hover:shadow-md hover:-translate-y-0.5">
                         <div className="flex items-center gap-2">
                           {v === 'Active' ? (
-                            <CheckCircle2 className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
+                            <CheckCircle2 className="w-4 h-4 text-orange-600 dark:text-orange-400" />
                           ) : (
                             <Ban className="w-4 h-4 text-neutral-400" />
                           )}
                           <span className="font-medium text-neutral-900 dark:text-white">{k}</span>
                         </div>
-                        <span className={`text-xs font-semibold px-2 py-0.5 rounded-full ${v === 'Active' ? 'bg-emerald-100 dark:bg-emerald-950 text-emerald-700 dark:text-emerald-300' : 'bg-neutral-200 dark:bg-neutral-700 text-neutral-600 dark:text-neutral-400'}`}>
+                        <span className={`text-xs font-semibold px-2 py-0.5 rounded-full ${v === 'Active' ? 'bg-orange-100 dark:bg-orange-950 text-orange-700 dark:text-orange-300' : 'bg-neutral-200 dark:bg-neutral-700 text-neutral-600 dark:text-neutral-400'}`}>
                           {v}
                         </span>
                       </li>
@@ -473,7 +473,7 @@ const CreateDesignationPage = () => {
         {/* Success Toast */}
         {showSuccess && (
           <div className="fixed top-6 left-1/2 -translate-x-1/2 z-50 animate-in slide-in-from-top-4 duration-500">
-            <div className="bg-gradient-to-r from-emerald-500 to-green-600 text-white pl-4 pr-2 py-3 rounded-2xl shadow-2xl shadow-emerald-500/50 flex items-center gap-3 min-w-[320px] border border-emerald-400">
+            <div className="bg-gradient-to-r from-orange-500 to-orange-600 text-white pl-4 pr-2 py-3 rounded-2xl shadow-2xl shadow-orange-500/50 flex items-center gap-3 min-w-[320px] border border-orange-400">
               <div className="p-2 bg-white/20 rounded-xl backdrop-blur-sm">
                 <CheckCircle2 className="w-5 h-5" />
               </div>

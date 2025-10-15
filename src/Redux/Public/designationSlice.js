@@ -53,6 +53,26 @@ export const fetchDesignations = createAsyncThunk(
   }
 )
 
+// Smart architecture flow for designations
+export const fetchDesignationsFlow = createAsyncThunk(
+  'designations/fetchFlow',
+  async (_, { getState, rejectWithValue }) => {
+    try {
+      const state = getState()
+      const base = buildBasePath(state)
+      if (!base) return rejectWithValue({ message: 'Missing company context' })
+      const endpoint = `${base}/designations/architecture-flow`
+      const res = await httpGetService(endpoint)
+      if (res.status >= 200 && res.status < 300) {
+        return res.data?.data || res.data
+      }
+      return rejectWithValue(res.data || { message: 'Failed to load designation flow' })
+    } catch (e) {
+      return rejectWithValue({ message: e.message || 'Unexpected error' })
+    }
+  }
+)
+
 const initialState = {
   items: [],
   loadingList: 'idle',
@@ -60,7 +80,10 @@ const initialState = {
   createError: null,
   listError: null,
   lastCreated: null,
-  version: nanoid(6)
+  version: nanoid(6),
+  flow: null,
+  loadingFlow: 'idle',
+  flowError: null,
 }
 
 const designationSlice = createSlice({
@@ -103,6 +126,19 @@ const designationSlice = createSlice({
         state.loadingList = 'failed'
         state.listError = action.payload?.message || 'Load failed'
       })
+      // Flow reducers
+      .addCase(fetchDesignationsFlow.pending, (state) => {
+        state.loadingFlow = 'loading'
+        state.flowError = null
+      })
+      .addCase(fetchDesignationsFlow.fulfilled, (state, action) => {
+        state.loadingFlow = 'succeeded'
+        state.flow = action.payload || null
+      })
+      .addCase(fetchDesignationsFlow.rejected, (state, action) => {
+        state.loadingFlow = 'failed'
+        state.flowError = action.payload?.message || 'Load flow failed'
+      })
   }
 })
 
@@ -115,5 +151,8 @@ export const selectDesignationCreateError = s => s.designations.createError
 export const selectLastCreatedDesignation = s => s.designations.lastCreated
 export const selectDesignationsListLoading = s => s.designations.loadingList
 export const selectDesignationsListError = s => s.designations.listError
+export const selectDesignationsFlow = s => s.designations.flow
+export const selectDesignationsFlowLoading = s => s.designations.loadingFlow
+export const selectDesignationsFlowError = s => s.designations.flowError
 
 export default designationSlice.reducer

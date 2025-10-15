@@ -13,6 +13,8 @@ import { attachAuthStore } from '../auth/auth'
 import { attachStore } from '../config/httphandler'
 import userleaveReducer from '../Redux/Public/UserleaveSlice'
 import leaveTypesReducer from '../Redux/Public/leaveTypesSlice'
+import notificationsReducer from '../Redux/Public/notificationsSlice'
+import leaveApprovalsReducer from '../Redux/Public/leaveApprovalsSlice'
 
 // Simple action logger (dev only)
 const actionLogger = store => next => action => {
@@ -47,6 +49,8 @@ export const store = configureStore({
   onboardingUser: onboardingUserReducer,
   userleave: userleaveReducer, // Add userleave slice to store
   leaveTypes: leaveTypesReducer, // Add this
+  notifications: notificationsReducer,
+  leaveApprovals: leaveApprovalsReducer,
 
 
   },

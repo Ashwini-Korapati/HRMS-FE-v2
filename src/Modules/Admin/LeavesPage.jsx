@@ -10,6 +10,16 @@ import {
   selectLeaveTypesListError 
 } from '../../Redux/Public/leaveTypesSlice'
 import { CheckCircle, XCircle, Calendar, RefreshCw } from 'lucide-react'
+import { 
+  fetchPendingApprovals, 
+  approveLeave, 
+  rejectLeave, 
+  selectPendingApprovals, 
+  selectApprovalsLoading, 
+  selectApprovalsError, 
+  selectApprovingMap, 
+  selectRejectingMap 
+} from '../../Redux/Public/leaveApprovalsSlice'
 
 const LEAVE_TYPE_OPTIONS = [
   { value: 'ANNUAL', label: 'Annual Leave' },
@@ -52,11 +62,22 @@ const safeSelectLeaveTypesListError = (state) => {
 
 export default function LeavesPage() {
   const dispatch = useDispatch()
+  const auth = useSelector(state => state.auth)
+  const companyId = auth?.company?.id
+  const userId = auth?.user?.id
+  const designationId = auth?.user?.designationId || auth?.user?.designation?.id || auth?.user?.designationParentId
   
   // Use safe selectors
   const leaveTypes = useSelector(safeSelectLeaveTypes)
   const loadingList = useSelector(safeSelectLeaveTypesListLoading)
   const listError = useSelector(safeSelectLeaveTypesListError)
+
+  // Pending approvals state
+  const pending = useSelector(selectPendingApprovals)
+  const approvalsLoading = useSelector(selectApprovalsLoading)
+  const approvalsError = useSelector(selectApprovalsError)
+  const approvingMap = useSelector(selectApprovingMap)
+  const rejectingMap = useSelector(selectRejectingMap)
 
   useEffect(() => {
     console.log('LeavesPage mounted, fetching leave types...')
@@ -66,6 +87,12 @@ export default function LeavesPage() {
       console.error('Error dispatching fetchLeaveTypes:', error)
     }
   }, [dispatch])
+
+  useEffect(() => {
+    if (companyId && userId && designationId) {
+      dispatch(fetchPendingApprovals({ companyId, userId, designationId }))
+    }
+  }, [dispatch, companyId, userId, designationId])
 
   const getStatusBadge = (isActive) => {
     return isActive 
@@ -233,22 +260,68 @@ export default function LeavesPage() {
             <h3 className="text-lg font-semibold text-gray-900">Recent Leave Requests</h3>
           </div>
           <div className="p-6">
-            <div className="animate-pulse">
-              <div className="space-y-3">
-                {[...Array(5)].map((_, i) => (
-                  <div key={i} className="flex items-center space-x-4">
-                    <div className="h-4 bg-gray-200 rounded w-1/4"></div>
-                    <div className="h-4 bg-gray-200 rounded w-1/6"></div>
-                    <div className="h-4 bg-gray-200 rounded w-1/6"></div>
-                    <div className="h-4 bg-gray-200 rounded w-1/6"></div>
-                    <div className="h-4 bg-gray-200 rounded w-1/6"></div>
-                  </div>
-                ))}
+            {approvalsLoading === 'loading' ? (
+              <div className="animate-pulse">
+                <div className="space-y-3">
+                  {[...Array(5)].map((_, i) => (
+                    <div key={i} className="flex items-center space-x-4">
+                      <div className="h-4 bg-gray-200 rounded w-1/4"></div>
+                      <div className="h-4 bg-gray-200 rounded w-1/6"></div>
+                      <div className="h-4 bg-gray-200 rounded w-1/6"></div>
+                      <div className="h-4 bg-gray-200 rounded w-1/6"></div>
+                      <div className="h-4 bg-gray-200 rounded w-1/6"></div>
+                    </div>
+                  ))}
+                </div>
               </div>
-            </div>
-            <div className="text-center py-4 text-sm text-gray-500">
-              Leave requests table will be implemented soon
-            </div>
+            ) : approvalsError ? (
+              <div className="text-center text-rose-600">{approvalsError}</div>
+            ) : !pending || pending.length === 0 ? (
+              <div className="text-center py-4 text-sm text-gray-500">No pending leave approvals</div>
+            ) : (
+              <div className="overflow-x-auto">
+                <table className="min-w-full divide-y">
+                  <thead className="bg-gray-50">
+                    <tr>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-600 uppercase tracking-wider">Employee</th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-600 uppercase tracking-wider">Type</th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-600 uppercase tracking-wider">Dates</th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-600 uppercase tracking-wider">Days</th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-600 uppercase tracking-wider">Reason</th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-600 uppercase tracking-wider">Actions</th>
+                    </tr>
+                  </thead>
+                  <tbody className="bg-white divide-y">
+                    {pending.map(req => (
+                      <tr key={req.id} className="hover:bg-slate-50 transition">
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{req.userId}</td>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{req.leaveType?.name || req.leaveTypeId}</td>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                          {new Date(req.startDate).toLocaleDateString()} - {new Date(req.endDate).toLocaleDateString()}
+                          {req.isHalfDay ? ' (Half day)' : ''}
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{req.totalDays}</td>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 max-w-xs truncate" title={req.reason}>{req.reason}</td>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm">
+                          <div className="flex items-center gap-2">
+                            <button
+                              onClick={() => dispatch(approveLeave({ companyId, userId, designationId, leaveId: req.id }))}
+                              disabled={!!approvingMap[req.id]}
+                              className="px-3 py-1 rounded bg-green-100 text-green-700 hover:bg-green-200 disabled:opacity-50"
+                            >Approve</button>
+                            <button
+                              onClick={() => dispatch(rejectLeave({ companyId, userId, designationId, leaveId: req.id }))}
+                              disabled={!!rejectingMap[req.id]}
+                              className="px-3 py-1 rounded bg-rose-100 text-rose-700 hover:bg-rose-200 disabled:opacity-50"
+                            >Reject</button>
+                          </div>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            )}
           </div>
         </div>
       </div>

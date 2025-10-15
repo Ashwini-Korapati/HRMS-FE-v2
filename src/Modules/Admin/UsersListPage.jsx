@@ -1,5 +1,6 @@
 import React, { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
+import { useNavigate } from 'react-router-dom';
 import { 
   selectEmployees, 
   selectEmployeesStatus, 
@@ -9,6 +10,9 @@ import {
 
 export default function UsersListPage() {
   const dispatch = useDispatch();
+  const navigate = useNavigate();
+  const auth = useSelector(s => s.auth)
+  const companyId = auth?.company?.id
   const employees = useSelector(selectEmployees);
   const status = useSelector(selectEmployeesStatus);
   const error = useSelector(selectEmployeesError);
@@ -205,7 +209,8 @@ export default function UsersListPage() {
                 return (
                   <div 
                     key={employee.user_id || employee.email} 
-                    className={`rounded-xl border ${getCardBackground(employee)} p-4 hover:scale-105 transition-all duration-200 hover:shadow-lg shadow-sm`}
+                    onClick={() => companyId && (employee.user_id || employee.id) && navigate(`/${companyId}/users/list/${employee.user_id || employee.id}/profile`)}
+                    className={`cursor-pointer rounded-xl border ${getCardBackground(employee)} p-4 hover:scale-105 transition-all duration-200 hover:shadow-lg shadow-sm`}
                   >
                     {/* Header with Avatar and Status */}
                     <div className="flex items-start justify-between mb-3">

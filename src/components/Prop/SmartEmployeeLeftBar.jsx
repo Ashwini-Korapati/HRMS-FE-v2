@@ -48,18 +48,6 @@ export default function SmartEmployeeLeftBar() {
   return (
     <aside className="w-full lg:w-72 xl:w-80 lg:sticky lg:top-4">
       <div className="rounded-xl border border-neutral-200 dark:border-neutral-800 bg-white dark:bg-neutral-900 shadow-sm overflow-hidden">
-        <div className="px-4 py-4 border-b border-neutral-200 dark:border-neutral-800">
-          <div className="text-xs text-neutral-500 dark:text-neutral-400 mb-2">Settings</div>
-          <nav className="space-y-1">
-            <button className="w-full text-left px-3 py-2 rounded-lg bg-neutral-100 dark:bg-neutral-800/80 text-sm font-medium text-neutral-900 dark:text-neutral-100">
-              My Profile
-            </button>
-            <button className="w-full text-left px-3 py-2 rounded-lg hover:bg-neutral-100 dark:hover:bg-neutral-800/60 text-sm text-neutral-700 dark:text-neutral-300">Security Options</button>
-            <button className="w-full text-left px-3 py-2 rounded-lg hover:bg-neutral-100 dark:hover:bg-neutral-800/60 text-sm text-neutral-700 dark:text-neutral-300">Chat</button>
-            <button className="w-full text-left px-3 py-2 rounded-lg hover:bg-neutral-100 dark:hover:bg-neutral-800/60 text-sm text-neutral-700 dark:text-neutral-300">Preferences</button>
-            <button className="w-full text-left px-3 py-2 rounded-lg hover:bg-neutral-100 dark:hover:bg-neutral-800/60 text-sm text-neutral-700 dark:text-neutral-300">Notifications</button>
-          </nav>
-        </div>
 
         <div className="px-4 py-3 border-b border-neutral-200 dark:border-neutral-800">
           <h3 className="text-sm font-semibold text-neutral-800 dark:text-neutral-100">Team Members</h3>

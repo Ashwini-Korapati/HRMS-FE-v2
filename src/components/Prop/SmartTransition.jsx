@@ -1,10 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react'
 
-/**
- * SmartTransition wraps any content and animates between children using a key.
- * Default: exit to right, enter from left, with fade.
- * Usage: <SmartTransition transitionKey={routeId}>{children}</SmartTransition>
- */
+
 export default function SmartTransition({ transitionKey, className = '', children, duration = 250 }) {
   const [phase, setPhase] = useState('enter') // 'enter' | 'steady' | 'exit'
   const prevKeyRef = useRef(transitionKey)

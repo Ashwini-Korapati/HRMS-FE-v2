@@ -61,6 +61,8 @@ import AnalyticsPage from "./Modules/Admin/AnalyticsPage";
 import AdminSelfProfilePage from "./Modules/Admin/AdminSelfProfilePage";
 import AdminUserProfilePage from "./Modules/Admin/AdminUserProfilePage";
 import CompletedTasks from "./Modules/Admin/completedTasks";
+import MyAdminDesignationTeam from "./Modules/Admin/MyAdminDesignationTeam";
+import MyTeamArchitecture from "./Modules/Admin/MyTeamArchitecture";
 import ProtectedRoute from "./auth/ProtectedRoute";
 import { ROLES, isAuthenticated } from "./auth/auth";
 import { selectBasePath } from "./Redux/Public/authSlice";
@@ -198,6 +200,11 @@ function AppRoutes() {
             path="designations/create"
             element={<CreateDesignationPage />}
           />
+          {/* Teams by designation */}
+          <Route path="projects/teams" element={<MyAdminDesignationTeam />} />
+          <Route path="projects/teams/:designationId" element={<MyAdminDesignationTeam />} />
+          {/* Members list architecture flow */}
+          <Route path="projects/members-list" element={<MyTeamArchitecture />} />
           <Route path="leaves" element={<LeavesPage />} />
           <Route path="attendance" element={<AttendancePage />} />
           <Route path="payroll" element={<PayrollPage />} />

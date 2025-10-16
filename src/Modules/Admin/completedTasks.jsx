@@ -1,6 +1,6 @@
 import React from 'react'
 
-const completedTasks = () => {
+const CompletedTasks = () => {
   return (
     <div>
       completedTasks sxdcfvgbhnjmk
@@ -8,4 +8,4 @@ const completedTasks = () => {
   )
 }
 
-export default completedTasks
+export default CompletedTasks

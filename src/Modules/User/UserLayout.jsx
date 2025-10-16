@@ -2,7 +2,8 @@ import React, { useEffect } from 'react'
 import SmartNavbar from '../../components/Cards/SmartNavbar'
 import SmartSidebar from '../../components/Cards/SmartSidebar'
 import { useTheme } from '../../theme/ThemeProvider'
-import { Outlet } from 'react-router-dom'
+import { Outlet, useLocation } from 'react-router-dom'
+import SmartTransition from '../../components/Prop/SmartTransition'
 import BreadcrumbBar from '../../components/Cards/BreadcrumbBar'
 import { useSelector } from 'react-redux'
 import { selectAuthUser, selectBasePath } from '../../Redux/Public/authSlice'
@@ -11,6 +12,7 @@ function LayoutShell() {
   const { mode, effectiveMode, setMode } = useTheme()
   const user = useSelector(selectAuthUser)
   const basePath = useSelector(selectBasePath)
+  const location = useLocation()
   useEffect(() => {
     // eslint-disable-next-line no-console
     console.debug('[UserLayout] theme mode', { mode, effectiveMode })
@@ -22,7 +24,9 @@ function LayoutShell() {
         <SmartSidebar basePath={basePath} />
         <main className="flex-1 p-6 overflow-auto">
           <BreadcrumbBar />
-          <Outlet />
+          <SmartTransition transitionKey={location.pathname}>
+            <Outlet />
+          </SmartTransition>
         </main>
       </div>
     </div>

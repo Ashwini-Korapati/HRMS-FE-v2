@@ -1,13 +1,16 @@
-import React, { useState } from "react"
-import { Search as SearchIcon, Bell, UserCircle2 } from "lucide-react"
+import React, { useEffect, useMemo, useRef, useState } from "react"
+import { Search as SearchIcon, Bell, UserCircle2, CheckCheck } from "lucide-react"
 import { ThemeSwitcher } from "../Buttons/SwitchButtons"
 import { useTheme } from '../../theme/ThemeProvider'
 import { useSelector, useDispatch } from 'react-redux'
 import { selectAuthUser, logout } from '../../Redux/Public/authSlice'
+import { Link } from 'react-router-dom'
+import { startNotifications, stopNotifications, markAsRead, markAllAsRead } from '../../Redux/Public/notificationsSlice'
+import { useNavigate } from 'react-router-dom'
 
 export default function SmartNavbar({
 	logo = "HR Office",
-	notifications = 2,
+	initialNotifications = 2,
 	onSearch,
 	userName: userNameProp,
 	themeMode,
@@ -15,6 +18,10 @@ export default function SmartNavbar({
 	className = "",
 }) {
 	const [query, setQuery] = useState("")
+	const [open, setOpen] = useState(false)
+	const dropdownRef = useRef(null)
+	const hoverTimerRef = useRef(null)
+	const navigate = useNavigate?.() || ((path) => { window.location.hash = `#${path}` })
     const authUser = useSelector(selectAuthUser)
     const dispatch = useDispatch()
     const userName = authUser?.name || authUser?.email || userNameProp || 'User'
@@ -28,9 +35,72 @@ export default function SmartNavbar({
 		onSearch?.(query)
 	}
 
+		// Start live notifications when we have auth context
+			const notifUrl = useMemo(() => process.env.REACT_APP_NOTIFICATIONS_URL || process.env.REACT_APP_SOCKET_URL || 'http://localhost:7001', [])
+			const authState = useSelector(state => state.auth)
+		useEffect(() => {
+			if (!notifUrl) return
+				const token = authState?.accessToken || null
+				const companyId = authState?.company?.id
+				const userId = authState?.user?.id
+			dispatch(startNotifications({ url: notifUrl, token, companyId, userId }))
+			return () => { dispatch(stopNotifications()) }
+			}, [dispatch, notifUrl, authState?.accessToken, authState?.company?.id, authState?.user?.id])
+
+        // Close dropdown on outside click
+		useEffect(() => {
+            if (!open) return
+            const onDocClick = (e) => {
+                if (dropdownRef.current && !dropdownRef.current.contains(e.target)) {
+                    setOpen(false)
+                }
+            }
+            document.addEventListener('mousedown', onDocClick)
+            return () => document.removeEventListener('mousedown', onDocClick)
+        }, [open])
+
+		const notifications = useSelector(state => state.notifications?.items || [])
+		const unreadCount = useSelector(state => state.notifications?.unread || 0)
+		const companyId = authState?.company?.id
+		const userId = authState?.user?.id
+
+		const items = useMemo(() => {
+			// Normalize fields to match provided feed sample
+			return notifications.map(n => ({
+				id: n.id,
+				title: n.title || n.type || 'Notification',
+				message: n.message || n.reason || '',
+				type: n.type || 'INFO',
+				isRead: !!n.isRead,
+				createdAt: n.at || n.createdAt,
+				metadata: n.metadata || {
+					userId: n.userId,
+					leaveId: n.leaveId,
+					companyId: n.companyId,
+				}
+			}))
+		}, [notifications])
+
+				const handleItemClick = (n) => {
+			const kind = (n.type || n.title || '').toString().toLowerCase()
+			// Heuristic: if it's a leave-related notification, navigate to /leaves
+			if (kind.includes('leave')) {
+								setOpen(false)
+								const role = authState?.user?.role
+								const cId = authState?.company?.id
+								const uId = authState?.user?.id
+								if (cId) {
+									if (role === 'ADMIN') navigate(`/${cId}/leaves`)
+									else navigate(`/${cId}/auth/${uId}/leaves`)
+								} else {
+									navigate('/leaves')
+								}
+			}
+		}
+
 	return (
 		<header
-			className={`w-full relative border-b border-orange-500/30 dark:border-orange-500/80 bg-white/70 dark:bg-transparent backdrop-blur supports-[backdrop-filter]:bg-white/60 dark:supports-[backdrop-filter]:bg-neutral-900/40 transition-colors ${className}`}
+            className={`w-full relative z-[60] border-b border-orange-500/30 dark:border-orange-500/80 bg-white/70 dark:bg-transparent backdrop-blur supports-[backdrop-filter]:bg-white/60 dark:supports-[backdrop-filter]:bg-neutral-900/40 transition-colors ${className}`}
 		>
 			<div className="max-w-7xl mx-auto h-12 px-4 flex items-center justify-between">
 				{/* Logo */}
@@ -64,17 +134,78 @@ export default function SmartNavbar({
 					</button>
 
 					{/* Notifications */}
-					<button
-						className="relative w-8 h-8 rounded-md bg-white/60 dark:bg-transparent border border-orange-500/30 dark:border-orange-500/40 hover:border-orange-500/70 grid place-items-center text-orange-600 dark:text-orange-400 hover:bg-orange-500/10 transition-colors"
-						aria-label="Notifications"
+					<div
+						className="relative"
+						ref={dropdownRef}
+						onMouseEnter={() => {
+							if (hoverTimerRef.current) { clearTimeout(hoverTimerRef.current); hoverTimerRef.current = null }
+							setOpen(true)
+						}}
+						onMouseLeave={() => {
+							if (hoverTimerRef.current) clearTimeout(hoverTimerRef.current)
+							hoverTimerRef.current = setTimeout(() => setOpen(false), 120)
+						}}
 					>
-						<Bell size={15} />
-						{notifications > 0 && (
-							<span className="absolute -top-1 -right-1 min-w-[16px] h-[16px] px-1 rounded-full bg-rose-500 text-white text-[9px] leading-[16px] grid place-items-center border border-orange-600/60">
-								{notifications}
-							</span>
-						)}
-					</button>
+						<button
+							className="relative w-8 h-8 rounded-md bg-white/60 dark:bg-transparent border border-orange-500/30 dark:border-orange-500/40 hover:border-orange-500/70 grid place-items-center text-orange-600 dark:text-orange-400 hover:bg-orange-500/10 transition-colors"
+							aria-label="Notifications"
+						>
+							<Bell size={15} />
+							{unreadCount > 0 && (
+								<span className="absolute -top-1 -right-1 min-w-[16px] h-[16px] px-1 rounded-full bg-neutral-900 text-white text-[9px] leading-[16px] grid place-items-center border border-orange-600/60">
+									{unreadCount > 99 ? '99+' : unreadCount}
+								</span>
+							)}
+						</button>
+						{/* Smart dropdown */}
+						<div className={`absolute right-0 mt-1 w-96 max-w-[92vw] bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-700 rounded-md shadow-xl ${open ? 'opacity-100 pointer-events-auto' : 'opacity-0 pointer-events-none'} transition-opacity z-[80]`}
+							style={{
+								// Make sure it overlays any other content
+								willChange: 'opacity'
+							}}
+						>
+							<div className="px-3 py-2 border-b border-neutral-200 dark:border-neutral-700 text-xs font-semibold text-neutral-700 dark:text-neutral-200 flex items-center justify-between sticky top-0 bg-inherit z-10">
+								<span>Notifications</span>
+								<div className="flex items-center gap-2">
+									<span className="text-[10px] font-normal text-neutral-500">{unreadCount} new</span>
+									<button
+										disabled={!unreadCount}
+										onClick={() => dispatch(markAllAsRead({ companyId, userId }))}
+										className="inline-flex items-center gap-1 px-2 py-1 rounded-md text-[10px] border border-neutral-300 dark:border-neutral-700 text-neutral-600 dark:text-neutral-300 hover:bg-neutral-100 dark:hover:bg-neutral-800 disabled:opacity-40 disabled:cursor-not-allowed"
+										title="Mark all as read"
+									>
+										<CheckCheck size={12} /> Mark all
+									</button>
+								</div>
+							</div>
+							<ul className="max-h-80 overflow-auto divide-y divide-neutral-100 dark:divide-neutral-800">
+								{items.slice(0, 15).map((n) => (
+									<li key={n.id}
+										className={`px-3 py-2 text-xs ${n.isRead ? 'text-neutral-600 dark:text-neutral-300' : 'text-neutral-800 dark:text-white'} hover:bg-neutral-50 dark:hover:bg-neutral-800/60 flex items-start gap-2 cursor-pointer`}
+										onClick={() => handleItemClick(n)}
+									>
+										<div className={`mt-0.5 w-2 h-2 rounded-full ${n.isRead ? 'bg-neutral-400' : 'bg-orange-500'}`} />
+										<div className="flex-1 min-w-0">
+											<div className="font-medium truncate">{n.title}</div>
+											{n.message && <div className="mt-0.5 text-[11px] text-neutral-600 dark:text-neutral-300 line-clamp-2">{n.message}</div>}
+											{n.createdAt && <div className="text-[10px] text-neutral-500 mt-0.5">{new Date(n.createdAt).toLocaleString()}</div>}
+										</div>
+										{!n.isRead && (
+											<button
+												onClick={() => dispatch(markAsRead({ companyId, userId, notificationId: n.id }))}
+												className="ml-2 shrink-0 px-2 py-1 rounded-md text-[10px] border border-neutral-300 dark:border-neutral-700 text-neutral-600 dark:text-neutral-300 hover:bg-neutral-100 dark:hover:bg-neutral-800"
+											>
+												Mark
+											</button>
+										)}
+									</li>
+								))}
+								{items.length === 0 && (
+									<li className="px-3 py-6 text-center text-xs text-neutral-500">No notifications yet</li>
+								)}
+							</ul>
+						</div>
+					</div>
 
 					{/* Theme switcher (re-mount on prop change to sync) */}
 					<ThemeSwitcher key={effectiveThemeMode} defaultValue={effectiveThemeMode} onChange={handleThemeChange} className="hidden md:inline-flex" />
@@ -85,7 +216,8 @@ export default function SmartNavbar({
 							<UserCircle2 size={16} className="text-cyan-400" />
 							<span className="hidden sm:inline leading-none">{userName}</span>
 						</button>
-						<div className="absolute right-0 mt-1 w-40 py-2 bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-700 rounded-md shadow-lg opacity-0 pointer-events-none group-hover:opacity-100 group-hover:pointer-events-auto transition-opacity z-20">
+						<div className="absolute right-0 mt-1 w-44 py-2 bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-700 rounded-md shadow-lg opacity-0 pointer-events-none group-hover:opacity-100 group-hover:pointer-events-auto transition-opacity z-20">
+							<Link to={`/${authState?.company?.id}/profile`} className="block px-3 py-1.5 text-xs text-neutral-700 dark:text-neutral-200 hover:bg-neutral-100 dark:hover:bg-neutral-700/60 transition-colors">My Profile</Link>
 							<button onClick={() => dispatch(logout())} className="w-full text-left px-3 py-1.5 text-xs text-neutral-600 dark:text-neutral-300 hover:bg-neutral-100 dark:hover:bg-neutral-700/60 transition-colors">Logout</button>
 						</div>
 					</div>

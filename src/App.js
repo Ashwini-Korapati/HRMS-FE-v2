@@ -58,6 +58,9 @@ import HolidaysPage from "./Modules/Admin/HolidaysPage";
 import AnnouncementsPage from "./Modules/Admin/AnnouncementsPage";
 import ReportsPage from "./Modules/Admin/ReportsPage";
 import AnalyticsPage from "./Modules/Admin/AnalyticsPage";
+import AdminSelfProfilePage from "./Modules/Admin/AdminSelfProfilePage";
+import AdminUserProfilePage from "./Modules/Admin/AdminUserProfilePage";
+import CompletedTasks from "./Modules/Admin/completedTasks";
 import ProtectedRoute from "./auth/ProtectedRoute";
 import { ROLES, isAuthenticated } from "./auth/auth";
 import { selectBasePath } from "./Redux/Public/authSlice";
@@ -66,7 +69,6 @@ import { useDispatch } from "react-redux";
 import { platformLogin } from "./Redux/Public/authSlice";
 import { ThemeProvider } from "./theme/ThemeProvider";
 import UserProject from "./Modules/User/UserProject";
-import completedTasks from "./Modules/Admin/completedTasks";
 
 function UAS() {
   return (
@@ -180,9 +182,11 @@ function AppRoutes() {
       {/* ADMIN pattern with nested pages */}
       <Route element={<ProtectedRoute roles={[ROLES.ADMIN]} />}>
         <Route path=":companyUuid" element={<AdminLayout />}>
+          <Route path="profile" element={<AdminSelfProfilePage />} />
           <Route path="overview" element={<OverviewPage />} />
           <Route path="users" element={<UsersPage />} />
           <Route path="users/list" element={<UsersListPage />} />
+          <Route path="users/list/:userId/profile" element={<AdminUserProfilePage />} />
           <Route path="users/create" element={<CreateUserPage />} />
           <Route path="users/import" element={<ImportUsersPage />} />
           <Route path="departments" element={<DepartmentsPage />} />
@@ -209,7 +213,7 @@ function AppRoutes() {
           <Route path="tasks/create" element={<CreateTaskPage />} />
           <Route path="holidays" element={<HolidaysPage />} />
           <Route path="announcements" element={<AnnouncementsPage />} />
-          <Route path="tasks/completed" element={<completedTasks />} />
+          <Route path="tasks/completed" element={<CompletedTasks />} />
           <Route path="reports" element={<ReportsPage />} />
           <Route path="analytics" element={<AnalyticsPage />} />
           <Route index element={<OverviewPage />} />

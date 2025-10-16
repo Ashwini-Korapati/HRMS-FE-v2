@@ -623,7 +623,7 @@ export default function SmartEmployeeOnboardingForm({ initialData = {}, onSubmit
 						touched={touched}
 						stepErrors={stepErrors}
 					/>
-				)}
+				)} 
 				{step === 1 && (
 					<EmploymentStep 
 						form={form}

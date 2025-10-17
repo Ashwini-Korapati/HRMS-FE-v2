@@ -16,11 +16,12 @@ import leaveTypesReducer from '../Redux/Public/leaveTypesSlice'
 import notificationsReducer from '../Redux/Public/notificationsSlice'
 import leaveApprovalsReducer from '../Redux/Public/leaveApprovalsSlice'
 import adminUserProfileReducer from '../Redux/Public/adminUserProfileSlice'
-
+import  WorkShiftsReducer from '../Redux/Public/WorkShiftsSlice'
 // Simple action logger (dev only)
 const actionLogger = store => next => action => {
   if (process.env.NODE_ENV === 'development') {
     // eslint-disable-next-line no-console
+
     console.debug('[Redux]', action.type, action.payload)
   }
   return next(action)
@@ -53,7 +54,7 @@ export const store = configureStore({
   notifications: notificationsReducer,
   leaveApprovals: leaveApprovalsReducer,
   adminUserProfile: adminUserProfileReducer,
-
+    workShifts: WorkShiftsReducer, // Add this reducer
 
   },
   middleware: getDefault => getDefault({ serializableCheck: false }).concat(actionLogger, errorReporter)

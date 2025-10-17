@@ -167,6 +167,39 @@ export function httpPatchService(url, data, options = {}) {
     })
 }
 
+export function httpPutService(url, data, options = {}) {
+  const apiURL = `${serverURL}/${url}`
+  const headers = injectAuthHeader({ 
+    "Content-Type": "application/json", 
+    ...options.headers 
+  })
+
+  if (window.loadingContext) window.loadingContext.showLoading()
+
+  return fetch(apiURL, {
+    method: "PUT",
+    headers,
+    body: JSON.stringify(data),
+  })
+    .then(async (response) => {
+      const json = await response.json().catch(() => ({}))
+      if (window.loadingContext) window.loadingContext.hideLoading()
+      return { 
+        status: response.status, 
+        data: json,
+        ok: response.ok
+      }
+    })
+    .catch((err) => {
+      console.error(err)
+      if (window.loadingContext) window.loadingContext.hideLoading()
+      return { 
+        status: 500, 
+        data: { message: "Something went wrong" },
+        ok: false
+      }
+    })
+}
 export function httpDeleteService(url, options = {}) {
   const apiURL = `${serverURL}/${url}`
   const headers = injectAuthHeader({ Accept: "application/json", ...options.headers })

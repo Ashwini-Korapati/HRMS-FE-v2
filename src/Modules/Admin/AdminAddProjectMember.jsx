@@ -2,8 +2,9 @@ import React, { useEffect, useMemo, useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { useNavigate, useParams } from 'react-router-dom'
 import { fetchProjects, selectProjects, selectProjectsListLoading } from '../../Redux/Public/projectsSlice'
-import { RefreshCw, Search, Check, UserPlus, X, ToggleLeft, ToggleRight } from 'lucide-react'
+import { RefreshCw, Search, Check, UserPlus, X, ToggleLeft, ToggleRight, Clock, Building2 } from 'lucide-react'
 import { fetchCompanyEmployees, selectEmployees, selectEmployeesLoading, selectEmployeesError, assignEmployeesToProject, selectEmployeesAssigning, selectEmployeesAssignError, selectEmployeesLastAssigned } from '../../Redux/Public/employeesSlice'
+import { fetchWorkShifts, selectWorkShifts } from '../../Redux/Public/WorkShiftsSlice'
 
 function ProjectList({ projects, currentId, onSelect, loading }) {
   return (
@@ -28,7 +29,14 @@ function ProjectList({ projects, currentId, onSelect, loading }) {
   )
 }
 
-function EmployeeRow({ emp, onToggle, selected, disabled, featureState, onFeatureToggle }) {
+const ATTENDANCE_TYPES = [
+  { value: 'OFFICE', label: 'Office' },
+  { value: 'WORK_FROM_HOME', label: 'Work from Home' },
+  { value: 'FIELD', label: 'Field' },
+  { value: 'HYBRID', label: 'Hybrid' }
+]
+
+function EmployeeRow({ emp, onToggle, selected, disabled, featureState, onFeatureToggle, attendanceType, workShiftId, shifts, onAttendanceChange, onShiftChange }) {
   const fullName = `${emp.firstName || ''} ${emp.lastName || ''}`.trim() || emp.email
   // Base from employee or defaults
   const baseEnabled = emp.enabledRoutesStatus || {}
@@ -89,6 +97,38 @@ function EmployeeRow({ emp, onToggle, selected, disabled, featureState, onFeatur
           })}
         </div>
       )}
+      {/* Attendance & Shift controls (visible only when selected) */}
+      {selected && !disabled && (
+        <div className="flex flex-wrap items-center gap-2 pt-1.5">
+          <div className="flex items-center gap-1">
+            <Building2 size={12} className="text-neutral-400" />
+            <select
+              value={attendanceType || 'OFFICE'}
+              onChange={(e) => onAttendanceChange(emp, e.target.value)}
+              className="text-[11px] px-1.5 py-0.5 border rounded-md bg-white/80 dark:bg-neutral-900/60"
+              title="Attendance Type"
+            >
+              {ATTENDANCE_TYPES.map(t => (
+                <option key={t.value} value={t.value}>{t.label}</option>
+              ))}
+            </select>
+          </div>
+          <div className="flex items-center gap-1">
+            <Clock size={12} className="text-neutral-400" />
+            <select
+              value={workShiftId || ''}
+              onChange={(e) => onShiftChange(emp, e.target.value || null)}
+              className={`text-[11px] px-1.5 py-0.5 border rounded-md bg-white/80 dark:bg-neutral-900/60 ${!workShiftId && (Array.isArray(shifts) && shifts.length > 0) ? 'border-amber-400' : ''}`}
+              title="Work Shift"
+            >
+              <option value="">No shift</option>
+              {(shifts || []).map(s => (
+                <option key={s.id} value={s.id}>{s.name || s.title || s.code || s.id}</option>
+              ))}
+            </select>
+          </div>
+        </div>
+      )}
     </div>
   )
 }
@@ -102,12 +142,15 @@ export default function AdminAddProjectMember(){
   const employees = useSelector(selectEmployees)
   const empLoading = useSelector(selectEmployeesLoading)
   const empError = useSelector(selectEmployeesError)
+  const shifts = useSelector(selectWorkShifts)
   const assigning = useSelector(selectEmployeesAssigning)
   const assignError = useSelector(selectEmployeesAssignError)
   const lastAssigned = useSelector(selectEmployeesLastAssigned)
   const [q, setQ] = useState('')
   const [selected, setSelected] = useState([]) // array of employee objects
   const [featureOverrides, setFeatureOverrides] = useState({}) // userId -> { feature: bool }
+  const [assignmentOptions, setAssignmentOptions] = useState({}) // userId -> { attendanceType, workShiftId }
+  const [auditLog, setAuditLog] = useState([])
 
   // Ensure projects loaded
   useEffect(() => { if(!projects.length) dispatch(fetchProjects()) }, [dispatch, projects.length])
@@ -119,6 +162,8 @@ export default function AdminAddProjectMember(){
     if ((empLoading === 'idle' && !employees.length) || empLoading === 'failed') {
       dispatch(fetchCompanyEmployees())
     }
+    // Always ensure we have shifts available for dropdowns
+    dispatch(fetchWorkShifts(currentProject?.id))
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [projects.length])
 
@@ -141,6 +186,12 @@ export default function AdminAddProjectMember(){
           delete next[emp.user_id]
           return next
         })
+        setAssignmentOptions(prev => {
+          const next = { ...prev }
+          delete next[emp.user_id]
+          return next
+        })
+        setAuditLog(log => [...log, { ts: Date.now(), action: 'deselect', userId: emp.user_id }])
         return sel.filter(e => e.user_id !== emp.user_id)
       }
       // initialize overrides from current state of employee (ensuring default keys)
@@ -150,6 +201,10 @@ export default function AdminAddProjectMember(){
         task: typeof base.task === 'boolean' ? base.task : false
       }
       setFeatureOverrides(prev => ({ ...prev, [emp.user_id]: init }))
+      // initialize assignment options defaults
+      const defaultShift = Array.isArray(shifts) && shifts.length > 0 ? (shifts[0].id) : null
+      setAssignmentOptions(prev => ({ ...prev, [emp.user_id]: { attendanceType: 'OFFICE', workShiftId: defaultShift } }))
+      setAuditLog(log => [...log, { ts: Date.now(), action: 'select', userId: emp.user_id }])
       return [...sel, emp]
     })
   }
@@ -165,13 +220,17 @@ export default function AdminAddProjectMember(){
     if (!currentProject || !companyId || !selected.length || assigning === 'loading') return
     const members = selected.map(s => ({
       userId: s.user_id || s.id,
-      enabledRoutesStatus: featureOverrides[s.user_id] || s.enabledRoutesStatus || { projects: true, task: false }
+      enabledRoutesStatus: featureOverrides[s.user_id] || s.enabledRoutesStatus || { projects: true, task: false },
+      attendanceType: assignmentOptions[s.user_id]?.attendanceType || 'OFFICE',
+      workShiftId: assignmentOptions[s.user_id]?.workShiftId || null
     }))
     try {
       await dispatch(assignEmployeesToProject({ companyId, projectId: currentProject.id, members })).unwrap()
       // Clear selection on success
       setSelected([])
       setFeatureOverrides({})
+      setAssignmentOptions({})
+      setAuditLog(log => [...log, { ts: Date.now(), action: 'assign', count: members.length, projectId: currentProject.id }])
     } catch (_) {
       // swallow; error shown below
     }
@@ -185,6 +244,23 @@ export default function AdminAddProjectMember(){
       }
       return { ...prev, [emp.user_id]: { ...current, [feat]: nextVal } }
     })
+    setAuditLog(log => [...log, { ts: Date.now(), action: 'toggle-feature', userId: emp.user_id, feature: feat, value: nextVal }])
+  }
+
+  const handleAttendanceChange = (emp, type) => {
+    setAssignmentOptions(prev => ({
+      ...prev,
+      [emp.user_id]: { attendanceType: type, workShiftId: prev[emp.user_id]?.workShiftId || null }
+    }))
+    setAuditLog(log => [...log, { ts: Date.now(), action: 'attendance', userId: emp.user_id, value: type }])
+  }
+
+  const handleShiftChange = (emp, shiftId) => {
+    setAssignmentOptions(prev => ({
+      ...prev,
+      [emp.user_id]: { attendanceType: prev[emp.user_id]?.attendanceType || 'OFFICE', workShiftId: shiftId }
+    }))
+    setAuditLog(log => [...log, { ts: Date.now(), action: 'work-shift', userId: emp.user_id, value: shiftId }])
   }
 
   return (
@@ -247,6 +323,11 @@ export default function AdminAddProjectMember(){
                     disabled={emp.isActiveInProject}
                     featureState={featureOverrides[emp.user_id]}
                     onFeatureToggle={handleFeatureToggle}
+                    attendanceType={assignmentOptions[emp.user_id]?.attendanceType}
+                    workShiftId={assignmentOptions[emp.user_id]?.workShiftId}
+                    shifts={shifts}
+                    onAttendanceChange={handleAttendanceChange}
+                    onShiftChange={handleShiftChange}
                   />
                 )
               })}
@@ -273,6 +354,10 @@ export default function AdminAddProjectMember(){
             {assigning === 'succeeded' && lastAssigned && lastAssigned.projectId === currentProject?.id && (
               <div className="text-[11px] text-emerald-600 dark:text-emerald-400">Members added successfully.</div>
             )}
+            {/* Soft validation hint */}
+            {selected.length > 0 && Array.isArray(shifts) && shifts.length > 0 && selected.some(s => !assignmentOptions[s.user_id]?.workShiftId) && (
+              <div className="text-[11px] text-amber-600">Tip: Select a work shift for all selected members for better scheduling.</div>
+            )}
             <div className="flex justify-end">
               <button
                 onClick={handleAssign}
@@ -297,6 +382,21 @@ export default function AdminAddProjectMember(){
           ) : (
             <div className="text-[11px] text-neutral-500">Select a project to view details.</div>
           )}
+          <div className="pt-3">
+            <div className="text-[10px] uppercase tracking-wide font-semibold text-neutral-600 dark:text-neutral-400">Audit</div>
+            {auditLog.length === 0 ? (
+              <div className="text-[11px] text-neutral-500">No actions yet.</div>
+            ) : (
+              <ul className="text-[11px] space-y-1 max-h-[30vh] overflow-auto pr-1">
+                {auditLog.slice(-20).reverse().map((e, idx) => (
+                  <li key={idx} className="flex items-center justify-between gap-2 border-b border-neutral-200/50 dark:border-neutral-800/50 pb-0.5">
+                    <span className="truncate">{e.action} {e.userId ? `• ${e.userId}` : ''} {e.feature ? `• ${e.feature}:${String(e.value)}` : ''} {e.count ? `• count:${e.count}` : ''}</span>
+                    <span className="text-[10px] text-neutral-400">{new Date(e.ts).toLocaleTimeString()}</span>
+                  </li>
+                ))}
+              </ul>
+            )}
+          </div>
         </div>
       </div>
     </div>

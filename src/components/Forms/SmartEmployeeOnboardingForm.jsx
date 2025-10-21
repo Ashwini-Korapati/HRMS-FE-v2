@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react"
+import { toAssetUrl } from "../../config/config"
 import { useDispatch, useSelector } from "react-redux"
 import {
 	User,
@@ -85,6 +86,158 @@ const Input = React.memo(({ label, error, required, className = "", ...props }) 
 	)
 })
 Input.displayName = 'Input'
+
+// Avatar uploader with drag & drop, gradient preview, and loading
+const AvatarUploader = React.memo(function AvatarUploader({ label = "Avatar", value, onChange, onFile, onBlur, error, required }) {
+	const [dragOver, setDragOver] = useState(false)
+	const [uploading, setUploading] = useState(false)
+	const [showUrlInput, setShowUrlInput] = useState(false)
+
+	const acceptTypes = ['image/png', 'image/jpeg']
+	const maxSize = 5 * 1024 * 1024 // 5MB
+
+	const readFile = (file) => new Promise((resolve, reject) => {
+		const reader = new FileReader()
+		reader.onload = () => resolve(reader.result)
+		reader.onerror = reject
+		reader.readAsDataURL(file)
+	})
+
+	const handleFiles = async (files) => {
+		const file = files?.[0]
+		if (!file) return
+		if (!acceptTypes.includes(file.type)) {
+			alert('Only PNG or JPG images are allowed')
+			return
+		}
+		if (file.size > maxSize) {
+			alert('Image is too large. Max size is 5MB')
+			return
+		}
+		try {
+			setUploading(true)
+			const dataUrl = await readFile(file)
+			onFile?.(file)
+			onChange?.(dataUrl)
+			onBlur?.()
+		} catch (e) {
+			console.error('Failed to read image', e)
+		} finally {
+			setUploading(false)
+		}
+	}
+
+	const onDrop = (e) => {
+		e.preventDefault()
+		e.stopPropagation()
+		setDragOver(false)
+		const files = e.dataTransfer?.files
+		handleFiles(files)
+	}
+
+	const onBrowse = (e) => {
+		const files = e.target?.files
+		handleFiles(files)
+	}
+
+	const hasImage = !!value
+
+	return (
+		<div className="md:col-span-2">
+			<label className="flex flex-col gap-1.5 w-full">
+				<span className="text-sm font-medium text-gray-800">
+					{label} {required && <span className="text-rose-500">*</span>}
+				</span>
+
+				{/* Dropzone */}
+				<div
+					onDragEnter={(e) => { e.preventDefault(); setDragOver(true) }}
+					onDragOver={(e) => { e.preventDefault(); setDragOver(true) }}
+					onDragLeave={(e) => { e.preventDefault(); setDragOver(false) }}
+					onDrop={onDrop}
+					className={`group relative border-2 border-dashed rounded-xl transition-colors overflow-hidden 
+						${dragOver ? 'border-orange-500 bg-orange-50/50' : error ? 'border-rose-400' : 'border-gray-300 hover:border-orange-400'}
+						${hasImage ? 'p-0' : 'p-4'}
+					`}
+				>
+					{/* Gradient backdrop */}
+					<div className={`absolute inset-0 pointer-events-none opacity-70 transition-opacity ${hasImage ? 'opacity-60' : 'opacity-100'}`}
+						style={{
+							background: 'radial-gradient(circle at 20% 10%, rgba(251,146,60,.20), transparent 40%), radial-gradient(circle at 80% 30%, rgba(59,130,246,.20), transparent 42%), radial-gradient(circle at 50% 90%, rgba(16,185,129,.18), transparent 40%)'
+						}}
+					/>
+
+					{/* Preview or placeholder */}
+					{hasImage ? (
+						<div className="relative aspect-[3/1] sm:aspect-[5/2] md:aspect-[7/3] w-full">
+							<div className="absolute inset-0 grid place-items-center">
+								<div className="relative w-28 h-28 sm:w-32 sm:h-32 rounded-2xl overflow-hidden ring-2 ring-white/60 shadow-lg transform transition-transform duration-300 group-hover:scale-[1.02]">
+									{/* image */}
+									<img
+										src={typeof value === 'string' ? toAssetUrl(value) : value}
+										alt="Avatar preview"
+										className="w-full h-full object-cover animate-[fadeIn_.3s_ease-out]"
+									/>
+									{/* subtle gradient veil */}
+									<div className="absolute inset-0 bg-gradient-to-t from-black/10 to-transparent" />
+								</div>
+							</div>
+
+							{/* controls */}
+							<div className="absolute bottom-2 left-1/2 -translate-x-1/2 flex items-center gap-2">
+								<label className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium bg-white/80 backdrop-blur border border-gray-300 text-gray-700 hover:bg-white cursor-pointer transition-colors">
+									<input type="file" accept="image/png,image/jpeg" className="hidden" onChange={onBrowse} />
+									Change
+								</label>
+								<button type="button" onClick={() => onChange?.("")} className="px-3 py-1.5 rounded-lg text-xs font-medium bg-white/70 backdrop-blur border border-gray-300 text-gray-600 hover:bg-white transition-colors">
+									Remove
+								</button>
+							</div>
+						</div>
+					) : (
+						<div className="relative grid place-items-center min-h-[140px]">
+							<div className="text-center space-y-1">
+								<div className="text-sm font-medium text-gray-800">Drag & drop avatar here</div>
+								<div className="text-xs text-gray-500">PNG or JPG (max 5MB)</div>
+								<div className="mt-2 flex items-center justify-center gap-2">
+									<label className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium bg-white/80 backdrop-blur border border-gray-300 text-gray-700 hover:bg-white cursor-pointer transition-colors">
+										<input type="file" accept="image/png,image/jpeg" className="hidden" onChange={onBrowse} />
+										Browse…
+									</label>
+									<button type="button" onClick={() => setShowUrlInput(s => !s)} className="px-3 py-1.5 rounded-lg text-xs font-medium bg-white/70 backdrop-blur border border-gray-300 text-gray-600 hover:bg-white transition-colors">
+										{showUrlInput ? 'Hide URL' : 'Paste URL'}
+									</button>
+								</div>
+							</div>
+						</div>
+					)}
+
+					{/* Loading overlay */}
+					{uploading && (
+						<div className="absolute inset-0 bg-white/60 backdrop-blur-sm grid place-items-center animate-[fadeIn_.15s_ease]">
+							<div className="w-7 h-7 border-2 border-orange-500/30 border-t-orange-500 rounded-full animate-spin" />
+						</div>
+					)}
+				</div>
+
+				{/* Optional URL input */}
+				{showUrlInput && !hasImage && (
+					<input
+						type="url"
+						placeholder="https://example.com/avatar.jpg"
+						className={`mt-2 w-full bg-white border rounded-lg px-4 py-2.5 text-gray-900 placeholder-gray-500 outline-none transition-all duration-200 focus:ring-2 focus:ring-orange-500/40 focus:border-orange-500 ${error ? 'border-rose-500 focus:ring-rose-500/30' : 'border-gray-300 hover:border-orange-500/50'}`}
+						value={value || ''}
+						onChange={(e) => onChange?.(e.target.value)}
+						onBlur={onBlur}
+					/>
+				)}
+
+				{error && <span className="text-xs text-rose-500 mt-0.5">{error}</span>}
+			</label>
+		</div>
+	)
+})
+AvatarUploader.displayName = 'AvatarUploader'
 
 // Move Select component outside to prevent recreation on every render
 const Select = React.memo(({ label, error, required, children, className = "", disabled, ...props }) => {
@@ -215,14 +368,14 @@ const PersonalStep = React.memo(function PersonalStep({ form, update, markTouche
 				<option value="Female">Female</option>
 				<option value="Other">Other</option>
 			</Select>
-			<Input 
-				label="Avatar URL" 
-				value={form.avatar} 
-				onChange={(e) => update("avatar", e.target.value)} 
-				onBlur={() => markTouched("avatar")} 
-				error={touched.avatar && stepErrors.avatar} 
-				className="md:col-span-2" 
-				required 
+			<AvatarUploader
+				label="Avatar"
+				value={form.avatar}
+				onChange={(val) => update("avatar", val)}
+				onFile={(file) => update("__avatarFile", file)}
+				onBlur={() => markTouched("avatar")}
+				error={touched.avatar && stepErrors.avatar}
+				required
 			/>
 			<Input 
 				label="Address Line 1" 
@@ -541,6 +694,7 @@ export default function SmartEmployeeOnboardingForm({ initialData = {}, onSubmit
             address: `${form.address.line1}, ${form.address.city}, ${form.address.state} ${form.address.postalCode}, ${form.address.country}`.trim(),
             dateOfBirth: formatDateForAPI(form.dateOfBirth),
             gender: form.gender,
+			avatar: (typeof form.avatar === 'string' && form.avatar) ? form.avatar : '',
             emergencyContact: {
                 name: form.emergencyContact.name.trim(),
                 relationship: form.emergencyContact.relation.trim(),

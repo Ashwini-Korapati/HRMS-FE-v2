@@ -1,5 +1,6 @@
 import { serverURL } from "./config"
 import axios from "axios"
+import { setOnlineStatus, setConnectionError } from '../Redux/Public/connectionSlice'
 import { storage, persistKeys } from '../store/storage'
 // We will lazily attach the redux store to enable refresh dispatch without circular import
 let reduxStore = null
@@ -13,7 +14,9 @@ const axiosInstance = axios.create({
 // Add request interceptor to show loading spinner
 axiosInstance.interceptors.request.use(
   (config) => {
-    if (window.loadingContext) {
+    // tag start time for latency measurement and preserve custom flags
+    config.metadata = { ...(config.metadata || {}), startTime: Date.now() }
+    if (window.loadingContext && !config.metadata?.skipLoading) {
       window.loadingContext.showLoading()
     }
     // Inject bearer token if available (session first then local)
@@ -47,6 +50,11 @@ axiosInstance.interceptors.response.use(
     if (window.loadingContext) {
       window.loadingContext.hideLoading()
     }
+    try {
+      const started = response.config?.metadata?.startTime
+      const latencyMs = started ? (Date.now() - started) : null
+      if (reduxStore) reduxStore.dispatch(setOnlineStatus({ online: true, latencyMs }))
+    } catch (_) {}
     return response
   },
   async (error) => {
@@ -54,6 +62,16 @@ axiosInstance.interceptors.response.use(
       window.loadingContext.hideLoading()
     }
     const original = error.config
+    try {
+      const started = original?.metadata?.startTime
+      const latencyMs = started ? (Date.now() - started) : null
+      const status = error?.response?.status
+      const message = error?.message || 'Network error'
+      if (reduxStore) {
+        reduxStore.dispatch(setConnectionError({ status, message }))
+        reduxStore.dispatch(setOnlineStatus({ online: false, latencyMs }))
+      }
+    } catch (_) {}
     if (error.response && error.response.status === 401 && !original._retry) {
       original._retry = true
       if (isRefreshing) {
@@ -99,7 +117,7 @@ export function httpPostService(url, data, options = {}) {
   if (window.loadingContext) {
     window.loadingContext.showLoading()
   }
- 
+  const started = Date.now()
   return fetch(apiURL, {
     method: "POST",
     headers: headers,
@@ -111,6 +129,7 @@ export function httpPostService(url, data, options = {}) {
         if (window.loadingContext) {
           window.loadingContext.hideLoading()
         }
+        try { if (reduxStore) reduxStore.dispatch(setOnlineStatus({ online: true, latencyMs: Date.now() - started })) } catch(_) {}
         return { status: response.status, data: data }
       })
     })
@@ -120,6 +139,13 @@ export function httpPostService(url, data, options = {}) {
       if (window.loadingContext) {
         window.loadingContext.hideLoading()
       }
+      try {
+        const message = err?.message || 'Something went wrong'
+        if (reduxStore) {
+          reduxStore.dispatch(setConnectionError({ status: 500, message }))
+          reduxStore.dispatch(setOnlineStatus({ online: false, latencyMs: Date.now() - started }))
+        }
+      } catch(_) {}
       return { status: 500, data: { message: "Something went wrong" } }
     })
 }
@@ -129,16 +155,24 @@ export function httpGetService(url, options = {}) {
   const headers = injectAuthHeader({ Accept: "application/json", ...options.headers })
 
   if (window.loadingContext) window.loadingContext.showLoading()
-
+  const started = Date.now()
   return fetch(apiURL, { method: "GET", headers })
     .then(async (response) => {
       const data = await response.json().catch(() => ({}))
       if (window.loadingContext) window.loadingContext.hideLoading()
+      try { if (reduxStore) reduxStore.dispatch(setOnlineStatus({ online: true, latencyMs: Date.now() - started })) } catch(_) {}
       return { status: response.status, data }
     })
     .catch((err) => {
       console.error(err)
       if (window.loadingContext) window.loadingContext.hideLoading()
+      try {
+        const message = err?.message || 'Something went wrong'
+        if (reduxStore) {
+          reduxStore.dispatch(setConnectionError({ status: 500, message }))
+          reduxStore.dispatch(setOnlineStatus({ online: false, latencyMs: Date.now() - started }))
+        }
+      } catch(_) {}
       return { status: 500, data: { message: "Something went wrong" } }
     })
 }
@@ -149,7 +183,7 @@ export function httpPatchService(url, data, options = {}) {
   const headers = injectAuthHeader({ "Content-Type": "application/json", ...options.headers })
 
   if (window.loadingContext) window.loadingContext.showLoading()
-
+  const started = Date.now()
   return fetch(apiURL, {
     method: "PATCH",
     headers,
@@ -158,11 +192,19 @@ export function httpPatchService(url, data, options = {}) {
     .then(async (response) => {
       const json = await response.json().catch(() => ({}))
       if (window.loadingContext) window.loadingContext.hideLoading()
+      try { if (reduxStore) reduxStore.dispatch(setOnlineStatus({ online: true, latencyMs: Date.now() - started })) } catch(_) {}
       return { status: response.status, data: json }
     })
     .catch((err) => {
       console.error(err)
       if (window.loadingContext) window.loadingContext.hideLoading()
+      try {
+        const message = err?.message || 'Something went wrong'
+        if (reduxStore) {
+          reduxStore.dispatch(setConnectionError({ status: 500, message }))
+          reduxStore.dispatch(setOnlineStatus({ online: false, latencyMs: Date.now() - started }))
+        }
+      } catch(_) {}
       return { status: 500, data: { message: "Something went wrong" } }
     })
 }
@@ -175,7 +217,7 @@ export function httpPutService(url, data, options = {}) {
   })
 
   if (window.loadingContext) window.loadingContext.showLoading()
-
+  const started = Date.now()
   return fetch(apiURL, {
     method: "PUT",
     headers,
@@ -184,6 +226,7 @@ export function httpPutService(url, data, options = {}) {
     .then(async (response) => {
       const json = await response.json().catch(() => ({}))
       if (window.loadingContext) window.loadingContext.hideLoading()
+      try { if (reduxStore) reduxStore.dispatch(setOnlineStatus({ online: true, latencyMs: Date.now() - started })) } catch(_) {}
       return { 
         status: response.status, 
         data: json,
@@ -193,6 +236,13 @@ export function httpPutService(url, data, options = {}) {
     .catch((err) => {
       console.error(err)
       if (window.loadingContext) window.loadingContext.hideLoading()
+      try {
+        const message = err?.message || 'Something went wrong'
+        if (reduxStore) {
+          reduxStore.dispatch(setConnectionError({ status: 500, message }))
+          reduxStore.dispatch(setOnlineStatus({ online: false, latencyMs: Date.now() - started }))
+        }
+      } catch(_) {}
       return { 
         status: 500, 
         data: { message: "Something went wrong" },
@@ -205,17 +255,25 @@ export function httpDeleteService(url, options = {}) {
   const headers = injectAuthHeader({ Accept: "application/json", ...options.headers })
 
   if (window.loadingContext) window.loadingContext.showLoading()
-
+  const started = Date.now()
   return fetch(apiURL, { method: "DELETE", headers })
     .then(async (response) => {
       let data = {}
       try { data = await response.json() } catch (_) {}
       if (window.loadingContext) window.loadingContext.hideLoading()
+      try { if (reduxStore) reduxStore.dispatch(setOnlineStatus({ online: true, latencyMs: Date.now() - started })) } catch(_) {}
       return { status: response.status, data }
     })
     .catch((err) => {
       console.error(err)
       if (window.loadingContext) window.loadingContext.hideLoading()
+      try {
+        const message = err?.message || 'Something went wrong'
+        if (reduxStore) {
+          reduxStore.dispatch(setConnectionError({ status: 500, message }))
+          reduxStore.dispatch(setOnlineStatus({ online: false, latencyMs: Date.now() - started }))
+        }
+      } catch(_) {}
       return { status: 500, data: { message: "Something went wrong" } }
     })
 }
@@ -227,7 +285,7 @@ export function httpPostFormService(url, formData, options = {}) {
   const headers = injectAuthHeader({ ...options.headers })
 
   if (window.loadingContext) window.loadingContext.showLoading()
-
+  const started = Date.now()
   return fetch(apiURL, {
     method: 'POST',
     headers,
@@ -236,13 +294,72 @@ export function httpPostFormService(url, formData, options = {}) {
     .then(async (response) => {
       const json = await response.json().catch(() => ({}))
       if (window.loadingContext) window.loadingContext.hideLoading()
+      try { if (reduxStore) reduxStore.dispatch(setOnlineStatus({ online: true, latencyMs: Date.now() - started })) } catch(_) {}
       return { status: response.status, data: json }
     })
     .catch((err) => {
       console.error(err)
       if (window.loadingContext) window.loadingContext.hideLoading()
+      try {
+        const message = err?.message || 'Something went wrong'
+        if (reduxStore) {
+          reduxStore.dispatch(setConnectionError({ status: 500, message }))
+          reduxStore.dispatch(setOnlineStatus({ online: false, latencyMs: Date.now() - started }))
+        }
+      } catch(_) {}
       return { status: 500, data: { message: 'Something went wrong' } }
     })
+}
+
+// Optional API heartbeat to keep online status fresh
+let apiHeartbeatIntervalId = null
+let apiHeartbeatAbort = null
+
+export function startApiHeartbeat({ path = '/health', intervalMs = 15000 } = {}) {
+  if (apiHeartbeatIntervalId) {
+    clearInterval(apiHeartbeatIntervalId)
+    apiHeartbeatIntervalId = null
+  }
+  if (apiHeartbeatAbort) {
+    try { apiHeartbeatAbort.abort() } catch (_) {}
+    apiHeartbeatAbort = null
+  }
+
+  const ping = async () => {
+    try {
+      apiHeartbeatAbort = new AbortController()
+      const started = Date.now()
+      // Using axiosInstance to leverage interceptors
+  await axiosInstance.get(path, { signal: apiHeartbeatAbort.signal, metadata: { skipLoading: true } })
+      if (reduxStore) reduxStore.dispatch(setOnlineStatus({ online: true, latencyMs: Date.now() - started }))
+    } catch (err) {
+      const message = err?.message || 'Heartbeat failed'
+      try {
+        if (reduxStore) {
+          reduxStore.dispatch(setConnectionError({ status: err?.response?.status, message }))
+          reduxStore.dispatch(setOnlineStatus({ online: false, latencyMs: null }))
+        }
+      } catch (_) {}
+    } finally {
+      apiHeartbeatAbort = null
+    }
+  }
+
+  ping()
+  apiHeartbeatIntervalId = setInterval(ping, intervalMs)
+
+  return () => stopApiHeartbeat()
+}
+
+export function stopApiHeartbeat() {
+  if (apiHeartbeatIntervalId) {
+    clearInterval(apiHeartbeatIntervalId)
+    apiHeartbeatIntervalId = null
+  }
+  if (apiHeartbeatAbort) {
+    try { apiHeartbeatAbort.abort() } catch (_) {}
+    apiHeartbeatAbort = null
+  }
 }
 
 export { axiosInstance }

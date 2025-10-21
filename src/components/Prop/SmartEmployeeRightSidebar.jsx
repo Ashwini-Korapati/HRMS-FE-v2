@@ -2,6 +2,7 @@ import React, { useEffect } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { useNavigate, useParams } from 'react-router-dom'
 import { fetchEmployees, selectEmployees, selectEmployeesStatus, selectEmployeesError } from '../../Redux/Public/onboardinguserSlice'
+import { toAssetUrl } from '../../config/config'
 
 function RoleBadge({ role }) {
   const r = (role || '').toUpperCase()
@@ -15,7 +16,8 @@ function RoleBadge({ role }) {
 }
 
 function Avatar({ employee, size = 32 }) {
-  const url = employee?.avatarUrl || employee?.avatar || employee?.photoUrl || employee?.photo || null
+  const path = employee?.avatarUrl || employee?.avatar || employee?.photoUrl || employee?.photo || ''
+  const url = toAssetUrl(path) || null
   const initials = (employee?.firstName?.[0] || employee?.name?.[0] || employee?.email?.[0] || 'U').toUpperCase()
   const cls = `rounded-full border border-neutral-300 bg-neutral-100 text-neutral-700 grid place-items-center`;
   if (url) return <img src={url} alt={employee?.name || employee?.email || 'avatar'} className={cls} style={{ width: size, height: size, objectFit: 'cover' }} />

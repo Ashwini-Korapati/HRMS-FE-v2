@@ -67,7 +67,7 @@ export default function DesignationsListPage() {
     return <div className="p-4 md:p-6 text-rose-600">Error: {error}</div>;
 
   return (
-    <div className="flex h-[calc(100vh-80px)] overflow-hidden bg-gradient-to-br from-white via-neutral-50 to-orange-50">
+    <div className="flex h-[calc(100vh-80px)] overflow-hidden bg-gradient-to-br from-white via-neutral-50 to-orange-50 border border-orange-200 rounded-2xl shadow-sm">
       {/* 🧠 Smart Left Sidebar */}
       <aside className="relative w-72 md:w-80 border-r border-orange-200 bg-white/80 backdrop-blur-sm flex flex-col">
         {/* Sticky Header */}

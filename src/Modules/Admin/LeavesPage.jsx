@@ -66,6 +66,8 @@ export default function LeavesPage() {
   const companyId = auth?.company?.id
   const userId = auth?.user?.id
   const designationId = auth?.user?.designationId || auth?.user?.designation?.id || auth?.user?.designationParentId
+  const [recentLiveEvents, setRecentLiveEvents] = React.useState([])
+  //
   
   // Use safe selectors
   const leaveTypes = useSelector(safeSelectLeaveTypes)
@@ -93,6 +95,50 @@ export default function LeavesPage() {
       dispatch(fetchPendingApprovals({ companyId, userId, designationId }))
     }
   }, [dispatch, companyId, userId, designationId])
+
+  // Live socket subscription for leave events
+  useEffect(() => {
+    try {
+      const { getSocket } = require('../../Redux/Public/notificationsSocket')
+      const s = getSocket()
+      if (!s) return
+      const onNotification = (evt) => {
+        const type = evt?.type
+        if (!type || !['leave.created','leave.approved','leave.rejected'].includes(type)) return
+        const matchCompany = evt.companyId && String(evt.companyId) === String(companyId)
+        const matchDesignation = evt.designationParentId && String(evt.designationParentId) === String(designationId)
+        if (!matchCompany && !matchDesignation) return
+        setRecentLiveEvents(prev => ([{
+          id: evt.id || `${type}:${evt.leaveId || evt.at || Date.now()}`,
+          type,
+          userId: evt.userId,
+          leaveId: evt.leaveId,
+          at: evt.at || evt.timestamp || new Date().toISOString(),
+          message: evt.message,
+        }, ...prev]).slice(0, 25))
+        // Reflect status change in user leave history slice when approved/rejected
+        try {
+          if (['leave.approved','leave.rejected'].includes(type) && evt.leaveId) {
+            const { applyLeaveEvent } = require('../../Redux/Public/UserleaveSlice')
+            const newStatus = type === 'leave.approved' ? 'APPROVED' : 'REJECTED'
+            dispatch(applyLeaveEvent({ leaveId: evt.leaveId, status: newStatus, at: evt.at || evt.timestamp }))
+            // Refresh pending approvals snapshot to reflect changes
+            if (companyId && userId && designationId) {
+              dispatch(fetchPendingApprovals({ companyId, userId, designationId }))
+            }
+          }
+          if (type === 'leave.created') {
+            // Newly created leave might add to approver's pending list
+            if (companyId && userId && designationId) {
+              dispatch(fetchPendingApprovals({ companyId, userId, designationId }))
+            }
+          }
+        } catch {}
+      }
+      s.off('notification', onNotification).on('notification', onNotification)
+      return () => { try { s.off('notification', onNotification) } catch {} }
+    } catch {}
+  }, [companyId, designationId, userId, dispatch])
 
   const getStatusBadge = (isActive) => {
     return isActive 
@@ -316,6 +362,41 @@ export default function LeavesPage() {
                             >Reject</button>
                           </div>
                         </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            )}
+          </div>
+        </div>
+
+        {/* Live events from socket */}
+        <div className="bg-white border border-gray-200 rounded-lg shadow-sm overflow-hidden mt-6">
+          <div className="px-6 py-4 border-b border-gray-200">
+            <h3 className="text-lg font-semibold text-gray-900">Live Leave Activity</h3>
+          </div>
+          <div className="p-6">
+            {recentLiveEvents.length === 0 ? (
+              <div className="text-sm text-gray-500">No recent activity.</div>
+            ) : (
+              <div className="overflow-x-auto">
+                <table className="min-w-full divide-y">
+                  <thead className="bg-gray-50">
+                    <tr>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-600 uppercase tracking-wider">Event</th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-600 uppercase tracking-wider">User</th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-600 uppercase tracking-wider">Leave</th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-600 uppercase tracking-wider">At</th>
+                    </tr>
+                  </thead>
+                  <tbody className="bg-white divide-y">
+                    {recentLiveEvents.map(e => (
+                      <tr key={e.id} className="hover:bg-slate-50 transition">
+                        <td className="px-6 py-3 text-sm text-gray-900">{e.type.replace('leave.','')}</td>
+                        <td className="px-6 py-3 text-sm text-gray-900">{e.userId}</td>
+                        <td className="px-6 py-3 text-sm text-gray-900">{e.leaveId || '-'}</td>
+                        <td className="px-6 py-3 text-sm text-gray-900">{new Date(e.at).toLocaleString()}</td>
                       </tr>
                     ))}
                   </tbody>

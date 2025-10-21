@@ -1,43 +1,86 @@
-import { useState, useEffect } from "react"
+import { useState, useEffect, useMemo } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { checkIn, checkOut } from "../../Redux/Public/attendanceSlice";
+import { requestDesignationSnapshot } from "../../Redux/Public/notificationsSocket";
 
 export default function AnalogClock() {
-  const [time, setTime] = useState(new Date())
+  const dispatch = useDispatch();
+  const [time, setTime] = useState(new Date());
+  // Attendance state
+  const auth = useSelector((s) => s.auth);
+  const companyId = auth?.company?.id;
+  const userId = auth?.user?.id;
+  const designationId = auth?.user?.designationId || auth?.user?.designation?.id || auth?.user?.designationParentId;
+  const role = (auth?.user?.role || "").toUpperCase();
+  const todayKey = useMemo(() => {
+    const d = new Date();
+    const iso = d.toISOString().slice(0, 10); // YYYY-MM-DD
+    return `${companyId || "c"}:${userId || "u"}:${iso}:attendance`;
+  }, [companyId, userId]);
+  const [checkedIn, setCheckedIn] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [lastError, setLastError] = useState("");
+  const [checkInAt, setCheckInAt] = useState(null);
+  const [checkOutAt, setCheckOutAt] = useState(null);
+  const [attendanceId, setAttendanceId] = useState(null);
 
   useEffect(() => {
     const timer = setInterval(() => {
-      setTime(new Date())
-    }, 1000)
+      setTime(new Date());
+    }, 1000);
 
-    return () => clearInterval(timer)
-  }, [])
+    return () => clearInterval(timer);
+  }, []);
 
-  const seconds = time.getSeconds()
-  const minutes = time.getMinutes()
-  const hours = time.getHours() % 12
+  // Restore local status for quick UX when no status endpoint exists
+  useEffect(() => {
+    try {
+      const raw = localStorage.getItem(todayKey);
+      if (raw) {
+        const obj = JSON.parse(raw);
+        setCheckedIn(!!obj.checkedIn);
+        setCheckInAt(obj.checkInAt ? new Date(obj.checkInAt) : null);
+        setCheckOutAt(obj.checkOutAt ? new Date(obj.checkOutAt) : null);
+        if (obj.lastAttendanceId) setAttendanceId(obj.lastAttendanceId);
+      }
+    } catch {}
+  }, [todayKey]);
+
+  const persist = (state) => {
+    try {
+      localStorage.setItem(todayKey, JSON.stringify(state));
+    } catch {}
+  };
+
+  const seconds = time.getSeconds();
+  const minutes = time.getMinutes();
+  const hours = time.getHours() % 12;
 
   // Calculate angles for each hand
-  const secondAngle = seconds * 6 - 90 // 6 degrees per second
-  const minuteAngle = minutes * 6 + seconds * 0.1 - 90 // 6 degrees per minute + smooth seconds
-  const hourAngle = hours * 30 + minutes * 0.5 - 90 // 30 degrees per hour + smooth minutes
+  const secondAngle = seconds * 6 - 90; // 6 degrees per second
+  const minuteAngle = minutes * 6 + seconds * 0.1 - 90; // 6 degrees per minute + smooth seconds
+  const hourAngle = hours * 30 + minutes * 0.5 - 90; // 30 degrees per hour + smooth minutes
 
   // Format digital time
   const digitalTime = time.toLocaleTimeString("en-US", {
     hour: "2-digit",
     minute: "2-digit",
     hour12: true,
-  })
+  });
 
   // Get day of week
-  const dayOfWeek = time.toLocaleDateString("en-US", { weekday: "short" }).toUpperCase()
+  const dayOfWeek = time
+    .toLocaleDateString("en-US", { weekday: "short" })
+    .toUpperCase();
 
   const tickMarks = Array.from({ length: 12 }, (_, i) => {
-    const angle = i * 30
-    const x = 50 + 42 * Math.cos(((angle - 90) * Math.PI) / 180)
-    const y = 50 + 42 * Math.sin(((angle - 90) * Math.PI) / 180)
+    const angle = i * 30;
+    const x = 50 + 42 * Math.cos(((angle - 90) * Math.PI) / 180);
+    const y = 50 + 42 * Math.sin(((angle - 90) * Math.PI) / 180);
 
-    const isMajorTick = i % 3 === 0
-    const tickHeight = isMajorTick ? "h-6" : "h-4"
-    const tickWidth = isMajorTick ? "w-0.5" : "w-px"
+    const isMajorTick = i % 3 === 0;
+    const tickHeight = isMajorTick ? "h-6" : "h-4";
+    const tickWidth = isMajorTick ? "w-0.5" : "w-px";
 
     return (
       <div
@@ -49,62 +92,129 @@ export default function AnalogClock() {
           transform: `translate(-50%, -50%) rotate(${angle}deg)`,
         }}
       />
-    )
-  })
+    );
+  });
 
   return (
-    <div className="w-64 h-64 bg-white rounded-2xl border border-orange-500 p-6 flex flex-col items-center justify-center">
-      {/* Clock Container */}
-      <div className="relative w-full h-full flex items-center justify-center">
-        <div className="relative w-48 h-48">
-          {/* Tick Marks */}
-          <div className="absolute inset-0">{tickMarks}</div>
+    <div className="  bg-white  p-4 rounded-2xl border border-orange-500 shadow-sm">
+      <div className="w-64 h-64 bg-white rounded-2xl border border-orange-500 p-6 flex flex-col items-center justify-center">
+        {/* Clock Container */}
+        <div className="relative w-full h-full flex items-center justify-center">
+          <div className="relative w-48 h-48">
+            {/* Tick Marks */}
+            <div className="absolute inset-0">{tickMarks}</div>
 
-          {/* Clock Center Dot */}
-          <div className="absolute top-1/2 left-1/2 w-3 h-3 bg-black rounded-full transform -translate-x-1/2 -translate-y-1/2 z-30" />
+            {/* Clock Center Dot */}
+            <div className="absolute top-1/2 left-1/2 w-3 h-3 bg-black rounded-full transform -translate-x-1/2 -translate-y-1/2 z-30" />
 
-          {/* Hour Hand */}
-          <div
-            className="absolute top-1/2 left-1/2 w-1 bg-black rounded-full origin-bottom z-20 transition-transform duration-1000 ease-in-out"
-            style={{
-              height: "60px",
-              transform: `translate(-50%, -100%) rotate(${hourAngle}deg)`,
-            }}
-          />
+            {/* Hour Hand */}
+            <div
+              className="absolute top-1/2 left-1/2 w-1 bg-black rounded-full origin-bottom z-20 transition-transform duration-1000 ease-in-out"
+              style={{
+                height: "60px",
+                transform: `translate(-50%, -100%) rotate(${hourAngle}deg)`,
+              }}
+            />
 
-          {/* Minute Hand */}
-          <div
-            className="absolute top-1/2 left-1/2 w-0.5 bg-black rounded-full origin-bottom z-20 transition-transform duration-1000 ease-in-out"
-            style={{
-              height: "80px",
-              transform: `translate(-50%, -100%) rotate(${minuteAngle}deg)`,
-            }}
-          />
+            {/* Minute Hand */}
+            <div
+              className="absolute top-1/2 left-1/2 w-0.5 bg-black rounded-full origin-bottom z-20 transition-transform duration-1000 ease-in-out"
+              style={{
+                height: "80px",
+                transform: `translate(-50%, -100%) rotate(${minuteAngle}deg)`,
+              }}
+            />
 
-          {/* Second Hand */}
-          <div
-            className="absolute top-1/2 left-1/2 w-0.5 bg-orange-500 rounded-full origin-bottom z-20 transition-transform duration-75 ease-out"
-            style={{
-              height: "85px",
-              transform: `translate(-50%, -100%) rotate(${secondAngle}deg)`,
-            }}
-          />
+            {/* Second Hand */}
+            <div
+              className="absolute top-1/2 left-1/2 w-0.5 bg-orange-500 rounded-full origin-bottom z-20 transition-transform duration-75 ease-out"
+              style={{
+                height: "85px",
+                transform: `translate(-50%, -100%) rotate(${secondAngle}deg)`,
+              }}
+            />
 
-          <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-center z-10">
-            <div className="bg-gray-900/80 backdrop-blur-sm px-3 py-1 rounded-md">
-              <div className="text-white text-sm font-normal tracking-wide">
-                {dayOfWeek} {digitalTime}
+            <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-center z-10">
+              <div className="bg-gray-900/80 backdrop-blur-sm px-3 py-1 rounded-md">
+                <div className="text-white text-sm font-normal tracking-wide">
+                  {dayOfWeek} {digitalTime}
+                </div>
               </div>
             </div>
           </div>
-        </div>
 
-        <div className="absolute bottom-12">
-          <div className="bg-gray-900/80 backdrop-blur-sm px-3 py-1 rounded-md">
-            <div className="text-white text-sm font-normal">Bengaluru</div>
-          </div>
+          {/* Toggle container moved below the clock */}
         </div>
       </div>
+            <div className="mt-4 w-full flex flex-col items-center gap-2">
+        <button
+          disabled={isSubmitting || !companyId}
+          onClick={async () => {
+            if (!companyId) return
+            setIsSubmitting(true)
+            setLastError('')
+            try {
+              if (!checkedIn) {
+                  const res = await dispatch(checkIn({ companyId, userId, role, attendanceId }))
+                if (res.error) throw new Error(res.error.message)
+                const payload = res.payload || {}
+                const ts = payload.checkInTime ? new Date(payload.checkInTime) : new Date()
+                setCheckedIn(true)
+                setCheckInAt(ts)
+                setCheckOutAt(null)
+                  const newAttendanceId = payload.attendanceId || payload.id || attendanceId
+                  setAttendanceId(newAttendanceId)
+                  persist({ checkedIn: true, checkInAt: ts, checkOutAt: null, lastAttendanceId: newAttendanceId })
+                  // Ask gateway to publish live snapshot for this designation
+                  if (designationId) requestDesignationSnapshot({ designationId, companyId })
+              } else {
+                  const res = await dispatch(checkOut({ companyId, userId, role, attendanceId }))
+                if (res.error) throw new Error(res.error.message)
+                const payload = res.payload || {}
+                const ts = payload.checkOutTime ? new Date(payload.checkOutTime) : new Date()
+                setCheckedIn(false)
+                setCheckOutAt(ts)
+                  const keepAttendanceId = payload.attendanceId || payload.id || attendanceId
+                  persist({ checkedIn: false, checkInAt, checkOutAt: ts, lastAttendanceId: keepAttendanceId })
+                  // Ask gateway to publish live snapshot for this designation
+                  if (designationId) requestDesignationSnapshot({ designationId, companyId })
+              }
+            } catch (e) {
+              setLastError(e?.message || 'Request failed')
+            } finally {
+              setIsSubmitting(false)
+            }
+          }}
+          className={
+            `relative w-40 h-10 rounded-full border transition-all duration-300 ` +
+            (checkedIn
+              ? 'bg-green-600/90 border-green-700 shadow-[0_0_0_3px_rgba(16,185,129,0.25)]'
+              : 'bg-neutral-800/90 border-neutral-900 shadow-[0_0_0_3px_rgba(0,0,0,0.25)]')
+          }
+        >
+          <span className={`absolute inset-0 flex items-center justify-${checkedIn ? 'end' : 'start'} px-1.5`}>
+            <span className={`w-8 h-8 rounded-full bg-white shadow transition-transform duration-300 ${isSubmitting ? 'scale-95' : 'scale-100'}`}/>
+          </span>
+          <span className="absolute left-3 top-1/2 -translate-y-1/2 text-[11px] font-medium text-white opacity-80 select-none">
+            {checkedIn ? 'Checked In' : 'Check In'}
+          </span>
+          <span className="absolute right-3 top-1/2 -translate-y-1/2 text-[11px] font-medium text-white opacity-80 select-none">
+            {checkedIn ? 'Check Out' : ''}
+          </span>
+          {isSubmitting && <span className="absolute inset-0 rounded-full animate-ping bg-white/10"/>}
+        </button>
+
+        <div className="text-[11px] text-neutral-700">
+          {checkedIn && checkInAt ? (
+            <span>In: {checkInAt.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>
+          ) : checkOutAt ? (
+            <span>Out: {checkOutAt.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>
+          ) : (
+            <span>Ready</span>
+          )}
+        </div>
+        {lastError && <div className="text-[10px] text-rose-600">{lastError}</div>}
+      </div>
     </div>
-  )
+  );
 }

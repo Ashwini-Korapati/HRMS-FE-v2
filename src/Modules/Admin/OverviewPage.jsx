@@ -2,8 +2,13 @@ import React from 'react'
 import { PageHeading, StatGrid, StatCard, PlaceholderPanel } from './components'
 import { Users, Folder, CalendarDays, Clock, BarChart3 } from 'lucide-react'
 import AnalogClock from '../../components/Prop/AnalogClock'
+import DesignationLiveAttendance from '../../components/Prop/DesignationLiveAttendance'
+import { useSelector } from 'react-redux'
 
 export default function OverviewPage() {
+  const auth = useSelector(s => s.auth)
+  const companyId = auth?.company?.id
+  const designationId = auth?.user?.designationId || auth?.user?.designation?.id || auth?.user?.designationParentId
   return (
     <div className="flex flex-col gap-8">
       {/* Header + Clock Row */}
@@ -23,10 +28,18 @@ export default function OverviewPage() {
       </div>
 
       {/* Analytics Panels */}
-      <div className="grid gap-6 lg:grid-cols-3">
-        <PlaceholderPanel title="Headcount Trend">Coming soon: charts summarizing growth.</PlaceholderPanel>
-        <PlaceholderPanel title="Attendance Heat">Planned: visualization of check-ins.</PlaceholderPanel>
-        <PlaceholderPanel title="Leave Balance">Upcoming aggregated leave balance widget.</PlaceholderPanel>
+      <div >
+        {companyId && designationId ? (
+          <div className="lg:col-span-1">
+            <DesignationLiveAttendance 
+              designationId={designationId}
+              companyId={companyId}
+              title="Designation Live Attendance"
+            />
+          </div>
+        ) : (
+          <PlaceholderPanel title="Leave Balance">Upcoming aggregated leave balance widget.</PlaceholderPanel>
+        )}
       </div>
 
       <PlaceholderPanel title="Analytics Quick View">

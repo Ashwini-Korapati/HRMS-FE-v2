@@ -163,7 +163,10 @@ const initialState = {
   deleteError: null,
   balanceError: null,
   lastCreated: null,
+  // leaveBalance will be normalized to { data: { year, summary, items } }
   leaveBalance: null,
+  // Fast lookup map: { [type]: remaining }
+  leaveBalanceByType: {},
   version: nanoid(6)
 }
 
@@ -184,6 +187,22 @@ const userleaveSlice = createSlice({
       state.updateError = null
       state.deleteError = null
       state.balanceError = null
+    },
+    applyLeaveEvent(state, action) {
+      const { leaveId, status, at, patch } = action.payload || {}
+      if (!leaveId) return
+      const idx = state.items.findIndex(l => l.id === leaveId)
+      if (idx >= 0) {
+        state.items[idx] = {
+          ...state.items[idx],
+          status: status || state.items[idx].status,
+          updatedAt: at || state.items[idx].updatedAt,
+          ...(patch || {}),
+        }
+      } else {
+        // Upsert minimal record so history reflects immediately
+        state.items.unshift({ id: leaveId, status: status || 'PENDING', appliedDate: at || new Date().toISOString(), ...(patch || {}) })
+      }
     }
   },
   extraReducers: builder => {
@@ -291,7 +310,17 @@ const userleaveSlice = createSlice({
       })
       .addCase(fetchLeaveBalance.fulfilled, (state, action) => {
         state.balanceLoading = 'succeeded'
-        state.leaveBalance = action.payload || null
+        const payload = action.payload || null // expected: { year, summary, items }
+        // Normalize to keep a stable shape { data: ... }
+        state.leaveBalance = payload ? { data: payload } : null
+        // Build a by-type map for quick access and backward compatibility
+        const byType = {}
+        if (payload && Array.isArray(payload.items)) {
+          payload.items.forEach(it => {
+            if (it && it.type) byType[it.type] = typeof it.remaining === 'number' ? it.remaining : 0
+          })
+        }
+        state.leaveBalanceByType = byType
       })
       .addCase(fetchLeaveBalance.rejected, (state, action) => {
         state.balanceLoading = 'failed'
@@ -300,7 +329,7 @@ const userleaveSlice = createSlice({
   }
 })
 
-export const { resetUserLeaveState, clearUserLeaveErrors } = userleaveSlice.actions
+export const { resetUserLeaveState, clearUserLeaveErrors, applyLeaveEvent } = userleaveSlice.actions
 
 // Selectors
 export const selectUserLeaveState = (s) => s.userleave

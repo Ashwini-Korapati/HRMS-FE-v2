@@ -1,6 +1,7 @@
 import React from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useParams } from "react-router-dom";
+ import { toAssetUrl } from "../../config/config";
 import {
   fetchDesignationsFlow,
   selectDesignationsFlow,
@@ -154,7 +155,7 @@ export default function MyTeamArchitecture() {
             .map((u) => (
               <div key={u.id} className="group bg-white border border-orange-500/10 rounded-xl shadow-sm hover:shadow-md transition-all duration-200 p-2.5">
                 <div className="flex items-center gap-3">
-                  <Avatar src={u.avatar} name={u.name} />
+                  <Avatar src={toAssetUrl(u.avatar)} name={u.name} />
                   <div className="min-w-0">
                     <div className="text-[13px] font-semibold text-neutral-800 truncate">{u.name}</div>
                     <div className="text-[11px] text-neutral-500 truncate flex items-center gap-1">
@@ -261,7 +262,7 @@ function UserNode({ data }) {
       <Handle type="target" position={Position.Top} className="!w-2 !h-2 !bg-neutral-900 !border !border-slate-900" />
       <div className="relative z-20 rounded-xl border bg-white px-3 py-2 shadow-sm hover:shadow-md transition-shadow" style={{ borderColor: "rgba(0,0,0,0.12)" }}>
         <div className="flex items-start gap-2">
-          <Avatar src={avatar} name={name} />
+          <Avatar src={toAssetUrl(avatar)} name={name} />
           <div className="min-w-0 flex-1">
             <div className="flex items-start justify-between gap-2">
               <div className="min-w-0">
@@ -313,7 +314,7 @@ function UserNode({ data }) {
   );
 }
 // Avatar helper
-function Avatar({ src, name }) {
+  function Avatar({ src, name }) {
   const initials = (name || "?")
     .split(" ")
     .filter(Boolean)

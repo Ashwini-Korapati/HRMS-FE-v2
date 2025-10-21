@@ -1,6 +1,7 @@
 import React from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useParams } from "react-router-dom";
+ import { toAssetUrl } from "../../config/config";
 import {
   fetchDesignationsFlow,
   selectDesignationsFlow,
@@ -9,6 +10,7 @@ import {
 } from "../../Redux/Public/designationSlice";
 import { httpGetService } from "../../config/httphandler";
 import SmartTransition from "../../components/Prop/SmartTransition";
+import SmartToster from "../../components/Prop/SmartToster";
 import {
   ReactFlow,
   Background,
@@ -49,6 +51,7 @@ export default function MyTeamArchitecture() {
   const [data, setData] = React.useState(null);
   const [loading, setLoading] = React.useState(false);
   const [error, setError] = React.useState(null);
+  const [toastMsg, setToastMsg] = React.useState("");
 
   React.useEffect(() => {
     if (!flow && flowLoading !== "loading") dispatch(fetchDesignationsFlow());
@@ -79,8 +82,15 @@ export default function MyTeamArchitecture() {
       );
       if (!active) return;
       if (res.status >= 200 && res.status < 300) {
-        setData(res.data?.data || res.data);
+        const payload = res.data?.data || res.data;
+        setData(payload);
         setError(null);
+        // Prepare toast about rendering with metrics
+        const members = payload?.metrics?.totalMembers ?? 0;
+        const ts = payload?.timestamp ? new Date(payload.timestamp) : new Date();
+        const hh = ts.getHours().toString().padStart(2, '0');
+        const mm = ts.getMinutes().toString().padStart(2, '0');
+        setToastMsg(`Rendered ${members} members at ${hh}:${mm}`);
       } else {
         setError(res.data?.message || "Failed to load architecture flow");
         setData(null);
@@ -104,6 +114,7 @@ export default function MyTeamArchitecture() {
 
   return (
     <div className="flex h-[calc(100vh-80px)] overflow-hidden bg-gradient-to-br from-white via-neutral-50 to-orange-50">
+      <SmartToster message={toastMsg} duration={2500} onClose={() => setToastMsg("")} />
       {/* Left: Team members list (no designations) */}
       <aside className="relative w-72 md:w-80 border-r border-orange-200 bg-white/80 backdrop-blur-sm flex flex-col">
         <header className="sticky top-0 z-10 bg-white/80 backdrop-blur-sm border-b border-orange-100 px-3 py-3">
@@ -144,7 +155,7 @@ export default function MyTeamArchitecture() {
             .map((u) => (
               <div key={u.id} className="group bg-white border border-orange-500/10 rounded-xl shadow-sm hover:shadow-md transition-all duration-200 p-2.5">
                 <div className="flex items-center gap-3">
-                  <Avatar src={u.avatar} name={u.name} />
+                  <Avatar src={toAssetUrl(u.avatar)} name={u.name} />
                   <div className="min-w-0">
                     <div className="text-[13px] font-semibold text-neutral-800 truncate">{u.name}</div>
                     <div className="text-[11px] text-neutral-500 truncate flex items-center gap-1">
@@ -220,7 +231,8 @@ export default function MyTeamArchitecture() {
                     proOptions={{ hideAttribution: true }}
                     defaultEdgeOptions={{
                       type: "smoothstep",
-                      markerEnd: { type: MarkerType.ArrowClosed },
+                      markerEnd: { type: MarkerType.ArrowClosed, color: "rgb(234,88,12)" },
+                      style: { stroke: "rgba(234,88,12,0.45)" },
                     }}
                     nodeTypes={{ user: UserNode }}
                   >
@@ -246,11 +258,11 @@ export default function MyTeamArchitecture() {
 function UserNode({ data }) {
   const { name, email, designationTitle, level, projectsCount, avatar, tasks, projects } = data || {};
   return (
-    <div className="relative w-[260px] group">
+    <div className="relative w-[220px] group">
       <Handle type="target" position={Position.Top} className="!w-2 !h-2 !bg-neutral-900 !border !border-slate-900" />
       <div className="relative z-20 rounded-xl border bg-white px-3 py-2 shadow-sm hover:shadow-md transition-shadow" style={{ borderColor: "rgba(0,0,0,0.12)" }}>
         <div className="flex items-start gap-2">
-          <Avatar src={avatar} name={name} />
+          <Avatar src={toAssetUrl(avatar)} name={name} />
           <div className="min-w-0 flex-1">
             <div className="flex items-start justify-between gap-2">
               <div className="min-w-0">
@@ -302,7 +314,7 @@ function UserNode({ data }) {
   );
 }
 // Avatar helper
-function Avatar({ src, name }) {
+  function Avatar({ src, name }) {
   const initials = (name || "?")
     .split(" ")
     .filter(Boolean)
@@ -343,44 +355,88 @@ function buildUserGraph(payload) {
     },
   }));
 
-  // Group by level
-  const groups = new Map();
-  users.forEach((u) => {
-    const lvl = u.designation?.level ?? 0;
-    if (!groups.has(lvl)) groups.set(lvl, []);
-    groups.get(lvl).push(u);
-  });
-  const levels = Array.from(groups.keys()).sort((a, b) => a - b);
-
   const rfNodes = [];
   const rfEdges = [];
-  const H_SPACING = 280;
-  const V_SPACING = 140;
+  const layout = payload.suggestedLayout || {};
+  const orientation = (layout.orientation || 'TB').toUpperCase(); // 'TB' or 'LR'
+  // Compute spacing using card size + provided gaps to avoid overlap while honoring suggestedLayout
+  const NODE_WIDTH = 220;
+  const NODE_HEIGHT = 110;
+  const nodeGap = typeof layout.nodeSpacing === 'number' ? layout.nodeSpacing : 80; // gap between siblings in same level
+  const levelGap = typeof layout.levelSpacing === 'number' ? layout.levelSpacing : 140; // gap between levels
+  // Main/cross axis step sizes depend on orientation
+  const STEP_X = orientation === 'LR' ? NODE_WIDTH + levelGap : NODE_WIDTH + nodeGap;
+  const STEP_Y = orientation === 'LR' ? NODE_HEIGHT + nodeGap : NODE_HEIGHT + levelGap;
 
-  levels.forEach((lvl, row) => {
-    const rowItems = groups.get(lvl) || [];
-    rowItems.forEach((u, i) => {
-      const x = i * H_SPACING;
-      const y = row * V_SPACING;
-      rfNodes.push({
-        id: u.id,
-        position: { x, y },
-        data: {
-          name: u.name,
-          email: u.email,
-          avatar: u.avatar,
-          designationTitle: u.designation?.title,
-          level: u.designation?.level,
-          projectsCount: Array.isArray(u.projects) ? u.projects.length : 0,
-          projects: Array.isArray(u.projects) ? u.projects : [],
-          tasks: u.tasks,
-        },
-        sourcePosition: Position.Bottom,
-        targetPosition: Position.Top,
-        type: "user",
-      });
+  // compute min designation level to anchor rows
+  const designLevels = payload.nodes
+    .filter((n) => n.type === 'designation' && typeof n.level === 'number')
+    .map((n) => n.level);
+  const minLevel = designLevels.length ? Math.min(...designLevels) : 0;
+
+  const placed = new Set();
+  let leafIndex = 0;
+
+  function placeUser(u) {
+    if (!u || placed.has(u.id)) return;
+    const row = Math.max(0, (u.designation?.level ?? minLevel) - minLevel);
+    const col = leafIndex;
+  const tbX = col * STEP_X;
+  const tbY = row * STEP_Y;
+    // small offset to reduce visual overlap when cards are dense
+    const offset = 0;
+    const x = orientation === 'LR' ? row * STEP_X + offset : tbX + offset;
+    const y = orientation === 'LR' ? col * STEP_Y : tbY;
+    rfNodes.push({
+      id: u.id,
+      position: { x, y },
+      data: {
+        name: u.name,
+        email: u.email,
+        avatar: u.avatar,
+        designationTitle: u.designation?.title,
+        level: u.designation?.level,
+        projectsCount: Array.isArray(u.projects) ? u.projects.length : 0,
+        projects: Array.isArray(u.projects) ? u.projects : [],
+        tasks: u.tasks,
+      },
+      sourcePosition: Position.Bottom,
+      targetPosition: Position.Top,
+      type: "user",
     });
-  });
+    placed.add(u.id);
+    leafIndex += 1;
+  }
+
+  function walkTree(des) {
+    if (!des) return;
+    // place members of this designation first (keeps tree order)
+    if (Array.isArray(des.members)) {
+      des.members.forEach((m) => placeUser(m));
+    }
+    // then process children designations
+    if (Array.isArray(des.children)) {
+      des.children.forEach((ch) => walkTree(ch));
+    }
+  }
+
+  if (payload.tree && payload.tree.type === 'designation') {
+    walkTree(payload.tree);
+    // fallback for any users not present in tree.members due to API variance
+    users.forEach((u) => placeUser(u));
+  } else {
+    // Fallback: group by level in ascending order
+    const groups = new Map();
+    users.forEach((u) => {
+      const lvl = u.designation?.level ?? minLevel;
+      if (!groups.has(lvl)) groups.set(lvl, []);
+      groups.get(lvl).push(u);
+    });
+    const levels = Array.from(groups.keys()).sort((a, b) => a - b);
+    levels.forEach((lvl) => {
+      (groups.get(lvl) || []).forEach((u) => placeUser({ ...u, designation: { ...u.designation, level: lvl } }));
+    });
+  }
 
   // Build designation parent mapping from payload edges (designation -> designation)
   const designationParent = new Map();
@@ -416,19 +472,26 @@ function buildUserGraph(payload) {
         id: `${managerUserId}->${childUserId}`,
         source: managerUserId,
         target: childUserId,
-        markerEnd: { type: MarkerType.ArrowClosed, color: "rgba(0,0,0,0.45)" },
-        style: { stroke: "rgba(0,0,0,0.3)", strokeDasharray: "4 3" },
+        markerEnd: { type: MarkerType.ArrowClosed, color: "rgb(234,88,12)" },
+        style: { stroke: "rgba(234,88,12,0.45)", strokeDasharray: "4 3" },
         type: "smoothstep",
       });
     }
   }
 
-  // Center horizontally
+  // Center according to orientation using node sizes
   if (rfNodes.length) {
-    const minX = Math.min(...rfNodes.map((n) => n.position.x));
-    const maxX = Math.max(...rfNodes.map((n) => n.position.x));
-    const offset = (minX + maxX) / 2;
-    for (const n of rfNodes) n.position.x -= offset;
+    if (orientation === 'LR') {
+      const minY = Math.min(...rfNodes.map((n) => n.position.y));
+      const maxY = Math.max(...rfNodes.map((n) => n.position.y + NODE_HEIGHT));
+      const centerY = (minY + maxY) / 2;
+      for (const n of rfNodes) n.position.y -= centerY;
+    } else {
+      const minX = Math.min(...rfNodes.map((n) => n.position.x));
+      const maxX = Math.max(...rfNodes.map((n) => n.position.x + NODE_WIDTH));
+      const centerX = (minX + maxX) / 2;
+      for (const n of rfNodes) n.position.x -= centerX;
+    }
   }
 
   return { rfNodes, rfEdges, usersList };

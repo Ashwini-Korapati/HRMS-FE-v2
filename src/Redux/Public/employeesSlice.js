@@ -46,7 +46,13 @@ export const assignEmployeesToProject = createAsyncThunk('employees/assignToProj
     // Given provided sample (single object) we post each member individually.
     const results = []
     for (const m of members) {
-      const body = { projectId, userId: m.userId, enabledRoutesStatus: m.enabledRoutesStatus || {} }
+      const body = {
+        projectId,
+        userId: m.userId,
+        enabledRoutesStatus: m.enabledRoutesStatus || {},
+        attendanceType: m.attendanceType || 'OFFICE',
+        workShiftId: m.workShiftId || null
+      }
       const endpoint = `${companyId}/projects/${projectId}/members`
       const res = await httpPostService(endpoint, body)
       if (!(res.status >= 200 && res.status < 300)) {

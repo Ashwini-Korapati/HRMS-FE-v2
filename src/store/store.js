@@ -10,13 +10,16 @@ import employeesReducer from '../Redux/Public/employeesSlice'
 import foldersReducer from '../Redux/Public/foldersSlice'
 import onboardingUserReducer from '../Redux/Public/onboardinguserSlice'
 import { attachAuthStore } from '../auth/auth'
-import { attachStore } from '../config/httphandler'
+import { attachStore, startApiHeartbeat } from '../config/httphandler'
 import userleaveReducer from '../Redux/Public/UserleaveSlice'
 import leaveTypesReducer from '../Redux/Public/leaveTypesSlice'
 import notificationsReducer from '../Redux/Public/notificationsSlice'
 import leaveApprovalsReducer from '../Redux/Public/leaveApprovalsSlice'
 import adminUserProfileReducer from '../Redux/Public/adminUserProfileSlice'
 import  WorkShiftsReducer from '../Redux/Public/WorkShiftsSlice'
+import attendanceReducer from '../Redux/Public/attendanceSlice'
+import designationMonitoringReducer from '../Redux/Public/designationMonitoringSlice'
+import connectionReducer from '../Redux/Public/connectionSlice'
 // Simple action logger (dev only)
 const actionLogger = store => next => action => {
   if (process.env.NODE_ENV === 'development') {
@@ -55,6 +58,9 @@ export const store = configureStore({
   leaveApprovals: leaveApprovalsReducer,
   adminUserProfile: adminUserProfileReducer,
     workShifts: WorkShiftsReducer, // Add this reducer
+    attendance: attendanceReducer,
+    designationMonitoring: designationMonitoringReducer,
+    connection: connectionReducer,
 
   },
   middleware: getDefault => getDefault({ serializableCheck: false }).concat(actionLogger, errorReporter)
@@ -64,6 +70,8 @@ export const dispatch = store.dispatch
 
 // Attach store for http handler refresh logic
 attachStore(store)
+// Start lightweight API heartbeat to track connectivity status
+startApiHeartbeat({ path: '/health', intervalMs: 15000 })
 // Setup auth scheduling for persisted tokens
 initAuthScheduling(store.dispatch, store.getState)
 authSubscribe(store)

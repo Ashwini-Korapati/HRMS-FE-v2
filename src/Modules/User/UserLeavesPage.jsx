@@ -24,6 +24,8 @@ export default function UserLeavesPage() {
   const companyId = auth?.company?.id
   const userId = auth?.user?.id
   const designationId = auth?.user?.designationId || auth?.user?.designation?.id || auth?.user?.designationParentId
+  const parentDesignationId = auth?.user?.designationParentId || auth?.user?.designation?.parentId || designationId
+  const [liveEvents, setLiveEvents] = React.useState([])
 
   const pending = useSelector(selectPendingApprovals)
   const loading = useSelector(selectApprovalsLoading)
@@ -48,9 +50,73 @@ export default function UserLeavesPage() {
     }
   }, [dispatch, companyId, userId])
 
+  // Subscribe to live leave events via notifications socket
+  useEffect(() => {
+    try {
+      const { getSocket } = require('../../Redux/Public/notificationsSocket')
+      const s = getSocket()
+      if (!s) return
+      const onNotification = (evt) => {
+        const type = evt?.type
+        if (!type || !['leave.created','leave.approved','leave.rejected'].includes(type)) return
+        const matchCompany = evt.companyId && String(evt.companyId) === String(companyId)
+        const matchDesignation = evt.designationParentId && String(evt.designationParentId) === String(parentDesignationId)
+        if (!matchCompany && !matchDesignation) return
+        setLiveEvents(prev => ([{
+          id: evt.id || `${type}:${evt.leaveId || evt.at || Date.now()}`,
+          type,
+          userId: evt.userId,
+          leaveId: evt.leaveId,
+          at: evt.at || new Date().toISOString(),
+          reason: evt.reason,
+        }, ...prev]).slice(0, 25))
+        // Reflect status change for current user's history immediately
+        try {
+          if (['leave.approved','leave.rejected'].includes(type) && evt.leaveId) {
+            const { applyLeaveEvent } = require('../../Redux/Public/UserleaveSlice')
+            const newStatus = type === 'leave.approved' ? 'APPROVED' : 'REJECTED'
+            dispatch(applyLeaveEvent({ leaveId: evt.leaveId, status: newStatus, at: evt.at || evt.timestamp }))
+          }
+        } catch {}
+      }
+      s.off('notification', onNotification).on('notification', onNotification)
+      return () => { try { s.off('notification', onNotification) } catch {} }
+    } catch {}
+  }, [companyId, parentDesignationId, dispatch])
+
   return (
     <div>
       <PageHeading title="My Leaves" subtitle="Leave balances and requests" />
+      {/* Live Recent Leave Requests */}
+      <div className="mt-2">
+        <h3 className="text-lg font-semibold text-gray-900 mb-3">Recent Leave Requests (Live)</h3>
+        {liveEvents.length === 0 ? (
+          <div className="text-sm text-gray-500">No recent activity.</div>
+        ) : (
+          <div className="overflow-x-auto">
+            <table className="min-w-full divide-y">
+              <thead className="bg-gray-50">
+                <tr>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-600 uppercase tracking-wider">Event</th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-600 uppercase tracking-wider">User</th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-600 uppercase tracking-wider">Leave</th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-600 uppercase tracking-wider">At</th>
+                </tr>
+              </thead>
+              <tbody className="bg-white divide-y">
+                {liveEvents.map(e => (
+                  <tr key={e.id} className="hover:bg-slate-50 transition">
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{e.type.replace('leave.','')}</td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{e.userId}</td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{e.leaveId || '-'}</td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{new Date(e.at).toLocaleString()}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        )}
+      </div>
       {/* Leave Balance */}
       <div className="mt-2">
         <h3 className="text-lg font-semibold text-gray-900 mb-3">Leave Balance {leaveBalance?.year ? `(${leaveBalance.year})` : ''}</h3>

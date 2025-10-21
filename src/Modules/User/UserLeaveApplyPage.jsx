@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react'
+import React, { useState, useEffect, useRef, useMemo } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { Calendar, Clock, AlertCircle, CheckCircle2, ChevronDown } from 'lucide-react'
 import { 
@@ -44,33 +44,7 @@ function Input({ label, error, required, className = "", ...props }) {
   )
 }
 
-function Select({ label, error, required, children, className = "", ...props }) {
-  return (
-    <label className="flex flex-col gap-1.5 w-full">
-      <span className="text-sm font-medium text-gray-800">
-        {label} {required && <span className="text-rose-500">*</span>}
-      </span>
-      <div className="relative">
-        <select
-          {...props}
-          className={`w-full bg-white border rounded-lg px-4 py-2.5 text-gray-900 
-            placeholder-gray-500 outline-none appearance-none transition-all duration-200 
-            focus:ring-2 focus:ring-blue-500/40 focus:border-blue-500
-            ${error 
-              ? "border-rose-500 focus:ring-rose-500/30" 
-              : "border-gray-300 hover:border-blue-500/50"
-            } ${className}`}
-        >
-          {children}
-        </select>
-        <div className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-500 pointer-events-none">
-          <ChevronDown className="w-4 h-4" />
-        </div>
-      </div>
-      {error && <span className="text-xs text-rose-500 mt-0.5">{error}</span>}
-    </label>
-  )
-}
+// Select component not used; custom dropdown and simple select are defined below
 
 function TextArea({ label, error, required, className = "", ...props }) {
   return (
@@ -137,9 +111,13 @@ function LeaveTypeDropdown({
   }, [])
 
   const getLeaveBalanceForType = (leaveTypeId) => {
-    if (!leaveBalance || !leaveTypeId) return 0
-    const leaveType = userLeaveTypes.find(lt => lt.id === leaveTypeId)
-    return leaveType ? (leaveBalance[leaveType.type] || 0) : 0
+    if (!leaveTypeId) return 0
+    const leaveType = userLeaveTypes.find(lt => (lt.leaveTypeId || lt.id) === leaveTypeId)
+    if (!leaveType) return 0
+    // Prefer API-provided remaining when available; fallback to legacy balance by type
+    if (typeof leaveType.remaining === 'number') return leaveType.remaining
+    if (leaveBalance && leaveType.type) return leaveBalance[leaveType.type] || 0
+    return 0
   }
 
   const getBalanceColor = (leaveTypeId) => {
@@ -150,7 +128,7 @@ function LeaveTypeDropdown({
     return 'text-red-600'
   }
 
-  const selectedLeaveType = userLeaveTypes.find(lt => lt.id === value)
+  const selectedLeaveType = userLeaveTypes.find(lt => (lt.leaveTypeId || lt.id) === value)
 
   const handleSelect = (leaveTypeId) => {
     onChange(leaveTypeId)
@@ -178,11 +156,11 @@ function LeaveTypeDropdown({
             ${className}`}
         >
           <div className="flex items-center gap-2 flex-1 min-w-0">
-            {selectedLeaveType ? (
+              {selectedLeaveType ? (
               <>
                 <span className="font-medium truncate">{selectedLeaveType.name}</span>
-                <span className={`text-xs ${getBalanceColor(selectedLeaveType.id)} flex-shrink-0`}>
-                  ({getLeaveBalanceForType(selectedLeaveType.id)} days available)
+                <span className={`text-xs ${getBalanceColor(selectedLeaveType.leaveTypeId || selectedLeaveType.id)} flex-shrink-0`}>
+                  ({getLeaveBalanceForType(selectedLeaveType.leaveTypeId || selectedLeaveType.id)} days available)
                 </span>
               </>
             ) : (
@@ -201,20 +179,20 @@ function LeaveTypeDropdown({
             {userLeaveTypes.length > 0 ? (
               userLeaveTypes.map(leaveType => (
                 <button
-                  key={leaveType.id}
+                  key={leaveType.leaveTypeId || leaveType.id}
                   type="button"
-                  onClick={() => handleSelect(leaveType.id)}
+                  onClick={() => handleSelect(leaveType.leaveTypeId || leaveType.id)}
                   className={`w-full px-4 py-3 text-left hover:bg-gray-50 border-b border-gray-100 last:border-b-0 
                     transition-colors duration-200 flex items-center justify-between
-                    ${value === leaveType.id ? 'bg-blue-50 border-blue-200' : ''}`}
+                    ${value === (leaveType.leaveTypeId || leaveType.id) ? 'bg-blue-50 border-blue-200' : ''}`}
                 >
                   <div className="flex flex-col items-start flex-1 min-w-0">
                     <span className="font-medium text-gray-900 truncate">{leaveType.name}</span>
                     <span className="text-xs text-gray-500 capitalize">{leaveType.type?.toLowerCase()} leave</span>
                   </div>
                   <div className="flex flex-col items-end flex-shrink-0 ml-2">
-                    <span className={`text-sm font-semibold ${getBalanceColor(leaveType.id)}`}>
-                      {getLeaveBalanceForType(leaveType.id)} days
+                    <span className={`text-sm font-semibold ${getBalanceColor(leaveType.leaveTypeId || leaveType.id)}`}>
+                      {getLeaveBalanceForType(leaveType.leaveTypeId || leaveType.id)} days
                     </span>
                     <span className="text-xs text-gray-500">available</span>
                   </div>
@@ -247,9 +225,12 @@ function SimpleLeaveTypeSelect({
   className = "" 
 }) {
   const getLeaveBalanceForType = (leaveTypeId) => {
-    if (!leaveBalance || !leaveTypeId) return 0
-    const leaveType = userLeaveTypes.find(lt => lt.id === leaveTypeId)
-    return leaveType ? (leaveBalance[leaveType.type] || 0) : 0
+    if (!leaveTypeId) return 0
+    const leaveType = userLeaveTypes.find(lt => (lt.leaveTypeId || lt.id) === leaveTypeId)
+    if (!leaveType) return 0
+    if (typeof leaveType.remaining === 'number') return leaveType.remaining
+    if (leaveBalance && leaveType.type) return leaveBalance[leaveType.type] || 0
+    return 0
   }
 
   return (
@@ -272,8 +253,8 @@ function SimpleLeaveTypeSelect({
         >
           <option value="">Select leave type</option>
           {userLeaveTypes.map(leaveType => (
-            <option key={leaveType.id} value={leaveType.id}>
-              {leaveType.name} ({getLeaveBalanceForType(leaveType.id)} days available)
+            <option key={leaveType.leaveTypeId || leaveType.id} value={leaveType.leaveTypeId || leaveType.id}>
+              {leaveType.name} ({getLeaveBalanceForType(leaveType.leaveTypeId || leaveType.id)} days available)
             </option>
           ))}
         </select>
@@ -300,6 +281,14 @@ export default function LeaveApplicationForm() {
   const [touched, setTouched] = useState({})
   const [calculatedDuration, setCalculatedDuration] = useState(0)
   const [useSimpleSelect, setUseSimpleSelect] = useState(false) // Toggle between custom and simple select
+
+  // Prefer fetchLeaveBalance data.items when present (new API shape)
+  const availableLeaveTypes = useMemo(() => {
+    const items = leaveBalance?.data?.items
+    if (Array.isArray(items) && items.length > 0) return items
+    return Array.isArray(userLeaveTypes) ? userLeaveTypes : []
+  }, [leaveBalance, userLeaveTypes])
+
 
   // Fetch leave balance and user leave types on component mount
   useEffect(() => {
@@ -365,12 +354,17 @@ export default function LeaveApplicationForm() {
       errors.reason = 'Reason must be less than 500 characters'
     }
     
-    // Check leave balance
-    if (form.leaveTypeId && calculatedDuration > 0 && leaveBalance) {
-      const selectedLeaveType = userLeaveTypes.find(lt => lt.id === form.leaveTypeId)
-      const balance = selectedLeaveType ? (leaveBalance[selectedLeaveType.type] || 0) : 0
+    // Check leave balance against remaining
+    if (form.leaveTypeId && calculatedDuration > 0) {
+      const selectedLeaveType = availableLeaveTypes.find(lt => (lt.leaveTypeId || lt.id) === form.leaveTypeId)
+      const balance = selectedLeaveType
+        ? (typeof selectedLeaveType.remaining === 'number'
+            ? selectedLeaveType.remaining
+            : (leaveBalance && selectedLeaveType.type ? (leaveBalance[selectedLeaveType.type] || 0) : 0)
+          )
+        : 0
       if (calculatedDuration > balance) {
-        errors.leaveTypeId = `Insufficient ${selectedLeaveType?.name} balance. Available: ${balance} days, Requested: ${calculatedDuration} days`
+        errors.leaveTypeId = `Insufficient ${selectedLeaveType?.name || 'leave'} balance. Available: ${balance} days, Requested: ${calculatedDuration} days`
       }
     }
 
@@ -421,9 +415,12 @@ export default function LeaveApplicationForm() {
   }
 
   const getLeaveBalanceForType = (leaveTypeId) => {
-    if (!leaveBalance || !leaveTypeId) return 0
-    const leaveType = userLeaveTypes.find(lt => lt.id === leaveTypeId)
-    return leaveType ? (leaveBalance[leaveType.type] || 0) : 0
+    if (!leaveTypeId) return 0
+    const leaveType = availableLeaveTypes.find(lt => (lt.leaveTypeId || lt.id) === leaveTypeId)
+    if (!leaveType) return 0
+    if (typeof leaveType.remaining === 'number') return leaveType.remaining
+    if (leaveBalance && leaveType.type) return leaveBalance[leaveType.type] || 0
+    return 0
   }
 
   const getBalanceColor = (leaveTypeId) => {
@@ -481,12 +478,12 @@ export default function LeaveApplicationForm() {
             <div>Error loading leave types</div>
             <div className="text-sm mt-1">{userLeaveTypesError}</div>
           </div>
-        ) : leaveBalance && userLeaveTypes.length > 0 ? (
+        ) : availableLeaveTypes.length > 0 ? (
           <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-            {userLeaveTypes.map(leaveType => (
-              <div key={leaveType.id} className="text-center p-3 bg-white rounded-lg border border-gray-200 shadow-sm">
-                <div className={`text-lg font-bold ${getBalanceColor(leaveType.id)}`}>
-                  {getLeaveBalanceForType(leaveType.id)}
+            {availableLeaveTypes.map(leaveType => (
+              <div key={leaveType.leaveTypeId || leaveType.id} className="text-center p-3 bg-white rounded-lg border border-gray-200 shadow-sm">
+                <div className={`text-lg font-bold ${getBalanceColor(leaveType.leaveTypeId || leaveType.id)}`}>
+                  {getLeaveBalanceForType(leaveType.leaveTypeId || leaveType.id)}
                 </div>
                 <div className="text-xs text-gray-600 mt-1">days</div>
                 <div className="text-xs font-medium text-gray-800 mt-2">{leaveType.name}</div>
@@ -497,7 +494,7 @@ export default function LeaveApplicationForm() {
         ) : (
           <div className="text-center py-4 text-gray-500">
             <AlertCircle className="w-8 h-8 mx-auto mb-2 text-gray-400" />
-            {userLeaveTypes.length === 0 ? 'No leave types available' : 'Unable to load leave balance'}
+            {availableLeaveTypes.length === 0 ? 'No leave types available' : 'Unable to load leave balance'}
           </div>
         )}
       </div>
@@ -513,7 +510,7 @@ export default function LeaveApplicationForm() {
             onBlur={() => markTouched('leaveTypeId')}
             error={touched.leaveTypeId && errors.leaveTypeId}
             required
-            userLeaveTypes={userLeaveTypes}
+            userLeaveTypes={availableLeaveTypes}
             leaveBalance={leaveBalance}
           />
         ) : (
@@ -524,7 +521,7 @@ export default function LeaveApplicationForm() {
             onBlur={() => markTouched('leaveTypeId')}
             error={touched.leaveTypeId && errors.leaveTypeId}
             required
-            userLeaveTypes={userLeaveTypes}
+            userLeaveTypes={availableLeaveTypes}
             leaveBalance={leaveBalance}
           />
         )}

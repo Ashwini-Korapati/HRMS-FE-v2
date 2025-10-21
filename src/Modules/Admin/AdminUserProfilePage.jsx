@@ -7,6 +7,7 @@ import {
   selectAdminProfileLoading,
   selectAdminProfileError,
 } from "../../Redux/Public/adminUserProfileSlice"
+import { toAssetUrl } from "../../config/config"
 
 // icons
 // icons (reserved if needed later) // import { Pencil } from 'lucide-react'
@@ -72,7 +73,7 @@ export default function AdminUserProfilePage() {
   }
 
   const initials = (profile.firstName?.[0] || profile.email?.[0] || "U").toUpperCase()
-  const avatarUrl = profile?.avatarUrl || profile?.avatar || profile?.photoUrl || profile?.photo || null
+  const avatarUrl = toAssetUrl(profile?.avatarUrl || profile?.avatar || profile?.photoUrl || profile?.photo || '') || null
   const isLoading = loading === 'loading'
 
   const InputBox = ({ value, placeholder = '—' }) => (

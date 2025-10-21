@@ -644,6 +644,7 @@ const EditWorkShiftForm = ({ shift, onSuccess, onCancel }) => {
             disabled={updating === 'loading' || isSubmitting}
             className="px-4 py-2 bg-gradient-to-r from-[#CA3500] to-[#FF6900] text-white rounded-lg hover:shadow transform hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none transition-all duration-200 text-sm font-bold relative overflow-hidden group"
           >
+            
             <span className="relative z-10">
               {updating === 'loading' || isSubmitting ? (
                 <span className="flex items-center space-x-1">
@@ -684,7 +685,7 @@ const EditWorkShiftForm = ({ shift, onSuccess, onCancel }) => {
         }
         .animate-shake {
           animation: shake 0.4s ease-in-out;
-        }Nikhil Green, Agrawal. Hey Cortana, all you can do in storage is. In Kandahar. Hey, Cortana. Someone they want to. Hey Cortana useful Cohen designed very cheap ticket. Hey, Cortana. Hey, Cortana. If anybody will get the. Company. Hey, Cortana. Play. Only 5. This is fine for exams. This is for three reasons. Hey, Cortana. 
+        }
       `}</style>
     </div>
   )

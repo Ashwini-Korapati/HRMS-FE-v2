@@ -33,13 +33,15 @@ export const fetchAttendance = createAsyncThunk(
 
 export const checkIn = createAsyncThunk(
   'attendance/checkIn',
-  async ({ companyId, userId, role, attendanceId }) => {
+  async ({ companyId, userId, role, attendanceId, isFirstCheckIn = false }) => {
     const isAdmin = ['ADMIN', 'SUPER_ADMIN', 'IT'].includes((role || '').toUpperCase())
     const base = isAdmin ? `${companyId}/attendance` : `${companyId}/auth/${userId}/attendance`
-    // Prefer stable GET endpoint if attendanceId is provided
-    const res = attendanceId
+    
+    // First check-in of the day uses POST, subsequent status checks use GET
+    const res = (attendanceId && !isFirstCheckIn)
       ? await httpGetService(`${base}/${attendanceId}/check-in`)
       : await httpPostService(`${base}/check-in`, {})
+    
     if (res.status >= 200 && res.status < 300) {
       return res.data?.data || { success: true }
     }
@@ -49,12 +51,15 @@ export const checkIn = createAsyncThunk(
 
 export const checkOut = createAsyncThunk(
   'attendance/checkOut',
-  async ({ companyId, userId, role, attendanceId }) => {
+  async ({ companyId, userId, role, attendanceId, isFirstCheckOut = false }) => {
     const isAdmin = ['ADMIN', 'SUPER_ADMIN', 'IT'].includes((role || '').toUpperCase())
     const base = isAdmin ? `${companyId}/attendance` : `${companyId}/auth/${userId}/attendance`
-    const res = attendanceId
+    
+    // First check-out of the day uses POST, subsequent status checks use GET
+    const res = (attendanceId && !isFirstCheckOut)
       ? await httpGetService(`${base}/${attendanceId}/check-out`)
       : await httpPostService(`${base}/check-out`, {})
+    
     if (res.status >= 200 && res.status < 300) {
       return res.data?.data || { success: true }
     }

@@ -10,13 +10,22 @@ import {
   selectLeaveTypesListError 
 } from '../../Redux/Public/leaveTypesSlice'
 import { CheckCircle, XCircle, Calendar, RefreshCw } from 'lucide-react'
+import { toAssetUrl } from '../../config/config'
 import { 
   fetchPendingApprovals, 
+  fetchApprovedApprovals,
+  fetchRejectedApprovals,
   approveLeave, 
   rejectLeave, 
   selectPendingApprovals, 
   selectApprovalsLoading, 
   selectApprovalsError, 
+  selectApprovedApprovals,
+  selectRejectedApprovals,
+  selectApprovedLoading,
+  selectRejectedLoading,
+  selectApprovedError,
+  selectRejectedError,
   selectApprovingMap, 
   selectRejectingMap 
 } from '../../Redux/Public/leaveApprovalsSlice'
@@ -60,6 +69,8 @@ const safeSelectLeaveTypesListError = (state) => {
   }
 }
 
+// (SmartApprovalSwitchCard removed: history now uses smart table view)
+
 export default function LeavesPage() {
   const dispatch = useDispatch()
   const auth = useSelector(state => state.auth)
@@ -67,6 +78,7 @@ export default function LeavesPage() {
   const userId = auth?.user?.id
   const designationId = auth?.user?.designationId || auth?.user?.designation?.id || auth?.user?.designationParentId
   const [recentLiveEvents, setRecentLiveEvents] = React.useState([])
+  const [historyTab, setHistoryTab] = React.useState('approved') // 'approved' | 'rejected'
   //
   
   // Use safe selectors
@@ -78,6 +90,13 @@ export default function LeavesPage() {
   const pending = useSelector(selectPendingApprovals)
   const approvalsLoading = useSelector(selectApprovalsLoading)
   const approvalsError = useSelector(selectApprovalsError)
+  // Approved/Rejected history state
+  const approved = useSelector(selectApprovedApprovals)
+  const rejected = useSelector(selectRejectedApprovals)
+  const approvedLoading = useSelector(selectApprovedLoading)
+  const rejectedLoading = useSelector(selectRejectedLoading)
+  const approvedError = useSelector(selectApprovedError)
+  const rejectedError = useSelector(selectRejectedError)
   const approvingMap = useSelector(selectApprovingMap)
   const rejectingMap = useSelector(selectRejectingMap)
 
@@ -95,6 +114,16 @@ export default function LeavesPage() {
       dispatch(fetchPendingApprovals({ companyId, userId, designationId }))
     }
   }, [dispatch, companyId, userId, designationId])
+
+  // Fetch history when tab changes
+  useEffect(() => {
+    if (!companyId || !userId || !designationId) return
+    if (historyTab === 'approved') {
+      dispatch(fetchApprovedApprovals({ companyId, userId, designationId }))
+    } else if (historyTab === 'rejected') {
+      dispatch(fetchRejectedApprovals({ companyId, userId, designationId }))
+    }
+  }, [historyTab, companyId, userId, designationId, dispatch])
 
   // Live socket subscription for leave events
   useEffect(() => {
@@ -300,7 +329,7 @@ export default function LeavesPage() {
           </div>
         </div>
 
-        {/* Recent Leave Requests Skeleton */}
+        {/* Recent Leave Requests (table) */}
         <div className="bg-white border border-gray-200 rounded-lg shadow-sm overflow-hidden">
           <div className="px-6 py-4 border-b border-gray-200">
             <h3 className="text-lg font-semibold text-gray-900">Recent Leave Requests</h3>
@@ -323,7 +352,7 @@ export default function LeavesPage() {
             ) : approvalsError ? (
               <div className="text-center text-rose-600">{approvalsError}</div>
             ) : !pending || pending.length === 0 ? (
-              <div className="text-center py-4 text-sm text-gray-500">No pending leave approvals</div>
+              <div className="text-center py-4 text-sm text-gray-500">No recent leave requests</div>
             ) : (
               <div className="overflow-x-auto">
                 <table className="min-w-full divide-y">
@@ -368,6 +397,123 @@ export default function LeavesPage() {
                 </table>
               </div>
             )}
+          </div>
+        </div>
+
+        {/* Smart Switch Cards for Leave History */}
+        <div className="bg-white border border-gray-200 rounded-lg shadow-sm overflow-hidden">
+          <div className="px-6 py-4 border-b border-gray-200 flex items-center justify-between">
+            <h3 className="text-lg font-semibold text-gray-900">Leave History</h3>
+            {/* History filter switch (Approved/Rejected only) */}
+            <div className="inline-flex rounded-full border border-gray-200 bg-gray-50 p-1 text-sm">
+              {['approved','rejected'].map(tab => (
+                <button
+                  key={tab}
+                  onClick={() => setHistoryTab(tab)}
+                  className={`px-3 py-1.5 rounded-full capitalize transition ${historyTab === tab ? 'bg-white shadow text-gray-900' : 'text-gray-600 hover:text-gray-900'}`}
+                >
+                  {tab}
+                  {tab === 'approved' && approved?.length ? ` (${approved.length})` : ''}
+                  {tab === 'rejected' && rejected?.length ? ` (${rejected.length})` : ''}
+                </button>
+              ))}
+            </div>
+          </div>
+          <div className="p-6">
+            {/* Resolve arrays and loading based on selected tab (Approved/Rejected) */}
+            {(() => {
+              const loading = historyTab === 'approved' ? approvedLoading : rejectedLoading
+              const error = historyTab === 'approved' ? approvedError : rejectedError
+              const items = historyTab === 'approved' ? approved : rejected
+              if (loading === 'loading') {
+                return (
+                  <div className="space-y-2">
+                    {[...Array(5)].map((_, i) => (
+                      <div key={i} className="h-10 bg-gray-100 rounded animate-pulse" />
+                    ))}
+                  </div>
+                )
+              }
+              if (error) return <div className="text-center text-rose-600">{error}</div>
+              if (!items || items.length === 0) {
+                const empty = historyTab === 'approved' ? 'No approved leave history' : 'No rejected leave history'
+                return <div className="text-center py-4 text-sm text-gray-500">{empty}</div>
+              }
+
+              // fixed width smart table
+              return (
+                <div className="overflow-x-auto">
+                  <table className="min-w-full table-fixed border-separate border-spacing-0">
+                    <thead>
+                      <tr className="bg-gray-50">
+                        <th className="px-4 py-3 text-left text-xs font-medium text-gray-600 uppercase tracking-wider w-[280px]">Employee</th>
+                        <th className="px-4 py-3 text-left text-xs font-medium text-gray-600 uppercase tracking-wider w-[140px]">Type</th>
+                        <th className="px-4 py-3 text-left text-xs font-medium text-gray-600 uppercase tracking-wider w-[220px]">Dates</th>
+                        <th className="px-4 py-3 text-center text-xs font-medium text-gray-600 uppercase tracking-wider w-[80px]">Days</th>
+                        <th className="px-4 py-3 text-left text-xs font-medium text-gray-600 uppercase tracking-wider w-[260px]">Reason</th>
+                        <th className="px-4 py-3 text-left text-xs font-medium text-gray-600 uppercase tracking-wider w-[140px]">Status</th>
+                        <th className="px-4 py-3 text-left text-xs font-medium text-gray-600 uppercase tracking-wider w-[170px]">Updated</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {items.map((req, idx) => {
+                        const fullName = `${req?.user?.firstName || ''} ${req?.user?.lastName || ''}`.trim() || (req.userId || '-')
+                        const email = req?.user?.email || ''
+                        const avatar = toAssetUrl(req?.user?.avatar || '')
+                        const typeName = req?.leaveType?.name || req?.leaveTypeId || '-'
+                        const status = req?.status || (historyTab === 'approved' ? 'APPROVED' : 'REJECTED')
+                        const updated = req?.approvedDate || req?.rejectedDate || req?.updatedAt || req?.appliedDate
+                        const isApproved = status === 'APPROVED'
+                        return (
+                          <tr key={req.id} className={`group transition-colors ${idx % 2 === 0 ? 'bg-white' : 'bg-slate-50'} hover:bg-slate-100`}>
+                            {/* Employee */}
+                            <td className="px-4 py-3 align-middle">
+                              <div className="flex items-center gap-3 min-w-0">
+                                <img src={avatar} alt={fullName} className="h-9 w-9 rounded-full object-cover border border-gray-200 shadow-sm" />
+                                <div className="min-w-0">
+                                  <div className="text-sm font-medium text-gray-900 truncate">{fullName}</div>
+                                  <div className="text-xs text-gray-500 truncate" title={email}>{email}</div>
+                                </div>
+                              </div>
+                            </td>
+                            {/* Type */}
+                            <td className="px-4 py-3 align-middle">
+                              <div className="text-sm text-gray-900 truncate">{typeName}</div>
+                            </td>
+                            {/* Dates */}
+                            <td className="px-4 py-3 align-middle">
+                              <div className="text-sm text-gray-900 whitespace-nowrap">
+                                {new Date(req.startDate).toLocaleDateString()} – {new Date(req.endDate).toLocaleDateString()}
+                                {req.isHalfDay ? <span className="text-xs text-gray-500"> (Half)</span> : null}
+                              </div>
+                            </td>
+                            {/* Days */}
+                            <td className="px-4 py-3 align-middle text-center">
+                              <span className="inline-flex items-center justify-center px-2 py-0.5 rounded bg-gray-100 text-gray-700 text-xs font-medium w-[48px]">{req.totalDays}</span>
+                            </td>
+                            {/* Reason */}
+                            <td className="px-4 py-3 align-middle">
+                              <div className="text-sm text-gray-900 truncate" title={req.reason}>{req.reason || '—'}</div>
+                            </td>
+                            {/* Status */}
+                            <td className="px-4 py-3 align-middle">
+                              <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold transition-all ${isApproved ? 'bg-green-100 text-green-700 border border-green-200' : 'bg-rose-100 text-rose-700 border border-rose-200'}`}>
+                                {isApproved ? <CheckCircle className="w-3.5 h-3.5" /> : <XCircle className="w-3.5 h-3.5" />}
+                                {isApproved ? 'Approved' : 'Rejected'}
+                              </span>
+                            </td>
+                            {/* Updated */}
+                            <td className="px-4 py-3 align-middle">
+                              <div className="text-sm text-gray-900 whitespace-nowrap">{updated ? new Date(updated).toLocaleString() : '-'}</div>
+                            </td>
+                          </tr>
+                        )
+                      })}
+                    </tbody>
+                  </table>
+                </div>
+              )
+            })()}
           </div>
         </div>
 

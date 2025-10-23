@@ -198,12 +198,12 @@ export default function SmartLandingPage() {
 						>
 							{authed ? 'Dashboard' : 'Login'}
 						</button>
-						<button
+						{/* <button
 							onClick={() => navigate('/platform/login')}
 							className="inline-flex items-center justify-center px-4 py-1.5 rounded-full text-xs font-medium border border-orange-500/50 text-orange-300 hover:bg-orange-500/10 transition-colors"
 						>
 							Platform Login
-						</button>
+						</button> */}
 					</div>
 				</nav>
 			</div>

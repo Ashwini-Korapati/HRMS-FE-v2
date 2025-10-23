@@ -3,34 +3,33 @@ import { X, Building2, Mail, Phone, MapPin, Link as LinkIcon, CreditCard, User, 
 import { httpPostService } from '../../config/httphandler'
 import { useNavigate } from 'react-router-dom'
 
-// Default payload (mirrors provided example) – values are editable and no validation enforced
-const makeDefaultData = (planId) => ({
+const initialPayload = (planId) => ({
   company: {
-    name: 'Innovex Inc',
-    email: 'korapatiashwini@gmail.com',
-    phone: '9966714320',
-    address: '100 Main St, City, Country',
-    website: 'https://innovexinc.example',
-    taxId: 'TAX-123789',
-    timezone: 'UTC',
-    workingDays: [1,2,3,4,5],
-    workingHours: { start: '09:00', end: '18:00' }
+    name: '',
+    email: '',
+    phone: '',
+    address: '',
+    website: '',
+    taxId: '',
+    timezone: '',
+    workingDays: [],
+    workingHours: { start: '', end: '' }
   },
   admin: {
-    firstName: 'harish',
-    lastName: 'M',
-    email: 'korapatiashwini@gmail.com',
-    phone: '9966714320',
-    password: 'Admin@123',
-    dateOfBirth: '1990-01-01',
-    gender: 'MALE'
+    firstName: '',
+    lastName: '',
+    email: '',
+    phone: '',
+    password: '',
+    dateOfBirth: '',
+    gender: ''
   },
-  planId: planId || '5e98cfa0-bac0-48f0-93e7-01080a0cd06f', // override by incoming selected plan
+  planId: planId || '',
   trialDays: 0,
   metadata: {
-    paymentTransactionId: 'txn_123456789',
-    paymentStatus: 'PAID',
-    gateway: 'MANUAL'
+    paymentTransactionId: '',
+    paymentStatus: '',
+    gateway: ''
   }
 })
 
@@ -96,8 +95,8 @@ function Select({ label, children, className='', multiple, ...props }) {
 
 export default function MultiStepSubscriptionForm({ plan, onClose }) {
   const navigate = useNavigate()
-  const [payload, setPayload] = useState(makeDefaultData(plan?.id))
-  const [step, setStep] = useState('company') // company | admin | review
+  const [payload, setPayload] = useState(initialPayload(plan?.id))
+  const [step, setStep] = useState('company')
   const [submitting, setSubmitting] = useState(false)
   const [error, setError] = useState(null)
   const [success, setSuccess] = useState(false)
@@ -113,7 +112,6 @@ export default function MultiStepSubscriptionForm({ plan, onClose }) {
     })
   }
 
-  // ensure planId reflects selection if user changed plan prop during open
   React.useEffect(()=>{ if (plan?.id) setPayload(p => ({...p, planId: plan.id})) }, [plan])
 
   const dob = useMemo(()=>{ const v = payload.admin.dateOfBirth; const [y,m,d]=v.split('-').map(n=>parseInt(n,10)); return { y,m,d } }, [payload.admin.dateOfBirth])
@@ -160,17 +158,26 @@ export default function MultiStepSubscriptionForm({ plan, onClose }) {
       <Input label="Address" icon={MapPin} value={payload.company.address} onChange={e=> update(['company','address'], e.target.value)} />
       <Input label="Website" icon={LinkIcon} value={payload.company.website} onChange={e=> update(['company','website'], e.target.value)} />
       <Input label="Tax ID" icon={CreditCard} value={payload.company.taxId} onChange={e=> update(['company','taxId'], e.target.value)} />
-      <Select label="Timezone" onChange={e=> update(['company','timezone'], e.target.value)}>
-        {TIMEZONES.map(tz => <option key={tz} value={tz} selected={payload.company.timezone === tz}>{tz}</option>)}
+
+      {/* Controlled select for timezone */}
+      <Select label="Timezone" value={payload.company.timezone} onChange={e=> update(['company','timezone'], e.target.value)}>
+        <option value="">Select timezone</option>
+        {TIMEZONES.map(tz => <option key={tz} value={tz}>{tz}</option>)}
       </Select>
-      <Select label="Working Days" multiple onChange={e=> update(['company','workingDays'], Array.from(e.target.selectedOptions).map(o=> parseInt(o.value,10)))}>
-        {WEEKDAYS.map(d => <option key={d.val} value={d.val} selected={payload.company.workingDays.includes(d.val)}>{d.label}</option>)}
+
+      {/* Controlled multi-select for working days */}
+      <Select label="Working Days" multiple value={payload.company.workingDays.map(String)} onChange={e=> update(['company','workingDays'], Array.from(e.target.selectedOptions).map(o=> parseInt(o.value,10)))}>
+        {WEEKDAYS.map(d => <option key={d.val} value={d.val}>{d.label}</option>)}
       </Select>
-      <Select label="Start Time" onChange={e=> update(['company','workingHours','start'], e.target.value)}>
-        {times.map(t => <option key={t} value={t} selected={payload.company.workingHours.start === t}>{t}</option>)}
+
+      <Select label="Start Time" value={payload.company.workingHours.start} onChange={e=> update(['company','workingHours','start'], e.target.value)}>
+        <option value="">Select Start</option>
+        {times.map(t => <option key={t} value={t}>{t}</option>)}
       </Select>
-      <Select label="End Time" onChange={e=> update(['company','workingHours','end'], e.target.value)}>
-        {times.map(t => <option key={t} value={t} selected={payload.company.workingHours.end === t}>{t}</option>)}
+
+      <Select label="End Time" value={payload.company.workingHours.end} onChange={e=> update(['company','workingHours','end'], e.target.value)}>
+        <option value="">Select End</option>
+        {times.map(t => <option key={t} value={t}>{t}</option>)}
       </Select>
     </div>
   )
@@ -182,21 +189,29 @@ export default function MultiStepSubscriptionForm({ plan, onClose }) {
       <Input label="Email" icon={Mail} value={payload.admin.email} onChange={e=> update(['admin','email'], e.target.value)} />
       <Input label="Phone" icon={Phone} value={payload.admin.phone} onChange={e=> update(['admin','phone'], e.target.value)} />
       <Input label="Password" type="password" icon={Lock} value={payload.admin.password} onChange={e=> update(['admin','password'], e.target.value)} />
+
       <div className="grid grid-cols-3 gap-3 md:col-span-2">
-        <Select label="Year" onChange={e=> update(['admin','dateOfBirth'], `${e.target.value}-${String(dob.m).padStart(2,'0')}-${String(Math.min(dob.d || 1, daysInMonth(parseInt(e.target.value,10), dob.m))).padStart(2,'0')}`)}>
-          {years.map(y => <option key={y} value={y} selected={dob.y===y}>{y}</option>)}
+        <Select label="Year" value={dob.y || ''} onChange={e=> update(['admin','dateOfBirth'], `${e.target.value}-${String(dob.m).padStart(2,'0')}-${String(Math.min(dob.d || 1, daysInMonth(parseInt(e.target.value,10), dob.m))).padStart(2,'0')}`)}>
+          <option value="">Year</option>
+          {years.map(y => <option key={y} value={y}>{y}</option>)}
         </Select>
-        <Select label="Month" onChange={e=> update(['admin','dateOfBirth'], `${dob.y}-${String(e.target.value).padStart(2,'0')}-${String(Math.min(dob.d || 1, daysInMonth(dob.y, parseInt(e.target.value,10)))).padStart(2,'0')}`)}>
-          {months.map(m => <option key={m.val} value={m.val} selected={dob.m===m.val}>{m.label}</option>)}
+
+        <Select label="Month" value={dob.m || ''} onChange={e=> update(['admin','dateOfBirth'], `${dob.y}-${String(e.target.value).padStart(2,'0')}-${String(Math.min(dob.d || 1, daysInMonth(dob.y, parseInt(e.target.value,10)))).padStart(2,'0')}`)}>
+          <option value="">Month</option>
+          {months.map(m => <option key={m.val} value={m.val}>{m.label}</option>)}
         </Select>
-        <Select label="Day" onChange={e=> update(['admin','dateOfBirth'], `${dob.y}-${String(dob.m).padStart(2,'0')}-${String(e.target.value).padStart(2,'0')}`)}>
-          {Array.from({ length: dayCount }, (_,i)=> i+1).map(d => <option key={d} value={d} selected={dob.d===d}>{d}</option>)}
+
+        <Select label="Day" value={dob.d || ''} onChange={e=> update(['admin','dateOfBirth'], `${dob.y}-${String(dob.m).padStart(2,'0')}-${String(e.target.value).padStart(2,'0')}`)}>
+          <option value="">Day</option>
+          {Array.from({ length: dayCount }, (_,i)=> i+1).map(d => <option key={d} value={d}>{d}</option>)}
         </Select>
       </div>
-      <Select label="Gender" onChange={e=> update(['admin','gender'], e.target.value)}>
-        <option value="FEMALE" selected={payload.admin.gender==='FEMALE'}>Female</option>
-        <option value="MALE" selected={payload.admin.gender==='MALE'}>Male</option>
-        <option value="OTHER" selected={payload.admin.gender==='OTHER'}>Other</option>
+
+      <Select label="Gender" value={payload.admin.gender} onChange={e=> update(['admin','gender'], e.target.value)}>
+        <option value="">Select</option>
+        <option value="FEMALE">Female</option>
+        <option value="MALE">Male</option>
+        <option value="OTHER">Other</option>
       </Select>
     </div>
   )
@@ -212,7 +227,7 @@ export default function MultiStepSubscriptionForm({ plan, onClose }) {
   return (
     <div className="fixed inset-0 z-[999] flex items-start md:items-center justify-center px-4 py-10 md:py-20 overflow-y-auto">
       <div className="absolute inset-0 bg-black/70 backdrop-blur-sm" onClick={onClose} />
-      <div className={`relative w-full max-w-4xl ${glass} p-6 md:p-8 shadow-[0_8px_40px_-12px_rgba(0,0,0,0.8)] animate-scale-in`}> 
+      <div className={`relative w-full max-w-4xl ${glass} p-6 md:p-8 shadow-[0_8px_40px_-12px_rgba(0,0,0,0.8)] animate-scale-in`}>
         <button onClick={onClose} className="absolute top-3 right-3 w-8 h-8 rounded-full bg-white/10 hover:bg-white/15 flex items-center justify-center text-neutral-300"><X size={16} /></button>
         <div className="mb-6">
           <h2 className="text-2xl font-semibold tracking-tight bg-gradient-to-r from-orange-400 via-rose-400 to-fuchsia-400 bg-clip-text text-transparent">Create Subscription</h2>

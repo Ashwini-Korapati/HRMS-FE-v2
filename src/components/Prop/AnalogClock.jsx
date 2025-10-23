@@ -155,7 +155,9 @@ export default function AnalogClock() {
             setLastError('')
             try {
               if (!checkedIn) {
-                  const res = await dispatch(checkIn({ companyId, userId, role, attendanceId }))
+                  // Determine if this is the first check-in of the day
+                  const isFirstCheckIn = !attendanceId || !checkInAt
+                  const res = await dispatch(checkIn({ companyId, userId, role, attendanceId, isFirstCheckIn }))
                 if (res.error) throw new Error(res.error.message)
                 const payload = res.payload || {}
                 const ts = payload.checkInTime ? new Date(payload.checkInTime) : new Date()
@@ -168,7 +170,9 @@ export default function AnalogClock() {
                   // Ask gateway to publish live snapshot for this designation
                   if (designationId) requestDesignationSnapshot({ designationId, companyId })
               } else {
-                  const res = await dispatch(checkOut({ companyId, userId, role, attendanceId }))
+                  // Determine if this is the first check-out of the day
+                  const isFirstCheckOut = !checkOutAt && !!checkInAt
+                  const res = await dispatch(checkOut({ companyId, userId, role, attendanceId, isFirstCheckOut }))
                 if (res.error) throw new Error(res.error.message)
                 const payload = res.payload || {}
                 const ts = payload.checkOutTime ? new Date(payload.checkOutTime) : new Date()

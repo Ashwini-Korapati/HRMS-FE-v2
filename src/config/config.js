@@ -1,4 +1,5 @@
 export const serverURL = 'http://localhost:5000/api';
+// export const serverURL = 'https://hrmstest.nmitsls.com:5000/api'
 
 // Derive the server origin (without the /api suffix) for serving static files like uploads
 export const serverOrigin = (() => {

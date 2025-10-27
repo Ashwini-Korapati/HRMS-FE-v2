@@ -38,6 +38,21 @@ export const changeOwnPassword = createAsyncThunk('adminUserProfile/changeOwnPas
   throw new Error(res.data?.message || 'Failed to change password')
 })
 
+// USER: Avatar upload/delete (own profile)
+export const uploadOwnAvatar = createAsyncThunk('adminUserProfile/uploadOwnAvatar', async ({ companyId, userId, file }) => {
+  const form = new FormData()
+  form.append('avatar', file)
+  const res = await httpPostFormService(`${ownProfilePath(companyId, userId)}/avatar`, form)
+  if (res.status >= 200 && res.status < 300) return res.data?.data || res.data
+  throw new Error(res.data?.message || 'Failed to upload avatar')
+})
+
+export const deleteOwnAvatar = createAsyncThunk('adminUserProfile/deleteOwnAvatar', async ({ companyId, userId }) => {
+  const res = await httpDeleteService(`${ownProfilePath(companyId, userId)}/avatar`)
+  if (res.status >= 200 && res.status < 300) return true
+  throw new Error(res.data?.message || 'Failed to delete avatar')
+})
+
 // Avatar
 export const uploadAdminUserAvatar = createAsyncThunk('adminUserProfile/uploadAvatar', async ({ companyId, userId, file }) => {
   const form = new FormData()
@@ -170,6 +185,19 @@ const adminUserProfileSlice = createSlice({
         state.loading = 'failed'
         state.error = action.error?.message || 'Failed to load profile'
       })
+      // Admin update selected user's profile
+      .addCase(updateAdminUserProfile.pending, (state) => {
+        state.loading = state.loading === 'loading' ? 'loading' : 'updating'
+        state.error = null
+      })
+      .addCase(updateAdminUserProfile.fulfilled, (state, action) => {
+        state.loading = 'succeeded'
+        state.profile = action.payload || state.profile
+      })
+      .addCase(updateAdminUserProfile.rejected, (state, action) => {
+        state.loading = 'failed'
+        state.error = action.error?.message || 'Failed to update profile'
+      })
       // USER own profile
       .addCase(fetchOwnProfile.pending, (state) => {
         state.loading = 'loading'
@@ -205,6 +233,44 @@ const adminUserProfileSlice = createSlice({
       .addCase(changeOwnPassword.rejected, (state, action) => {
         state.loading = 'failed'
         state.error = action.error?.message || 'Failed to change password'
+      })
+      // Own avatar upload/delete
+      .addCase(uploadOwnAvatar.pending, (state) => {
+        state.loading = state.loading === 'loading' ? 'loading' : 'updating'
+        state.error = null
+      })
+      .addCase(uploadOwnAvatar.fulfilled, (state, action) => {
+        state.loading = 'succeeded'
+        const payload = action.payload
+        if (!payload) return
+        // If backend returns full profile, replace; else update avatar fields
+        if (payload && (payload.firstName || payload.email || payload.employeeId)) {
+          state.profile = payload
+        } else if (state.profile) {
+          const url = payload?.avatar || payload?.avatarUrl || payload?.url || payload
+          state.profile.avatar = url
+        }
+      })
+      .addCase(uploadOwnAvatar.rejected, (state, action) => {
+        state.loading = 'failed'
+        state.error = action.error?.message || 'Failed to upload avatar'
+      })
+      .addCase(deleteOwnAvatar.pending, (state) => {
+        state.loading = state.loading === 'loading' ? 'loading' : 'updating'
+        state.error = null
+      })
+      .addCase(deleteOwnAvatar.fulfilled, (state) => {
+        state.loading = 'succeeded'
+        if (state.profile) {
+          state.profile.avatar = ''
+          if (state.profile.avatarUrl) state.profile.avatarUrl = ''
+          if (state.profile.photo) state.profile.photo = ''
+          if (state.profile.photoUrl) state.profile.photoUrl = ''
+        }
+      })
+      .addCase(deleteOwnAvatar.rejected, (state, action) => {
+        state.loading = 'failed'
+        state.error = action.error?.message || 'Failed to delete avatar'
       })
   }
 })

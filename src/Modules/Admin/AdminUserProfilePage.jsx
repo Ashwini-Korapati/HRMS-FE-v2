@@ -3,6 +3,7 @@ import { useDispatch, useSelector } from "react-redux"
 import { useParams } from "react-router-dom"
 import {
   fetchAdminUserProfile,
+  updateAdminUserProfile,
   selectAdminProfile,
   selectAdminProfileLoading,
   selectAdminProfileError,
@@ -25,6 +26,17 @@ export default function AdminUserProfilePage() {
   const profile = useSelector(selectAdminProfile)
   const loading = useSelector(selectAdminProfileLoading)
   const error = useSelector(selectAdminProfileError)
+  const [editing, setEditing] = useState(false)
+  const [form, setForm] = useState({
+    phone: '',
+    bio: '',
+    gender: '',
+    dateOfBirth: '',
+    addressCountry: '',
+    addressCity: '',
+    postalCode: '',
+    taxId: ''
+  })
 
   // Transition state for sliding content when switching selected user
   const prevIdRef = useRef(selectedUserId)
@@ -57,6 +69,36 @@ export default function AdminUserProfilePage() {
   }, [loading, selectedUserId])
 
   const formatDate = (d) => (d ? new Date(d).toLocaleDateString() : "-")
+
+  useEffect(() => {
+    if (!profile) return
+    setForm({
+      phone: profile.phone || '',
+      bio: profile.bio || '',
+      gender: profile.gender || '',
+      dateOfBirth: profile.dateOfBirth ? new Date(profile.dateOfBirth).toISOString().slice(0,10) : '',
+      addressCountry: profile.addressCountry || profile.country || '',
+      addressCity: profile.addressCity || profile.city || profile.state || '',
+      postalCode: profile.postalCode || profile.zip || '',
+      taxId: profile.taxId || profile.taxID || ''
+    })
+  }, [profile])
+
+  const onSave = async () => {
+    if (!companyId || !selectedUserId) return
+    const payload = {
+      phone: form.phone,
+      bio: form.bio,
+      gender: form.gender,
+      dateOfBirth: form.dateOfBirth || undefined,
+      addressCountry: form.addressCountry,
+      addressCity: form.addressCity,
+      postalCode: form.postalCode,
+      taxId: form.taxId
+    }
+    const res = await dispatch(updateAdminUserProfile({ companyId, userId: selectedUserId, payload }))
+    if (res?.type?.endsWith('fulfilled')) setEditing(false)
+  }
 
   if (loading === "loading" && !profile) {
     return <div className="rounded-xl border border-border bg-card p-12 text-center shadow-sm">Loading profile…</div>
@@ -100,13 +142,18 @@ export default function AdminUserProfilePage() {
         {/* Header row: avatar/name/designation + Edit button */}
         <div className="flex items-start justify-between gap-4">
           <div className="flex items-center gap-3">
-            <div className={`w-14 h-14 rounded-full bg-neutral-100 dark:bg-neutral-800 overflow-hidden grid place-items-center text-lg font-semibold text-neutral-800 dark:text-neutral-100 ${isLoading ? 'animate-pulse' : ''}`}>
+            <div className={`w-20 h-20 rounded-full bg-neutral-100 dark:bg-neutral-800 overflow-hidden grid place-items-center text-lg font-semibold text-neutral-800 dark:text-neutral-100 relative ${isLoading ? 'animate-pulse' : ''}`}>
               {isLoading ? (
                 <div className="w-full h-full bg-neutral-200 dark:bg-neutral-700" />
               ) : avatarUrl ? (
                 <img src={avatarUrl} alt={profile.firstName || profile.email} className="w-full h-full object-cover" />
               ) : (
                 initials
+              )}
+              {!isLoading && (
+                <div className="absolute -bottom-2 left-1/2 -translate-x-1/2 px-2 py-0.5 rounded-full text-[10px] bg-neutral-900 text-white border border-white/30 shadow">
+                  {(profile.role || 'USER')}
+                </div>
               )}
             </div>
             <div>
@@ -118,10 +165,14 @@ export default function AdminUserProfilePage() {
               </div>
             </div>
           </div>
-          <button type="button" className="inline-flex items-center gap-2 rounded-lg bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-medium px-3 py-1.5 transition-colors">
-            {/* <Pencil size={14}/> */}
-            Edit
-          </button>
+          {!editing ? (
+            <button type="button" onClick={() => setEditing(true)} className="inline-flex items-center gap-2 rounded-lg bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-medium px-3 py-1.5 transition-colors">Edit</button>
+          ) : (
+            <div className="flex items-center gap-2">
+              <button type="button" onClick={onSave} className="inline-flex items-center gap-2 rounded-lg bg-green-600 hover:bg-green-700 text-white text-sm font-medium px-3 py-1.5 transition-colors">Save</button>
+              <button type="button" onClick={() => setEditing(false)} className="inline-flex items-center gap-2 rounded-lg border border-neutral-300 dark:border-neutral-700 text-neutral-700 dark:text-neutral-200 text-sm font-medium px-3 py-1.5 transition-colors">Cancel</button>
+            </div>
+          )}
         </div>
 
         <hr className="my-4 border-neutral-200 dark:border-neutral-800" />
@@ -143,19 +194,27 @@ export default function AdminUserProfilePage() {
           </div>
           <div>
             <div className="text-xs text-neutral-500 mb-1">Phone</div>
-            <InputBox value={profile.phone} />
+            {!editing ? <InputBox value={profile.phone} /> : (
+              <input value={form.phone} onChange={(e)=>setForm(f=>({...f, phone: e.target.value}))} className="rounded-md border border-neutral-200 dark:border-neutral-800 bg-white dark:bg-neutral-900 text-sm text-neutral-900 dark:text-neutral-100 px-3 py-2 min-h-[38px] w-full" />
+            )}
           </div>
           <div>
             <div className="text-xs text-neutral-500 mb-1">Bio</div>
-            <InputBox value={profile.bio} />
+            {!editing ? <InputBox value={profile.bio} /> : (
+              <textarea value={form.bio} onChange={(e)=>setForm(f=>({...f, bio: e.target.value}))} rows={2} className="rounded-md border border-neutral-200 dark:border-neutral-800 bg-white dark:bg-neutral-900 text-sm text-neutral-900 dark:text-neutral-100 px-3 py-2 w-full" />
+            )}
           </div>
           <div>
             <div className="text-xs text-neutral-500 mb-1">Gender</div>
-            <InputBox value={profile.gender} />
+            {!editing ? <InputBox value={profile.gender} /> : (
+              <input value={form.gender} onChange={(e)=>setForm(f=>({...f, gender: e.target.value}))} className="rounded-md border border-neutral-200 dark:border-neutral-800 bg-white dark:bg-neutral-900 text-sm text-neutral-900 dark:text-neutral-100 px-3 py-2 min-h-[38px] w-full" />
+            )}
           </div>
           <div>
             <div className="text-xs text-neutral-500 mb-1">Date of Birth</div>
-            <InputBox value={formatDate(profile.dateOfBirth)} />
+            {!editing ? <InputBox value={formatDate(profile.dateOfBirth)} /> : (
+              <input type="date" value={form.dateOfBirth} onChange={(e)=>setForm(f=>({...f, dateOfBirth: e.target.value}))} className="rounded-md border border-neutral-200 dark:border-neutral-800 bg-white dark:bg-neutral-900 text-sm text-neutral-900 dark:text-neutral-100 px-3 py-2 min-h-[38px] w-full" />
+            )}
           </div>
           <div>
             <div className="text-xs text-neutral-500 mb-1">National ID</div>
@@ -168,19 +227,27 @@ export default function AdminUserProfilePage() {
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-sm">
           <div>
             <div className="text-xs text-neutral-500 mb-1">Country</div>
-            <InputBox value={profile.addressCountry || profile.country} />
+            {!editing ? <InputBox value={profile.addressCountry || profile.country} /> : (
+              <input value={form.addressCountry} onChange={(e)=>setForm(f=>({...f, addressCountry: e.target.value}))} className="rounded-md border border-neutral-200 dark:border-neutral-800 bg-white dark:bg-neutral-900 text-sm text-neutral-900 dark:text-neutral-100 px-3 py-2 min-h-[38px] w-full" />
+            )}
           </div>
           <div>
             <div className="text-xs text-neutral-500 mb-1">City/State</div>
-            <InputBox value={profile.addressCity || profile.city || profile.state} />
+            {!editing ? <InputBox value={profile.addressCity || profile.city || profile.state} /> : (
+              <input value={form.addressCity} onChange={(e)=>setForm(f=>({...f, addressCity: e.target.value}))} className="rounded-md border border-neutral-200 dark:border-neutral-800 bg-white dark:bg-neutral-900 text-sm text-neutral-900 dark:text-neutral-100 px-3 py-2 min-h-[38px] w-full" />
+            )}
           </div>
           <div>
             <div className="text-xs text-neutral-500 mb-1">Postal Code</div>
-            <InputBox value={profile.postalCode || profile.zip} />
+            {!editing ? <InputBox value={profile.postalCode || profile.zip} /> : (
+              <input value={form.postalCode} onChange={(e)=>setForm(f=>({...f, postalCode: e.target.value}))} className="rounded-md border border-neutral-200 dark:border-neutral-800 bg-white dark:bg-neutral-900 text-sm text-neutral-900 dark:text-neutral-100 px-3 py-2 min-h-[38px] w-full" />
+            )}
           </div>
           <div>
             <div className="text-xs text-neutral-500 mb-1">TAX ID</div>
-            <InputBox value={profile.taxId || profile.taxID} />
+            {!editing ? <InputBox value={profile.taxId || profile.taxID} /> : (
+              <input value={form.taxId} onChange={(e)=>setForm(f=>({...f, taxId: e.target.value}))} className="rounded-md border border-neutral-200 dark:border-neutral-800 bg-white dark:bg-neutral-900 text-sm text-neutral-900 dark:text-neutral-100 px-3 py-2 min-h-[38px] w-full" />
+            )}
           </div>
         </div>
       </section>

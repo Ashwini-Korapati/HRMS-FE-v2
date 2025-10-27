@@ -1,7 +1,7 @@
 import React from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { selectAuthState } from '../../Redux/Public/authSlice'
-import { fetchOwnProfile, updateOwnProfile, changeOwnPassword, selectAdminProfile, selectAdminProfileLoading } from '../../Redux/Public/adminUserProfileSlice'
+import { fetchOwnProfile, updateOwnProfile, changeOwnPassword, uploadOwnAvatar, deleteOwnAvatar, selectAdminProfile, selectAdminProfileLoading } from '../../Redux/Public/adminUserProfileSlice'
 import SmartToster from '../../components/Prop/SmartToster'
 import { toAssetUrl } from '../../config/config'
 
@@ -150,7 +150,7 @@ export default function UserProfilePage() {
         <div className="flex items-start gap-4 md:w-1/3">
           <div className="relative">
             <div className="w-20 h-20 rounded-full bg-gradient-to-tr from-orange-200 to-amber-200 p-[2px]">
-              <div className="w-full h-full rounded-full bg-white overflow-hidden">
+              <div className="w-full h-full rounded-full bg-white overflow-hidden relative group">
                 {avatarUrl ? (
                   <img src={avatarUrl} alt={profile?.firstName || 'Avatar'} className="w-full h-full object-cover" />
                 ) : (
@@ -158,6 +158,48 @@ export default function UserProfilePage() {
                     {(profile?.firstName || profile?.email || 'U')[0]}
                   </div>
                 )}
+                {/* Overlay controls */}
+                <div className="absolute inset-0 bg-neutral-900/30 opacity-0 group-hover:opacity-100 transition-opacity grid place-items-center">
+                  <div className="flex gap-2">
+                    <label className="px-2 py-1 rounded-md text-[11px] bg-white/90 text-neutral-800 border border-neutral-300 cursor-pointer">
+                      Change
+                      <input
+                        type="file"
+                        accept="image/*"
+                        className="hidden"
+                        onChange={async (e) => {
+                          const file = e.target.files?.[0]
+                          if (!file) return
+                          try {
+                            const res = await dispatch(uploadOwnAvatar({ companyId, userId, file }))
+                            if (res?.type?.endsWith('fulfilled')) setToast('Avatar updated')
+                            else setToast(res?.error?.message || 'Failed to update avatar')
+                          } catch (err) {
+                            setToast(err.message || 'Failed to update avatar')
+                          } finally {
+                            e.target.value = ''
+                          }
+                        }}
+                      />
+                    </label>
+                    {avatarUrl ? (
+                      <button
+                        onClick={async () => {
+                          try {
+                            const res = await dispatch(deleteOwnAvatar({ companyId, userId }))
+                            if (res?.type?.endsWith('fulfilled')) setToast('Avatar removed')
+                            else setToast(res?.error?.message || 'Failed to remove avatar')
+                          } catch (err) {
+                            setToast(err.message || 'Failed to remove avatar')
+                          }
+                        }}
+                        className="px-2 py-1 rounded-md text-[11px] bg-white/90 text-neutral-800 border border-neutral-300"
+                      >
+                        Remove
+                      </button>
+                    ) : null}
+                  </div>
+                </div>
               </div>
             </div>
           </div>

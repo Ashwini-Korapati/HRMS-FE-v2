@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo, useRef, useState } from "react"
-import { Search as SearchIcon, Bell, UserCircle2, CheckCheck } from "lucide-react"
+import { Search as SearchIcon, Bell, UserCircle2, CheckCheck, User, LogOut } from "lucide-react"
 import { ThemeSwitcher } from "../Buttons/SwitchButtons"
 import { useTheme } from '../../theme/ThemeProvider'
 import { useSelector, useDispatch } from 'react-redux'
@@ -18,8 +18,10 @@ export default function SmartNavbar({
   className = "",
 }) {
   const [query, setQuery] = useState("")
-  const [open, setOpen] = useState(false)
+  const [open, setOpen] = useState(false) // notifications
   const dropdownRef = useRef(null)
+  const [profileOpen, setProfileOpen] = useState(false)
+  const profileRef = useRef(null)
   const hoverTimerRef = useRef(null)
   const navigate = useNavigate?.() || ((path) => { window.location.hash = `#${path}` })
 
@@ -63,6 +65,18 @@ export default function SmartNavbar({
     document.addEventListener('mousedown', onDocClick)
     return () => document.removeEventListener('mousedown', onDocClick)
   }, [open])
+
+  // Close profile menu on outside click / ESC
+  useEffect(() => {
+    if (!profileOpen) return
+    const onDocClick = (e) => {
+      if (profileRef.current && !profileRef.current.contains(e.target)) setProfileOpen(false)
+    }
+    const onKey = (e) => { if (e.key === 'Escape') setProfileOpen(false) }
+    document.addEventListener('mousedown', onDocClick)
+    document.addEventListener('keydown', onKey)
+    return () => { document.removeEventListener('mousedown', onDocClick); document.removeEventListener('keydown', onKey) }
+  }, [profileOpen])
 
   // Raw notifications from store
   const notifications = useSelector(state => state.notifications?.items || [])
@@ -137,11 +151,42 @@ export default function SmartNavbar({
         continue
       }
 
+      if (t === 'attendance.monitoring.snapshot') {
+        const ts = n.dbTimestamp || n.timestamp || n.at || n.createdAt
+        const timeStr = ts ? new Date(ts).toLocaleTimeString() : ''
+        const status = n.metadata?.status || n.status
+        const total = n.metadata?.totalHours || n.totalHours
+        const ot = n.metadata?.overtimeHours || n.overtimeHours
+        const shift = n.metadata?.shift || n.shift || n.shiftId
+        const parts = [
+          timeStr ? `at ${timeStr}` : null,
+          status ? `status: ${status}` : null,
+          (total || total === 0) ? `hours: ${total}h${ot ? ` (+${ot}h OT)` : ''}` : null,
+          shift ? `shift: ${shift}` : null,
+        ].filter(Boolean)
+        deduped.push({
+          ...base,
+          title: 'Attendance snapshot',
+          message: parts.length ? parts.join(' • ') : (n.message || ''),
+        })
+        continue
+      }
+
+      if (t === 'profile.avatar.updated') {
+        const actor = n.metadata?.actor || n.actor || n.userName || 'You'
+        deduped.push({
+          ...base,
+          title: 'Profile photo updated',
+          message: n.message || `${actor} updated profile photo`,
+        })
+        continue
+      }
+
       // Default formatting
       deduped.push({
         ...base,
         title: n.title || n.type || 'Notification',
-        message: n.message || n.reason || n.description || '',
+        message: n.message || n.reason || n.description || (t || 'You have a new notification'),
       })
     }
 
@@ -293,8 +338,11 @@ export default function SmartNavbar({
           <ThemeSwitcher key={effectiveThemeMode} defaultValue={effectiveThemeMode} onChange={handleThemeChange} className="hidden md:inline-flex" />
 
           {/* Profile */}
-          <div className="relative group">
-            <button className="flex items-center gap-1.5 pl-1.5 pr-2.5 py-1 rounded-lg bg-neutral-200/80 dark:bg-neutral-800/70 border border-neutral-300 dark:border-neutral-700 text-neutral-700 dark:text-neutral-200 hover:bg-neutral-300/70 dark:hover:bg-neutral-700 transition-colors text-sm">
+          <div className="relative" ref={profileRef}>
+            <button
+              onClick={() => setProfileOpen(v => !v)}
+              className="flex items-center gap-1.5 pl-1.5 pr-2.5 py-1 rounded-lg bg-neutral-200/80 dark:bg-neutral-800/70 border border-neutral-300 dark:border-neutral-700 text-neutral-700 dark:text-neutral-200 hover:bg-neutral-300/70 dark:hover:bg-neutral-700 transition-colors text-sm"
+            >
               {avatarUrl ? (
                 <img src={avatarUrl} alt={userName} className="w-5 h-5 rounded-full object-cover border border-neutral-300" />
               ) : (
@@ -302,18 +350,27 @@ export default function SmartNavbar({
               )}
               <span className="hidden sm:inline leading-none">{userName}</span>
             </button>
-            <div className="absolute right-0 mt-1 w-44 py-2 bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-700 rounded-md shadow-lg opacity-0 pointer-events-none group-hover:opacity-100 group-hover:pointer-events-auto transition-opacity z-20">
+            <div className={`absolute right-0 mt-1 w-48 py-2 bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-700 rounded-md shadow-lg ${profileOpen ? 'opacity-100 pointer-events-auto' : 'opacity-0 pointer-events-none'} transition-opacity z-20`}
+            >
+              <div className="px-3 pb-1 pt-1 text-[11px] text-neutral-500">Account</div>
               <button
                 onClick={() => {
                   const base = (basePath || '').replace(/\/$/, '')
                   const to = `${base}/profile`
+                  setProfileOpen(false)
                   navigate(to || '/profile')
                 }}
-                className="w-full text-left px-3 py-1.5 text-xs text-neutral-700 dark:text-neutral-200 hover:bg-neutral-100 dark:hover:bg-neutral-700/60 transition-colors"
+                className="w-full flex items-center gap-2 px-3 py-1.5 text-xs text-neutral-700 dark:text-neutral-200 hover:bg-neutral-100 dark:hover:bg-neutral-700/60 transition-colors"
               >
-                My Profile
+                <User size={14} /> My Profile
               </button>
-              <button onClick={() => dispatch(logout())} className="w-full text-left px-3 py-1.5 text-xs text-neutral-600 dark:text-neutral-300 hover:bg-neutral-100 dark:hover:bg-neutral-700/60 transition-colors">Logout</button>
+              <div className="my-1 h-px bg-neutral-200 dark:bg-neutral-800" />
+              <button
+                onClick={() => { setProfileOpen(false); dispatch(logout()) }}
+                className="w-full flex items-center gap-2 px-3 py-1.5 text-xs text-neutral-600 dark:text-neutral-300 hover:bg-neutral-100 dark:hover:bg-neutral-700/60 transition-colors"
+              >
+                <LogOut size={14} /> Logout
+              </button>
             </div>
           </div>
         </div>

@@ -132,11 +132,50 @@ export const startNotifications = createAsyncThunk(
 
         // Live attendance snapshot integration for designation dashboards
         if (t === "attendance.monitoring.snapshot") {
-          const items = Array.isArray(payload.items) ? payload.items : null;
+          const itemsRaw = Array.isArray(payload.items) ? payload.items : [];
           const tree = payload.tree;
+          const members = Array.isArray(tree?.members) ? tree.members : [];
+          const byId = new Map(members.map(m => [m.userId || m.id, m]));
+          // Merge items with members so UI has avatar, status, in/out, totals, location, etc.
+          const mergedItems = [];
+          for (const it of itemsRaw) {
+            const m = byId.get(it.userId) || {};
+            mergedItems.push({
+              userId: it.userId || m.userId || m.id,
+              name: it.name || m.name,
+              avatar: it.avatar || m.avatar,
+              status: it.status || m.status,
+              date: it.date || m.date,
+              checkInTime: it.checkInTime || m.checkInTime,
+              checkOutTime: it.checkOutTime || m.checkOutTime,
+              totalHours: (it.totalHours ?? m.totalHours),
+              overtimeHours: (it.overtimeHours ?? m.overtimeHours),
+              location: it.location || m.location,
+              designationId: payload.designationId || it.designationId || m.designationId,
+            });
+          }
+          // Include any members not present in itemsRaw
+          const present = new Set(mergedItems.map(x => x.userId));
+          for (const m of members) {
+            const id = m.userId || m.id;
+            if (!id || present.has(id)) continue;
+            mergedItems.push({
+              userId: id,
+              name: m.name,
+              avatar: m.avatar,
+              status: m.status,
+              date: m.date,
+              checkInTime: m.checkInTime,
+              checkOutTime: m.checkOutTime,
+              totalHours: m.totalHours,
+              overtimeHours: m.overtimeHours,
+              location: m.location,
+              designationId: payload.designationId || m.designationId,
+            });
+          }
           const suggestedLayout = payload.suggestedLayout;
           const timestamp = payload.timestamp || evt?.timestamp;
-          if (targetDesignationId && Array.isArray(items)) {
+          if (targetDesignationId && mergedItems.length) {
             dispatch(
               setDesignationConnected({
                 designationId: targetDesignationId,
@@ -146,7 +185,7 @@ export const startNotifications = createAsyncThunk(
             dispatch(
               upsertDesignationItems({
                 designationId: targetDesignationId,
-                items,
+                items: mergedItems,
                 tree,
                 suggestedLayout,
                 timestamp,

@@ -208,13 +208,13 @@ export default function AnalogClock() {
           {isSubmitting && <span className="absolute inset-0 rounded-full animate-ping bg-white/10"/>}
         </button>
 
-        <div className="text-[11px] text-neutral-700">
+        <div className="text-[11px] text-neutral-700 mt-18">
           {checkedIn && checkInAt ? (
             <span>In: {checkInAt.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>
           ) : checkOutAt ? (
             <span>Out: {checkOutAt.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>
           ) : (
-            <span>Ready</span>
+            <span className="mb-20">Ready</span>
           )}
         </div>
         {lastError && <div className="text-[10px] text-rose-600">{lastError}</div>}

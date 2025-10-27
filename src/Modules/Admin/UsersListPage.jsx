@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import { 
@@ -7,6 +7,70 @@ import {
   selectEmployeesError, 
   fetchEmployees 
 } from '../../Redux/Public/onboardinguserSlice';
+
+// Base URL for API - adjust according to your environment
+const API_BASE_URL = process.env.REACT_APP_API_URL || 'http://localhost:5000';
+
+// Create a simple SVG avatar as data URL to avoid external requests
+const DEFAULT_AVATAR_SVG = `data:image/svg+xml;base64,${btoa(`
+  <svg width="32" height="32" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <circle cx="16" cy="16" r="16" fill="#6b7280"/>
+    <circle cx="16" cy="12" r="5" fill="white"/>
+    <path d="M16 32C22 32 26 28 26 22H6C6 28 10 32 16 32Z" fill="white"/>
+  </svg>
+`)}`;
+
+// Custom Avatar Component to handle image loading properly
+function UserAvatar({ src, alt, className = "w-12 h-12", placeholder }) {
+  const [imgSrc, setImgSrc] = useState(DEFAULT_AVATAR_SVG);
+
+  useEffect(() => {
+    if (src) {
+      // Build the correct image URL
+      let imageUrl = src;
+      
+      // If it's a relative path (starts with /), prepend the API base URL
+      if (src.startsWith('/') && !src.startsWith('http')) {
+        imageUrl = `${API_BASE_URL}${src}`;
+      }
+      
+      // Test if the image loads successfully
+      const img = new Image();
+      img.onload = () => {
+        setImgSrc(imageUrl);
+      };
+      img.onerror = () => {
+        console.warn(`Failed to load avatar: ${imageUrl}`);
+        setImgSrc(DEFAULT_AVATAR_SVG);
+      };
+      img.src = imageUrl;
+    } else if (placeholder) {
+      // If we have a text placeholder, use the gradient avatar
+      setImgSrc(DEFAULT_AVATAR_SVG);
+    } else {
+      setImgSrc(DEFAULT_AVATAR_SVG);
+    }
+  }, [src, placeholder]);
+
+  if (placeholder && (!src || src === DEFAULT_AVATAR_SVG)) {
+    // Show text placeholder if no avatar image
+    return (
+      <div className={`${className} bg-gradient-to-br from-gray-600 to-gray-800 rounded-full flex items-center justify-center border border-gray-300 font-semibold text-white shadow-sm`}>
+        {placeholder}
+      </div>
+    );
+  }
+
+  return (
+    <img 
+      src={imgSrc}
+      alt={alt}
+      className={`rounded-full object-cover border border-gray-300 shadow-sm ${className}`}
+      loading="lazy"
+      onError={() => setImgSrc(DEFAULT_AVATAR_SVG)}
+    />
+  );
+}
 
 export default function UsersListPage() {
   const dispatch = useDispatch();
@@ -206,6 +270,7 @@ export default function UsersListPage() {
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
               {employees.map((employee) => {
                 const roleInfo = getRoleDisplay(employee.role);
+                const placeholder = getAvatarPlaceholder(employee);
                 return (
                   <div 
                     key={employee.user_id || employee.email} 
@@ -215,9 +280,14 @@ export default function UsersListPage() {
                     {/* Header with Avatar and Status */}
                     <div className="flex items-start justify-between mb-3">
                       <div className="flex items-center gap-3">
-                        <div className="w-12 h-12 bg-gradient-to-br from-gray-600 to-gray-800 rounded-full flex items-center justify-center border border-gray-300 font-semibold text-white shadow-sm">
-                          {getAvatarPlaceholder(employee)}
-                        </div>
+                        <UserAvatar 
+                          src={employee.avatar} 
+                          alt={employee.firstName && employee.lastName 
+                            ? `${employee.firstName} ${employee.lastName}`
+                            : employee.name || 'Employee'
+                          }
+                          placeholder={placeholder}
+                        />
                         <div>
                           <div className="font-semibold text-gray-900 truncate max-w-[120px]">
                             {employee.firstName && employee.lastName 

@@ -41,9 +41,6 @@ export default function SmartNavbar({
     onSearch?.(query)
   }
 
-  // Socket base URL
-  const notifUrl = useMemo(() => process.env.REACT_APP_NOTIFICATIONS_URL || process.env.REACT_APP_SOCKET_URL || 'http://localhost:7001', [])
-
   // Derive company/user/designation IDs for scoping + routing
   const companyId = authState?.company?.id
   const userId = authState?.user?.id
@@ -51,11 +48,10 @@ export default function SmartNavbar({
 
   // Start live notifications (designation scoped) when we have auth context
   useEffect(() => {
-    if (!notifUrl) return
-    const token = authState?.accessToken || null
-    dispatch(startNotifications({ url: notifUrl, token, companyId, userId, designationId }))
+    if (!companyId || !userId) return
+    dispatch(startNotifications({ companyId, userId, designationId }))
     return () => { dispatch(stopNotifications()) }
-  }, [dispatch, notifUrl, authState?.accessToken, companyId, userId, designationId])
+  }, [dispatch, companyId, userId, designationId])
 
   // Close dropdown on outside click
   useEffect(() => {
@@ -186,7 +182,7 @@ export default function SmartNavbar({
 
   return (
     <header
-      className={`w-full relative z-[60] border-b border-orange-500/30 dark:border-orange-500/80 bg-white/70 dark:bg-transparent backdrop-blur supports-[backdrop-filter]:bg-white/60 dark:supports-[backdrop-filter]:bg-neutral-900/40 transition-colors ${className}`}
+      className={`w-full fixed top-0 left-0 right-0 z-[60] border-b border-orange-500/30 dark:border-orange-500/80 bg-white/70 dark:bg-transparent backdrop-blur supports-[backdrop-filter]:bg-white/60 dark:supports-[backdrop-filter]:bg-neutral-900/40 transition-colors ${className}`}
     >
       <div className="max-w-7xl mx-auto h-12 px-4 flex items-center justify-between">
         {/* Logo */}

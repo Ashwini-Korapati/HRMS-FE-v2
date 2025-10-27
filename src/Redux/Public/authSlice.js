@@ -76,6 +76,30 @@ export const platformLogin = createAsyncThunk('auth/platformLogin', async (paylo
     if (res.status >= 200 && res.status < 300 && res.data?.success) {
       const data = res.data.data || {}
       // Normalize shape to match exchangeToken expectations where practical
+      // Helper: derive clean pathname from absolute url or provided path
+      const getPath = (urlOrPath) => {
+        if (!urlOrPath) return ''
+        try {
+          const u = new URL(urlOrPath)
+          return u.pathname.replace(/\/$/, '')
+        } catch {
+          const p = (urlOrPath || '').replace(/\/$/, '')
+          return p.startsWith('/') ? p : `/${p}`
+        }
+      }
+      // Normalize hierarchical routesTree if backend provided it
+      const normalizeTree = (node) => {
+        if (!node) return null
+        const path = getPath(node.url || node.path)
+        return {
+          label: node.label || path.split('/').pop() || 'item',
+          path,
+          url: node.url || null,
+          icon: node.icon || null,
+          children: Array.isArray(node.children) ? node.children.map(normalizeTree).filter(Boolean) : []
+        }
+      }
+      const routesTree = Array.isArray(data.routesTree) ? data.routesTree.map(normalizeTree).filter(Boolean) : []
       return {
         access_token: data.accessToken,
         refresh_token: data.refreshToken,
@@ -92,7 +116,8 @@ export const platformLogin = createAsyncThunk('auth/platformLogin', async (paylo
             } catch {
               return { ...r, path: r.url }
             }
-        })
+        }),
+        routesTree
       }
     }
     return rejectWithValue(res.data)
@@ -317,27 +342,36 @@ const authSlice = createSlice({
         state.user = action.payload.user || state.user
         state.company = action.payload.company || state.company
 
-        // Build hierarchical routeTree from routes (and support legacy roleRoutes if present)
-        let sourceRoutes = action.payload.routes || []
-        if ((!sourceRoutes.length) && action.payload.roleRoutes) {
-          const rr = action.payload.roleRoutes
-          if (Array.isArray(rr.Admin)) sourceRoutes = rr.Admin
-          else if (Array.isArray(rr.adminTree)) sourceRoutes = rr.adminTree
-          else if (Array.isArray(rr.admin)) sourceRoutes = rr.admin
-        }
-
+        // Prefer hierarchical routesTree from backend if provided; else build from routes/legacy roleRoutes
         const normalizeRoute = (node) => {
           if (!node) return null
-          const cleanPath = (node.path || '').replace(/\/$/, '')
+          const sourcePath = node.url || node.path
+          const cleanPath = (() => {
+            if (!sourcePath) return ''
+            try { return new URL(sourcePath, window.location.origin).pathname.replace(/\/$/, '') } catch { return (sourcePath || '').replace(/\/$/, '').replace(/^(?!\/)/, '/') }
+          })()
           return {
             label: node.label || cleanPath.split('/').pop() || 'item',
-            path: cleanPath ? (cleanPath.startsWith('/') ? cleanPath : `/${cleanPath}`) : '',
+            path: cleanPath,
             url: node.url || null,
             icon: node.icon || null,
             children: Array.isArray(node.children) ? node.children.map(ch => normalizeRoute(ch)).filter(Boolean) : []
           }
         }
-        const routeTree = sourceRoutes.map(normalizeRoute).filter(Boolean)
+        let routeTree = []
+        if (Array.isArray(action.payload.routesTree) && action.payload.routesTree.length) {
+          routeTree = action.payload.routesTree.map(normalizeRoute).filter(Boolean)
+        } else {
+          // Build hierarchical routeTree from routes (and support legacy roleRoutes if present)
+          let sourceRoutes = action.payload.routes || []
+          if ((!sourceRoutes.length) && action.payload.roleRoutes) {
+            const rr = action.payload.roleRoutes
+            if (Array.isArray(rr.Admin)) sourceRoutes = rr.Admin
+            else if (Array.isArray(rr.adminTree)) sourceRoutes = rr.adminTree
+            else if (Array.isArray(rr.admin)) sourceRoutes = rr.admin
+          }
+          routeTree = sourceRoutes.map(normalizeRoute).filter(Boolean)
+        }
         const flat = []
         const collect = (n) => { flat.push({ label: n.label, path: n.path, url: n.url, icon: n.icon }); n.children.forEach(collect) }
         routeTree.forEach(collect)
@@ -358,19 +392,26 @@ const authSlice = createSlice({
         state.accessToken = action.payload.access_token
         state.refreshToken = action.payload.refresh_token || state.refreshToken
         state.idToken = action.payload.id_token || state.idToken
-        if (action.payload.routes && action.payload.routes.length) {
+        if ((action.payload.routesTree && action.payload.routesTree.length) || (action.payload.routes && action.payload.routes.length)) {
           const normalizeRoute = (node) => {
             if (!node) return null
-            const cleanPath = (node.path || '').replace(/\/$/, '')
+            const sourcePath = node.url || node.path
+            const cleanPath = (() => {
+              if (!sourcePath) return ''
+              try { return new URL(sourcePath, window.location.origin).pathname.replace(/\/$/, '') } catch { return (sourcePath || '').replace(/\/$/, '').replace(/^(?!\/)/, '/') }
+            })()
             return {
               label: node.label || cleanPath.split('/').pop() || 'item',
-              path: cleanPath ? (cleanPath.startsWith('/') ? cleanPath : `/${cleanPath}`) : '',
+              path: cleanPath,
               url: node.url || null,
               icon: node.icon || null,
               children: Array.isArray(node.children) ? node.children.map(ch => normalizeRoute(ch)).filter(Boolean) : []
             }
           }
-          const tree = action.payload.routes.map(normalizeRoute).filter(Boolean)
+          const tree = (action.payload.routesTree && action.payload.routesTree.length
+            ? action.payload.routesTree
+            : action.payload.routes
+          ).map(normalizeRoute).filter(Boolean)
           const flat = []
           const collect = (n) => { flat.push({ label: n.label, path: n.path, url: n.url, icon: n.icon }); n.children.forEach(collect) }
           tree.forEach(collect)
@@ -407,16 +448,22 @@ const authSlice = createSlice({
         state.company = action.payload.company
         const normalizeRoute = (node) => {
           if (!node) return null
-          const cleanPath = (node.path || '').replace(/\/$/, '')
+          const sourcePath = node.url || node.path
+          const cleanPath = (() => {
+            if (!sourcePath) return ''
+            try { return new URL(sourcePath, window.location.origin).pathname.replace(/\/$/, '') } catch { return (sourcePath || '').replace(/\/$/, '').replace(/^(?!\/)/, '/') }
+          })()
           return {
             label: node.label || cleanPath.split('/').pop() || 'item',
-            path: cleanPath ? (cleanPath.startsWith('/') ? cleanPath : `/${cleanPath}`) : '',
+            path: cleanPath,
             url: node.url || null,
             icon: node.icon || null,
             children: Array.isArray(node.children) ? node.children.map(ch => normalizeRoute(ch)).filter(Boolean) : []
           }
         }
-        const routeTree = (action.payload.routes || []).map(normalizeRoute).filter(Boolean)
+        const routeTree = (Array.isArray(action.payload.routesTree) && action.payload.routesTree.length ? action.payload.routesTree : (action.payload.routes || []))
+          .map(normalizeRoute)
+          .filter(Boolean)
         const flat = []
         const collect = (r) => { flat.push({ label: r.label, path: r.path, url: r.url, icon: r.icon }); r.children.forEach(collect) }
         routeTree.forEach(collect)

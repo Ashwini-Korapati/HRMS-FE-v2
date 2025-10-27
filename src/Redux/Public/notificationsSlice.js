@@ -4,6 +4,7 @@ import {
   connectSocket,
   disconnectSocket,
   getSocket,
+  requestDesignationSnapshot,
 } from "./notificationsSocket";
 import { applyLeaveEvent } from "./UserleaveSlice";
 import {
@@ -35,23 +36,93 @@ const initialState = {
 
 export const startNotifications = createAsyncThunk(
   "notifications/start",
-  async ({ url, token, companyId, userId }, { dispatch }) => {
-    const s = connectSocket({ url, token, companyId, userId });
+  async ({ companyId, userId, designationId } = {}, { dispatch, getState }) => {
+    // mark connecting state for UI
+    dispatch(connectingStarted());
+    const state = getState();
+    const token = state?.auth?.accessToken || undefined;
+    const s = connectSocket({ token, companyId, userId, designationId });
+
+    // Normalizer to keep a consistent shape for UI regardless of backend payload
+    const normalizeNotification = (evt) => {
+      try {
+        const raw = evt?.data || evt || {};
+        const meta = raw.metadata || {};
+        const nowIso = new Date().toISOString();
+        const stateNow = getState();
+        const myCompanyId = stateNow?.auth?.company?.id || companyId;
+        const myUserId = stateNow?.auth?.user?.id || userId;
+        const myDesigId =
+          stateNow?.auth?.user?.designationId ||
+          stateNow?.auth?.user?.designation?.id ||
+          designationId || null;
+
+        // Prefer server-provided ids
+        const nCompanyId = raw.companyId || meta.companyId || myCompanyId || undefined;
+        const nUserId = raw.userId || meta.userId || undefined;
+        const nDesigId = raw.designationId || meta.designationId || undefined;
+        const nParentDesigId = raw.parentDesignationId || meta.designationParentId || undefined;
+
+        // Channel tags to help client-side filtering (company/designation)
+        const channels = Array.isArray(raw.channels) ? [...raw.channels] : [];
+        if (nCompanyId) channels.push(`company:${nCompanyId}`);
+        if (nDesigId) channels.push(`designation:${nDesigId}`);
+        if (nParentDesigId) channels.push(`designation:${nParentDesigId}`);
+        // For direct-to-user events that lack designation metadata, map them to the user's designation
+        if (!nDesigId && !nParentDesigId && nUserId && myUserId && nUserId === myUserId && myDesigId) {
+          channels.push(`designation:${myDesigId}`);
+        }
+
+        // Build a stable-ish id when server doesn't provide one
+        const when = raw.at || raw.createdAt || raw.timestamp || nowIso;
+        const minuteKey = new Date(when).toISOString().slice(0, 16);
+        const id =
+          raw.id ||
+          raw.notificationId ||
+          evt?.id ||
+          `${raw.type || 'INFO'}:${nCompanyId || '-'}:${nDesigId || nParentDesigId || '-'}:${nUserId || '-'}:${minuteKey}`;
+
+        return {
+          id,
+          type: raw.type || 'INFO',
+          title: raw.title || evt?.title || 'Notification',
+          message: raw.message || evt?.message || raw.reason || '',
+          createdAt: when,
+          isRead: !!raw.isRead,
+          companyId: nCompanyId,
+          userId: nUserId,
+          designationId: nDesigId,
+          parentDesignationId: nParentDesigId,
+          metadata: meta,
+          channels,
+        };
+      } catch {
+        return evt;
+      }
+    };
 
     s.on("connect", () => {
       dispatch(connected());
+      if (designationId) {
+        // Reflect live status immediately and request a fresh snapshot
+        dispatch(setDesignationConnected({ designationId, connected: true }));
+        try { requestDesignationSnapshot({ designationId, companyId }); } catch {}
+      }
     });
 
     s.on("disconnect", () => {
       dispatch(disconnected());
+      if (designationId) dispatch(setDesignationConnected({ designationId, connected: false }));
     });
 
     s.on("connect_error", (err) => {
       dispatch(connectionFailed(err?.message || "connect_error"));
     });
 
-    s.on("notification", (evt) => {
-      dispatch(eventReceived(evt));
+    const onNotification = (evt) => {
+      // Persist immediately for UI without reload
+      const normalized = normalizeNotification(evt);
+      dispatch(eventReceived(normalized));
       try {
         const t = evt?.type;
         // Unify payload extraction for both raw and wrapped messages
@@ -156,7 +227,12 @@ export const startNotifications = createAsyncThunk(
           );
         }
       } catch {}
-    });
+    };
+
+    // Support multiple event names that backend may use
+    s.on("notification", onNotification);
+    s.on("app.notification", onNotification);
+    s.on("notify", onNotification);
 
     // Also fetch current unread count and feed snapshot from REST if available
     if (companyId && userId) {
@@ -170,7 +246,16 @@ export const stopNotifications = createAsyncThunk(
   "notifications/stop",
   async () => {
     const s = getSocket();
-    if (s) s.removeAllListeners("notification");
+    if (s) {
+      try {
+        s.removeAllListeners("notification");
+        s.removeAllListeners("app.notification");
+        s.removeAllListeners("notify");
+        s.removeAllListeners("connect");
+        s.removeAllListeners("disconnect");
+        s.removeAllListeners("connect_error");
+      } catch {}
+    }
     disconnectSocket();
   }
 );

@@ -1,11 +1,9 @@
 import { useEffect, useRef } from "react"
 import { useDispatch, useSelector } from "react-redux"
-import { connectDesignationSocket, disconnectDesignationSocket } from "../../Redux/Public/notificationsSocket"
+// Removed direct socket connection; live updates now come via global notifications socket
 import { toAssetUrl } from "../../config/config"
 import {
   fetchDesignationSnapshot,
-  setConnected,
-  upsertItems,
   selectDesignationRows,
   selectDesignationConnected,
   selectDesignationLoading,
@@ -59,10 +57,9 @@ export default function DesignationLiveAttendance({
   designationId,
   companyId,
   title = "Live Attendance",
-  gatewayUrl = "http://localhost:7001",
 }) {
   const dispatch = useDispatch()
-  const token = useSelector((s) => s.auth?.accessToken)
+  // Global notifications socket handles live events; token not used here anymore
   const rows = useSelector((state) => selectDesignationRows(state, designationId))
   const connected = useSelector((state) => selectDesignationConnected(state, designationId))
   const loading = useSelector((state) => selectDesignationLoading(state, designationId))
@@ -77,58 +74,7 @@ export default function DesignationLiveAttendance({
     dispatch(fetchDesignationSnapshot({ companyId, designationId }))
   }, [dispatch, companyId, designationId])
 
-  // Live socket wiring
-  useEffect(() => {
-    if (!designationId) return
-    const socket = connectDesignationSocket({ url: gatewayUrl, token, designationId })
-
-    const onConnect = () => {
-      dispatch(setConnected({ designationId, connected: true }))
-      dispatch(fetchDesignationSnapshot({ companyId, designationId }))
-    }
-    const onDisconnect = () => dispatch(setConnected({ designationId, connected: false }))
-    const onNotification = (evt) => {
-      if (evt?.type === "attendance.monitoring.update" && Array.isArray(evt.items)) {
-        dispatch(upsertItems({ designationId, items: evt.items }))
-      }
-      if (evt?.type === "attendance.monitoring.snapshot") {
-        const payload = evt?.data || evt || {}
-        const targetDesignationId = payload.designationId || payload.rootDesignationId || designationId
-        const items = Array.isArray(payload.items) ? payload.items : null
-        if (targetDesignationId && Array.isArray(items)) {
-          dispatch(
-            upsertItems({
-              designationId: targetDesignationId,
-              items,
-              tree: payload.tree,
-              suggestedLayout: payload.suggestedLayout,
-              timestamp: payload.timestamp,
-            }),
-          )
-        }
-      }
-    }
-    const onError = () => {
-      /* no-op */
-    }
-
-    socket.off("connect", onConnect).on("connect", onConnect)
-    socket.off("disconnect", onDisconnect).on("disconnect", onDisconnect)
-    socket.off("notification", onNotification).on("notification", onNotification)
-    socket.off("connect_error", onError).on("connect_error", onError)
-    socket.off("error", onError).on("error", onError)
-
-    return () => {
-      try {
-        socket.off("notification", onNotification)
-        socket.off("connect", onConnect)
-        socket.off("disconnect", onDisconnect)
-        socket.off("connect_error", onError)
-        socket.off("error", onError)
-      } catch {}
-      disconnectDesignationSocket(designationId)
-    }
-  }, [dispatch, designationId, companyId, token, gatewayUrl])
+  // Live updates flow via global notifications socket; this component only renders store data.
 
   useEffect(() => {
     if (rows?.length > lastRowCountRef.current && tableBodyRef.current) {

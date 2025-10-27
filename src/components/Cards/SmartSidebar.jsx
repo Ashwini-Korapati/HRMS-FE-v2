@@ -15,7 +15,9 @@ import {
 	LogOut,
 	UserCircle2,
 	UsersRound,
-	ChevronDown
+	ChevronDown,
+	Menu,
+	X
 } from "lucide-react"
 import { useSelector, useDispatch } from 'react-redux'
 import { selectAuthRoutes, selectAuthRouteTree, logout, selectAuthState, selectBasePath } from '../../Redux/Public/authSlice'
@@ -39,6 +41,8 @@ export default function SmartSidebar({ items, className = "", onSelect, basePath
 	const dispatch = useDispatch()
 	const location = useLocation()
 	const navigate = useNavigate()
+	const [mobileOpen, setMobileOpen] = useState(false)
+	const [isDesktop, setIsDesktop] = useState(() => typeof window !== 'undefined' ? window.innerWidth >= 1024 : true)
 	// choose explicit prop first, then selector; normalize (strip trailing slash)
 	const basePath = useMemo(() => {
 		const raw = (propBasePath || selectorBasePath || '').trim()
@@ -193,7 +197,8 @@ export default function SmartSidebar({ items, className = "", onSelect, basePath
 		derivedItems.forEach(entry => {
 			if (entry.type === 'group') {
 				const isActiveChild = entry.children.some(c => location.pathname.startsWith(c.path))
-				if (isActiveChild && !openGroups[entry.key]) {
+				const isOnParent = !!entry.parent?.path && location.pathname.startsWith(entry.parent.path)
+				if ((isActiveChild || isOnParent) && !openGroups[entry.key]) {
 					setOpenGroups(o => ({ ...o, [entry.key]: true }))
 				}
 			}
@@ -229,13 +234,71 @@ export default function SmartSidebar({ items, className = "", onSelect, basePath
 		onSelect?.(key)
 	}
 
+		// Keep a layout-wide CSS variable in sync so main content can offset the sidebar dynamically
+		useEffect(() => {
+			const updateVars = () => {
+				const desktop = window.innerWidth >= 1024
+				setIsDesktop(desktop)
+				const padding = desktop ? '56px' : '0px' // collapsed desktop, no offset on mobile (drawer overlays)
+				document.documentElement.style.setProperty('--sidebar-padding', padding)
+			}
+			updateVars()
+			window.addEventListener('resize', updateVars)
+			return () => window.removeEventListener('resize', updateVars)
+		}, [])
+
+		const handleMouseEnter = () => {
+			// When sidebar expands on desktop hover, increase the layout padding
+			if (isDesktop) {
+				document.documentElement.style.setProperty('--sidebar-padding', '224px')
+			}
+		}
+		const handleMouseLeave = () => {
+			if (isDesktop) {
+				document.documentElement.style.setProperty('--sidebar-padding', '56px')
+			}
+		}
+
 	return (
-		<aside className={`group relative bg-neutral-50/40 dark:bg-transparent backdrop-blur supports-[backdrop-filter]:bg-neutral-50/60 dark:supports-[backdrop-filter]:bg-neutral-950/40 border-r border-orange-500/20 dark:border-orange-500/60 transition-colors ${className}`}>
-			{/* Sidebar width collapses to icons and expands on hover */}
-			<div
-				className={`h-[calc(100vh-48px)] transition-[width] duration-300 ease-in-out overflow-hidden flex flex-col
-				w-14 group-hover:w-56`}
+		<>
+			{/* Mobile menu button */}
+			<button
+				onClick={() => setMobileOpen(true)}
+				className="lg:hidden fixed top-3 left-4 z-[70] w-8 h-8 rounded-md bg-white/60 dark:bg-neutral-900/60 border border-orange-500/30 dark:border-orange-500/40 backdrop-blur grid place-items-center text-orange-600 dark:text-orange-400 hover:bg-orange-500/10 transition-colors"
+				aria-label="Open menu"
 			>
+				<Menu size={16} />
+			</button>
+
+			{/* Mobile backdrop */}
+			{mobileOpen && (
+				<div
+					className="lg:hidden fixed inset-0 bg-black/20 backdrop-blur-sm z-[60]"
+					onClick={() => setMobileOpen(false)}
+				/>
+			)}
+
+					{/* Sidebar */}
+					<aside
+						onMouseEnter={handleMouseEnter}
+						onMouseLeave={handleMouseLeave}
+						className={`group fixed top-12 left-0 bottom-0 z-[65] bg-neutral-50/40 dark:bg-transparent backdrop-blur supports-[backdrop-filter]:bg-neutral-50/60 dark:supports-[backdrop-filter]:bg-neutral-950/40 border-r border-orange-500/20 dark:border-orange-500/60 transition-all duration-300 ${
+				mobileOpen ? 'translate-x-0' : '-translate-x-full'
+					} lg:translate-x-0 lg:block ${className}`}
+					>
+				{/* Mobile close button */}
+				<button
+					onClick={() => setMobileOpen(false)}
+					className="lg:hidden absolute top-2 right-2 w-8 h-8 rounded-md bg-white/60 dark:bg-neutral-900/60 border border-orange-500/30 dark:border-orange-500/40 backdrop-blur grid place-items-center text-orange-600 dark:text-orange-400 hover:bg-orange-500/10 transition-colors"
+					aria-label="Close menu"
+				>
+					<X size={16} />
+				</button>
+
+						{/* Sidebar content - responsive width: full on mobile, collapsible on desktop */}
+				<div
+					className={`h-[calc(100vh-48px)] transition-[width] duration-300 ease-in-out overflow-hidden flex flex-col w-64 lg:w-14 lg:group-hover:w-56`}
+				>
 				{/* Nav list with scroll (scrollbars hidden) */}
 				<nav className="flex-1 overflow-y-auto overflow-x-hidden py-1 no-scrollbar">
 					{derivedItems.map(entry => {
@@ -254,7 +317,7 @@ export default function SmartSidebar({ items, className = "", onSelect, basePath
 											<span className={`w-8 h-8 grid place-items-center rounded-md text-current transition-colors ${isActiveParent ? 'bg-orange-500/10 dark:bg-transparent' : 'group-hover:bg-orange-500/5'}`}>
 												<ParentIcon size={16} />
 											</span>
-											<span className="whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity duration-200 truncate">{parent.label}</span>
+											<span className="whitespace-nowrap opacity-100 lg:opacity-0 lg:group-hover:opacity-100 transition-opacity duration-200 truncate">{parent.label}</span>
 										</button>
 										<button
 											onClick={(e) => { e.stopPropagation(); setOpenGroups(o => ({ ...o, [key]: !o[key] })) }}
@@ -302,7 +365,7 @@ export default function SmartSidebar({ items, className = "", onSelect, basePath
 									<span className={`w-8 h-8 grid place-items-center rounded-md text-current transition-colors ${isActive ? 'bg-orange-500/10 dark:bg-transparent' : 'group-hover:bg-orange-500/5'}`}>
 										<Icon size={16} />
 									</span>
-									<span className="whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity duration-200">{label}</span>
+									<span className="whitespace-nowrap opacity-100 lg:opacity-0 lg:group-hover:opacity-100 transition-opacity duration-200">{label}</span>
 								</span>
 							</button>
 						)
@@ -315,16 +378,17 @@ export default function SmartSidebar({ items, className = "", onSelect, basePath
 						<span className="w-8 h-8 grid place-items-center rounded-md border border-transparent bg-transparent group-hover:border-orange-500/40 group-hover:bg-orange-500/5 transition-colors">
 							<HelpCircle size={16} />
 						</span>
-						<span className="whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity duration-200">Help</span>
+						<span className="whitespace-nowrap opacity-100 lg:opacity-0 lg:group-hover:opacity-100 transition-opacity duration-200">Help</span>
 					</button>
 					<button onClick={() => dispatch(logout())} className="w-full flex items-center gap-3 px-2.5 py-1.5 text-xs text-neutral-600 hover:text-orange-700 dark:text-neutral-400 dark:hover:text-orange-400 transition-colors">
 						<span className="w-8 h-8 grid place-items-center rounded-md border border-transparent bg-transparent group-hover:border-orange-500/40 group-hover:bg-orange-500/5 transition-colors">
 							<LogOut size={16} />
 						</span>
-						<span className="whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity duration-200">Logout</span>
+						<span className="whitespace-nowrap opacity-0 lg:group-hover:opacity-100 transition-opacity duration-200">Logout</span>
 					</button>
 				</div>
 			</div>
 		</aside>
+		</>
 	)
 }

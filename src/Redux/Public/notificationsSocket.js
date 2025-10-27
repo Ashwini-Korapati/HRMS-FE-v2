@@ -34,18 +34,21 @@ function stopHeartbeat(s) {
   }
 }
 
-export function connectSocket({ url, token, companyId, userId }) {
+export function connectSocket({ url, token, companyId, userId, designationId } = {}) {
   // Reuse singleton socket to avoid duplicate managers and StrictMode noise
   if (socket) {
     try { if (!socket.connected) socket.connect() } catch {}
     return socket
   }
-  let finalUrl = url
+  const baseUrl =
+    url || process.env.REACT_APP_SOCKET_URL || process.env.REACT_APP_NOTIFICATIONS_URL || 'http://localhost:7001'
+  let finalUrl = baseUrl
   try {
-    const u = new URL(url)
+    const u = new URL(baseUrl)
     if (token) u.searchParams.set('token', token)
     if (companyId) u.searchParams.set('companyId', companyId)
     if (userId) u.searchParams.set('userId', userId)
+    if (designationId) u.searchParams.set('designationId', designationId)
     finalUrl = u.toString()
   } catch {
     // if url is not absolute, append query manually
@@ -53,7 +56,8 @@ export function connectSocket({ url, token, companyId, userId }) {
     if (token) qp.set('token', token)
     if (companyId) qp.set('companyId', companyId)
     if (userId) qp.set('userId', userId)
-    finalUrl = url + (url.includes('?') ? '&' : '?') + qp.toString()
+    if (designationId) qp.set('designationId', designationId)
+    finalUrl = baseUrl + (baseUrl.includes('?') ? '&' : '?') + qp.toString()
   }
 
   socket = io(finalUrl, {
@@ -64,12 +68,17 @@ export function connectSocket({ url, token, companyId, userId }) {
     reconnectionDelay: 500,
     reconnectionDelayMax: 5000,
     timeout: 10000,
-    auth: { token, companyId, userId },
+    auth: { token, companyId, userId, designationId },
   })
 
   socket.on('connect', () => {
-    // optional namespace join if your gateway requires it
-    // socket.emit('joinCompany', { companyId })
+    // Join company/designation rooms if your gateway uses them
+    try {
+      if (companyId) socket.emit('joinCompany', { companyId })
+      if (designationId) socket.emit('joinDesignation', { designationId })
+      // Optional: explicit subscription message some gateways expect
+      socket.emit('subscribe.notifications', { companyId, designationId, userId })
+    } catch {}
     startHeartbeat(socket)
   })
   socket.on('disconnect', () => stopHeartbeat(socket))

@@ -1,243 +1,191 @@
 {
     "success": true,
-    "message": "Project folder tree retrieved successfully",
+    "message": "Employees retrieved",
     "data": {
-        "project": {
-            "id": "3f313e24-2757-40e9-a0bf-a4145db71d02",
-            "name": "Mobile App",
-            "projectCode": "PRJ-COMPANY930342066-LXN1WP"
-        },
-        "mode": "admin",
         "total": 2,
-        "roots": 2,
-        "tree": [
+        "items": [
             {
-                "id": "e1066029-d787-4499-9d67-e44ec294695d",
-                "projectId": "3f313e24-2757-40e9-a0bf-a4145db71d02",
-                "parentId": null,
-                "name": "Assets",
-                "path": "/assets",
-                "createdAt": "2025-09-24T05:11:44.747Z",
-                "updatedAt": "2025-09-24T05:11:44.755Z",
-                "urn": "urn:hrms.bentrod:fs.folder:co.d1e98959792818e807a393ed",
-                "parentUrn": null,
-                "title": "Mobile App Assets",
-                "docType": "project.folder",
-                "deleted": false,
-                "folderType": "normal",
-                "isRoot": true,
-                "configurations": {
-                    "allowedTypes": [
-                        "*"
-                    ],
-                    "visibleTypes": [
-                        "*"
-                    ],
-                    "maxFileSize": "100MB",
-                    "autoSync": true
+                "user_id": "2493877b-7927-4d13-9513-b191d47047b1",
+                "companyId": "48fc6fa5-8dd4-4f82-83ab-6f21dd779c9d",
+                "employeeId": "MECAKRE0002",
+                "firstName": "Akkarapalli krishna",
+                "lastName": "Reddy",
+                "email": "akkarapallichenchukrishna@gmail.com",
+                "phone": "98475943004",
+                "password": "$2a$12$8IlaON4CKTxnEE8BwyJV0O56LwEE3grGr6xNbKOg.hs5rJMltGNuq",
+                "avatar": "/uploads/avatars/avatar_1761302286855_sM438N.jpeg",
+                "role": "USER",
+                "platform": "hroffice",
+                "platformId": null,
+                "isActive": true,
+                "isVerified": false,
+                "lastLogin": "2025-10-24T10:45:21.353Z",
+                "passwordChangedAt": null,
+                "dateOfBirth": "2025-10-24T00:00:00.000Z",
+                "gender": "Male",
+                "address": "aefasd, sfdssd, fdssfz 343455, india",
+                "emergencyContact": {
+                    "name": "ewee",
+                    "email": "DS@GMAIL.COM",
+                    "phone": "343242342424",
+                    "relationship": "DSFC"
                 },
-                "lastModifiedTimestamp": "1758690704665",
-                "lastModifiedTime": "2025-09-24T05:11:44.665Z",
-                "createUserId": "fe692390-8a6e-4cd3-88a7-c3b64c171770",
-                "createUserName": "krishnacancan143@gmail.com",
-                "lastModifiedUserId": "fe692390-8a6e-4cd3-88a7-c3b64c171770",
-                "lastModifiedUserName": "krishnacancan143@gmail.com",
-                "hidden": false,
-                "userPreferences": {
-                    "subscribed": false,
-                    "viewMode": "grid",
-                    "sortBy": "name",
-                    "sortOrder": "asc"
+                "joiningDate": "2025-10-25T00:00:00.000Z",
+                "exitDate": "2025-10-23T00:00:00.000Z",
+                "salary": "5555555",
+                "designationId": "0bde8622-2ea9-42d8-b38b-37f9d9721880",
+                "departmentId": "86451e82-ccf1-4d79-80c1-cce5b608a4cb",
+                "managerId": null,
+                "settings": null,
+                "createdAt": "2025-10-24T10:38:06.889Z",
+                "updatedAt": "2025-10-24T10:45:21.355Z",
+                "isActiveInProject": false,
+                "company": {
+                    "tenent_id": "48fc6fa5-8dd4-4f82-83ab-6f21dd779c9d",
+                    "name": "Mech",
+                    "email": "krishnanord@gmail.com",
+                    "phone": "740499403039",
+                    "address": "Banglore",
+                    "website": "ganglore.com",
+                    "logo": null,
+                    "taxId": "45345",
+                    "companyCode": "COMPANY678097010",
+                    "subdomain": "mech",
+                    "domain": null,
+                    "timezone": "America/New_York",
+                    "workingDays": "[1,2,3,4,5]",
+                    "workingHours": "{\"start\":\"09:30\",\"end\":\"06:30\"}",
+                    "status": "ACTIVE",
+                    "settings": null,
+                    "createdAt": "2025-10-24T10:11:18.110Z",
+                    "updatedAt": "2025-10-24T10:11:18.114Z",
+                    "platformId": null
                 },
-                "viewOption": "LMV",
-                "permissionActions": [
-                    "view",
-                    "upload",
-                    "download",
-                    "delete",
-                    "rename",
-                    "share"
-                ],
-                "kebabActions": [
-                    "add_subfolder",
-                    "upload_files",
-                    "share",
-                    "rename",
-                    "delete",
-                    "move",
-                    "copy",
-                    "view_details",
-                    "download_all"
-                ],
-                "isSystemFolder": false,
-                "description": "Assets folder for project Mobile App",
-                "hasSubfolders": false,
-                "permissions": [
+                "designation": {
+                    "id": "0bde8622-2ea9-42d8-b38b-37f9d9721880",
+                    "companyId": "48fc6fa5-8dd4-4f82-83ab-6f21dd779c9d",
+                    "title": "Team Lead",
+                    "description": "Admin@123",
+                    "level": 2,
+                    "parentId": "34f04f0d-8855-4f70-b789-2a0732698f7a",
+                    "ancestry": [
+                        "34f04f0d-8855-4f70-b789-2a0732698f7a"
+                    ],
+                    "enabledRoutes": [
+                        "projects",
+                        "tasks"
+                    ],
+                    "isActive": true,
+                    "createdAt": "2025-10-24T10:35:30.706Z",
+                    "updatedAt": "2025-10-24T10:35:30.706Z",
+                    "enabledRouteStates": [
+                        {
+                            "id": "283de3b4-b5e7-4ceb-b349-206f1d2c63ed",
+                            "designationId": "0bde8622-2ea9-42d8-b38b-37f9d9721880",
+                            "feature": "projects",
+                            "isActive": true,
+                            "createdAt": "2025-10-24T10:35:30.718Z",
+                            "updatedAt": "2025-10-24T10:35:30.718Z"
+                        },
+                        {
+                            "id": "a9d02c48-14f7-4832-acb0-f54070003230",
+                            "designationId": "0bde8622-2ea9-42d8-b38b-37f9d9721880",
+                            "feature": "tasks",
+                            "isActive": true,
+                            "createdAt": "2025-10-24T10:35:30.723Z",
+                            "updatedAt": "2025-10-24T10:35:30.723Z"
+                        }
+                    ]
+                },
+                "enabledRoutesStatus": {
+                    "projects": true,
+                    "tasks": true
+                },
+                "enabledRoutes": [
                     {
-                        "id": "3d386511-fa2c-460a-b35a-e22668c83f6e",
-                        "role": "ADMIN",
-                        "actions": [
-                            "view",
-                            "upload",
-                            "download",
-                            "delete",
-                            "rename",
-                            "share"
-                        ]
+                        "id": "283de3b4-b5e7-4ceb-b349-206f1d2c63ed",
+                        "feature": "projects",
+                        "isActive": true
                     },
                     {
-                        "id": "89917139-374b-43c8-9d17-e555eba1a3d8",
-                        "role": "SUPER_ADMIN",
-                        "actions": [
-                            "view",
-                            "upload",
-                            "download",
-                            "delete",
-                            "rename",
-                            "share"
-                        ]
-                    },
-                    {
-                        "id": "99fbbd21-76df-461c-876b-a6bb3a93b263",
-                        "role": "IT",
-                        "actions": [
-                            "view",
-                            "upload",
-                            "download",
-                            "delete",
-                            "rename",
-                            "share"
-                        ]
-                    },
-                    {
-                        "id": "e71ddc73-d8b3-4edd-a2f8-1fbef56218e7",
-                        "role": "USER",
-                        "actions": [
-                            "view",
-                            "upload",
-                            "download",
-                            "delete",
-                            "rename",
-                            "share"
-                        ]
+                        "id": "a9d02c48-14f7-4832-acb0-f54070003230",
+                        "feature": "tasks",
+                        "isActive": true
                     }
-                ],
-                "children": []
+                ]
             },
             {
-                "id": "c00e36f6-807e-4dfb-ab80-1be1c1f6bc14",
-                "projectId": "3f313e24-2757-40e9-a0bf-a4145db71d02",
-                "parentId": null,
-                "name": "Documents",
-                "path": "/documents",
-                "createdAt": "2025-09-24T05:11:44.709Z",
-                "updatedAt": "2025-09-24T05:11:44.729Z",
-                "urn": "urn:hrms.bentrod:fs.folder:co.6d0cc80f52c7b598d94cf837",
-                "parentUrn": null,
-                "title": "Mobile App Documents",
-                "docType": "project.folder",
-                "deleted": false,
-                "folderType": "normal",
-                "isRoot": true,
-                "configurations": {
-                    "allowedTypes": [
-                        "*"
-                    ],
-                    "visibleTypes": [
-                        "*"
-                    ],
-                    "maxFileSize": "100MB",
-                    "autoSync": true
+                "user_id": "992e8b4b-71e0-4d55-aaec-229e6fbdcd21",
+                "companyId": "48fc6fa5-8dd4-4f82-83ab-6f21dd779c9d",
+                "employeeId": "COMPANY678097010EMP001",
+                "firstName": "krishna",
+                "lastName": "Akkarapalli",
+                "email": "krishnanord@gmail.com",
+                "phone": "82349832899",
+                "password": "$2a$12$WRqgT23WIPxxfOqWEo7HneppGsuXr9Y1EotXMBPXli7IAgLt.6CK.",
+                "avatar": null,
+                "role": "ADMIN",
+                "platform": "hroffice",
+                "platformId": "01be61e6-1463-43a2-a96c-bdf42e035aa0",
+                "isActive": true,
+                "isVerified": true,
+                "lastLogin": "2025-10-24T11:29:54.270Z",
+                "passwordChangedAt": null,
+                "dateOfBirth": "1999-04-21T00:00:00.000Z",
+                "gender": "MALE",
+                "address": null,
+                "emergencyContact": null,
+                "joiningDate": "2025-10-24T10:11:18.426Z",
+                "exitDate": null,
+                "salary": null,
+                "designationId": "34f04f0d-8855-4f70-b789-2a0732698f7a",
+                "departmentId": "86451e82-ccf1-4d79-80c1-cce5b608a4cb",
+                "managerId": null,
+                "settings": null,
+                "createdAt": "2025-10-24T10:11:18.428Z",
+                "updatedAt": "2025-10-24T11:29:54.271Z",
+                "isActiveInProject": false,
+                "company": {
+                    "tenent_id": "48fc6fa5-8dd4-4f82-83ab-6f21dd779c9d",
+                    "name": "Mech",
+                    "email": "krishnanord@gmail.com",
+                    "phone": "740499403039",
+                    "address": "Banglore",
+                    "website": "ganglore.com",
+                    "logo": null,
+                    "taxId": "45345",
+                    "companyCode": "COMPANY678097010",
+                    "subdomain": "mech",
+                    "domain": null,
+                    "timezone": "America/New_York",
+                    "workingDays": "[1,2,3,4,5]",
+                    "workingHours": "{\"start\":\"09:30\",\"end\":\"06:30\"}",
+                    "status": "ACTIVE",
+                    "settings": null,
+                    "createdAt": "2025-10-24T10:11:18.110Z",
+                    "updatedAt": "2025-10-24T10:11:18.114Z",
+                    "platformId": null
                 },
-                "lastModifiedTimestamp": "1758690704665",
-                "lastModifiedTime": "2025-09-24T05:11:44.665Z",
-                "createUserId": "fe692390-8a6e-4cd3-88a7-c3b64c171770",
-                "createUserName": "krishnacancan143@gmail.com",
-                "lastModifiedUserId": "fe692390-8a6e-4cd3-88a7-c3b64c171770",
-                "lastModifiedUserName": "krishnacancan143@gmail.com",
-                "hidden": false,
-                "userPreferences": {
-                    "subscribed": false,
-                    "viewMode": "grid",
-                    "sortBy": "name",
-                    "sortOrder": "asc"
+                "designation": {
+                    "id": "34f04f0d-8855-4f70-b789-2a0732698f7a",
+                    "companyId": "48fc6fa5-8dd4-4f82-83ab-6f21dd779c9d",
+                    "title": "HR",
+                    "description": "Human Resources role for administrators",
+                    "level": 1,
+                    "parentId": null,
+                    "ancestry": null,
+                    "enabledRoutes": null,
+                    "isActive": true,
+                    "createdAt": "2025-10-24T10:11:18.439Z",
+                    "updatedAt": "2025-10-24T10:11:18.439Z",
+                    "enabledRouteStates": []
                 },
-                "viewOption": "LMV",
-                "permissionActions": [
-                    "view",
-                    "upload",
-                    "download",
-                    "delete",
-                    "rename",
-                    "share"
-                ],
-                "kebabActions": [
-                    "add_subfolder",
-                    "upload_files",
-                    "share",
-                    "rename",
-                    "delete",
-                    "move",
-                    "copy",
-                    "view_details",
-                    "download_all"
-                ],
-                "isSystemFolder": false,
-                "description": "Documents folder for project Mobile App",
-                "hasSubfolders": false,
-                "permissions": [
-                    {
-                        "id": "2efa99f2-5461-4042-9ec7-7c6288712bde",
-                        "role": "IT",
-                        "actions": [
-                            "view",
-                            "upload",
-                            "download",
-                            "delete",
-                            "rename",
-                            "share"
-                        ]
-                    },
-                    {
-                        "id": "3e3f6bfd-4834-4ec3-b475-4968ff8f8ed4",
-                        "role": "USER",
-                        "actions": [
-                            "view",
-                            "upload",
-                            "download",
-                            "delete",
-                            "rename",
-                            "share"
-                        ]
-                    },
-                    {
-                        "id": "a4447fae-2fca-4d4b-a36b-ee412ec4d6a5",
-                        "role": "SUPER_ADMIN",
-                        "actions": [
-                            "view",
-                            "upload",
-                            "download",
-                            "delete",
-                            "rename",
-                            "share"
-                        ]
-                    },
-                    {
-                        "id": "e24c6432-4172-4ef1-87b7-deb16d9cc07e",
-                        "role": "ADMIN",
-                        "actions": [
-                            "view",
-                            "upload",
-                            "download",
-                            "delete",
-                            "rename",
-                            "share"
-                        ]
-                    }
-                ],
-                "children": []
+                "enabledRoutesStatus": {},
+                "enabledRoutes": []
             }
-        ]
+        ],
+        "page": 1,
+        "pageSize": 10
     },
-    "timestamp": "2025-09-25T06:54:37.346Z"
+    "timestamp": "2025-10-25T10:35:31.648Z"
 }

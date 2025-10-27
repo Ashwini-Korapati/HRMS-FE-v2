@@ -1,0 +1,386 @@
+{
+    "success": true,
+    "message": "Token exchange successful",
+    "data": {
+        "access_token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiIyOTc0ZWU1YS0yMjk0LTRlMDItOTgzMi1jZTQ5NGYyZWFjNmYiLCJlbWFpbCI6ImtyaXNobmFzYXZlZXRoYTE5MTcxMTI1NEBnbWFpbC5jb20iLCJyb2xlIjoiVVNFUiIsImNvbXBhbnlJZCI6IjQ4ZmM2ZmE1LThkZDQtNGY4Mi04M2FiLTZmMjFkZDc3OWM5ZCIsInN1YmRvbWFpbiI6Im1lY2giLCJpYXQiOjE3NjEzOTIyMTYsImV4cCI6MTc2MTM5NTgxNn0.CUf5ccVefPCtN_UWM3UxEu8GQVp84w-ckOGUOBBn4ho",
+        "refresh_token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiIyOTc0ZWU1YS0yMjk0LTRlMDItOTgzMi1jZTQ5NGYyZWFjNmYiLCJjb21wYW55SWQiOiI0OGZjNmZhNS04ZGQ0LTRmODItODNhYi02ZjIxZGQ3NzljOWQiLCJpYXQiOjE3NjEzOTIyMTYsImV4cCI6MTc2MTk5NzAxNn0.H59nRhXDWBPOY5BokrSrf17hEBzlt6VxdZKtACIjPcw",
+        "id_token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIyOTc0ZWU1YS0yMjk0LTRlMDItOTgzMi1jZTQ5NGYyZWFjNmYiLCJlbWFpbCI6ImtyaXNobmFzYXZlZXRoYTE5MTcxMTI1NEBnbWFpbC5jb20iLCJuYW1lIjoiS3Jpc2huYSBTYXZlZXRoYSBBIiwiY29tcGFueSI6Ik1lY2giLCJyb2xlIjoiVVNFUiIsImlzcyI6Imh0dHBzOi8vaHJvZmZpY2UuY29tIiwiYXVkIjoiaHJvZmZpY2UtYXBwIiwiaWF0IjoxNzYxMzkyMjE2LCJleHAiOjE3NjEzOTU4MTZ9.d2N44QCWWz1ESa4jkc3ntbQx2CY2ZXPjUwYssBXAp3Q",
+        "token_type": "Bearer",
+        "expires_in": 3600,
+        "scope": "openid profile email",
+        "routesTree": [
+            {
+                "label": "My Dashboard",
+                "path": "/overview",
+                "icon": "LayoutDashboard",
+                "url": "http://localhost:3000/48fc6fa5-8dd4-4f82-83ab-6f21dd779c9d/auth/2974ee5a-2294-4e02-9832-ce494f2eac6f/overview",
+                "children": [],
+                "id": "bde6cce0-cce2-403d-9131-2f2bfda2cf68",
+                "role": "USER",
+                "type": "USER",
+                "breadcrumb": [
+                    {
+                        "label": "My Dashboard",
+                        "path": "/overview",
+                        "url": "http://localhost:3000/48fc6fa5-8dd4-4f82-83ab-6f21dd779c9d/auth/2974ee5a-2294-4e02-9832-ce494f2eac6f/overview"
+                    }
+                ]
+            },
+            {
+                "label": "My Profile",
+                "path": "/profile",
+                "icon": "User",
+                "url": "http://localhost:3000/48fc6fa5-8dd4-4f82-83ab-6f21dd779c9d/auth/2974ee5a-2294-4e02-9832-ce494f2eac6f/profile",
+                "children": [
+                    {
+                        "label": "Settings",
+                        "path": "/profile/settings",
+                        "url": "http://localhost:3000/48fc6fa5-8dd4-4f82-83ab-6f21dd779c9d/auth/2974ee5a-2294-4e02-9832-ce494f2eac6f/profile/settings",
+                        "priority": 0,
+                        "children": [],
+                        "id": "5ada7c76-f838-4bfd-8228-0d4520a7585e",
+                        "role": "USER",
+                        "type": "USER",
+                        "breadcrumb": [
+                            {
+                                "label": "My Profile",
+                                "path": "/profile",
+                                "url": "http://localhost:3000/48fc6fa5-8dd4-4f82-83ab-6f21dd779c9d/auth/2974ee5a-2294-4e02-9832-ce494f2eac6f/profile"
+                            },
+                            {
+                                "label": "Settings",
+                                "path": "/profile/settings",
+                                "url": "http://localhost:3000/48fc6fa5-8dd4-4f82-83ab-6f21dd779c9d/auth/2974ee5a-2294-4e02-9832-ce494f2eac6f/profile/settings"
+                            }
+                        ]
+                    },
+                    {
+                        "label": "Security",
+                        "path": "/profile/security",
+                        "url": "http://localhost:3000/48fc6fa5-8dd4-4f82-83ab-6f21dd779c9d/auth/2974ee5a-2294-4e02-9832-ce494f2eac6f/profile/security",
+                        "priority": 1,
+                        "children": [],
+                        "id": "8da74a07-bdba-44e8-95e3-8562d59366e0",
+                        "role": "USER",
+                        "type": "USER",
+                        "breadcrumb": [
+                            {
+                                "label": "My Profile",
+                                "path": "/profile",
+                                "url": "http://localhost:3000/48fc6fa5-8dd4-4f82-83ab-6f21dd779c9d/auth/2974ee5a-2294-4e02-9832-ce494f2eac6f/profile"
+                            },
+                            {
+                                "label": "Security",
+                                "path": "/profile/security",
+                                "url": "http://localhost:3000/48fc6fa5-8dd4-4f82-83ab-6f21dd779c9d/auth/2974ee5a-2294-4e02-9832-ce494f2eac6f/profile/security"
+                            }
+                        ]
+                    }
+                ],
+                "id": "066a3ffb-4612-40e9-8448-3a03cb5501d7",
+                "role": "USER",
+                "type": "USER",
+                "breadcrumb": [
+                    {
+                        "label": "My Profile",
+                        "path": "/profile",
+                        "url": "http://localhost:3000/48fc6fa5-8dd4-4f82-83ab-6f21dd779c9d/auth/2974ee5a-2294-4e02-9832-ce494f2eac6f/profile"
+                    }
+                ]
+            },
+            {
+                "label": "My Team",
+                "path": "/team",
+                "icon": "Users",
+                "url": "http://localhost:3000/48fc6fa5-8dd4-4f82-83ab-6f21dd779c9d/auth/2974ee5a-2294-4e02-9832-ce494f2eac6f/team",
+                "children": [],
+                "id": "bba96683-2cfc-48c6-9354-d19784f7cc13",
+                "role": "USER",
+                "type": "USER",
+                "breadcrumb": [
+                    {
+                        "label": "My Team",
+                        "path": "/team",
+                        "url": "http://localhost:3000/48fc6fa5-8dd4-4f82-83ab-6f21dd779c9d/auth/2974ee5a-2294-4e02-9832-ce494f2eac6f/team"
+                    }
+                ]
+            },
+            {
+                "label": "My Leaves",
+                "path": "/leaves",
+                "icon": "Calendar",
+                "url": "http://localhost:3000/48fc6fa5-8dd4-4f82-83ab-6f21dd779c9d/auth/2974ee5a-2294-4e02-9832-ce494f2eac6f/leaves",
+                "children": [
+                    {
+                        "label": "History",
+                        "path": "/leaves/history",
+                        "url": "http://localhost:3000/48fc6fa5-8dd4-4f82-83ab-6f21dd779c9d/auth/2974ee5a-2294-4e02-9832-ce494f2eac6f/leaves/history",
+                        "priority": 0,
+                        "children": [],
+                        "id": "6eb9f3f7-bc96-4564-9923-e6068b637542",
+                        "role": "USER",
+                        "type": "USER",
+                        "breadcrumb": [
+                            {
+                                "label": "My Leaves",
+                                "path": "/leaves",
+                                "url": "http://localhost:3000/48fc6fa5-8dd4-4f82-83ab-6f21dd779c9d/auth/2974ee5a-2294-4e02-9832-ce494f2eac6f/leaves"
+                            },
+                            {
+                                "label": "History",
+                                "path": "/leaves/history",
+                                "url": "http://localhost:3000/48fc6fa5-8dd4-4f82-83ab-6f21dd779c9d/auth/2974ee5a-2294-4e02-9832-ce494f2eac6f/leaves/history"
+                            }
+                        ]
+                    },
+                    {
+                        "label": "Apply Leave",
+                        "path": "/leaves/apply",
+                        "url": "http://localhost:3000/48fc6fa5-8dd4-4f82-83ab-6f21dd779c9d/auth/2974ee5a-2294-4e02-9832-ce494f2eac6f/leaves/apply",
+                        "priority": 1,
+                        "children": [],
+                        "id": "2c4240eb-8788-40d0-b01d-451ab6ea193e",
+                        "role": "USER",
+                        "type": "USER",
+                        "breadcrumb": [
+                            {
+                                "label": "My Leaves",
+                                "path": "/leaves",
+                                "url": "http://localhost:3000/48fc6fa5-8dd4-4f82-83ab-6f21dd779c9d/auth/2974ee5a-2294-4e02-9832-ce494f2eac6f/leaves"
+                            },
+                            {
+                                "label": "Apply Leave",
+                                "path": "/leaves/apply",
+                                "url": "http://localhost:3000/48fc6fa5-8dd4-4f82-83ab-6f21dd779c9d/auth/2974ee5a-2294-4e02-9832-ce494f2eac6f/leaves/apply"
+                            }
+                        ]
+                    }
+                ],
+                "id": "0e618801-fb76-4269-b3aa-c85ec6bfbce6",
+                "role": "USER",
+                "type": "USER",
+                "breadcrumb": [
+                    {
+                        "label": "My Leaves",
+                        "path": "/leaves",
+                        "url": "http://localhost:3000/48fc6fa5-8dd4-4f82-83ab-6f21dd779c9d/auth/2974ee5a-2294-4e02-9832-ce494f2eac6f/leaves"
+                    }
+                ]
+            },
+            {
+                "label": "My Attendance",
+                "path": "/attendance",
+                "icon": "Clock",
+                "url": "http://localhost:3000/48fc6fa5-8dd4-4f82-83ab-6f21dd779c9d/auth/2974ee5a-2294-4e02-9832-ce494f2eac6f/attendance",
+                "children": [],
+                "id": "4dc58170-e779-4986-95c4-c340d1084c2f",
+                "role": "USER",
+                "type": "USER",
+                "breadcrumb": [
+                    {
+                        "label": "My Attendance",
+                        "path": "/attendance",
+                        "url": "http://localhost:3000/48fc6fa5-8dd4-4f82-83ab-6f21dd779c9d/auth/2974ee5a-2294-4e02-9832-ce494f2eac6f/attendance"
+                    }
+                ]
+            },
+            {
+                "label": "My Payroll",
+                "path": "/payroll",
+                "icon": "DollarSign",
+                "url": "http://localhost:3000/48fc6fa5-8dd4-4f82-83ab-6f21dd779c9d/auth/2974ee5a-2294-4e02-9832-ce494f2eac6f/payroll",
+                "children": [],
+                "id": "9af6bb62-2391-4af4-b148-a3934037f137",
+                "role": "USER",
+                "type": "USER",
+                "breadcrumb": [
+                    {
+                        "label": "My Payroll",
+                        "path": "/payroll",
+                        "url": "http://localhost:3000/48fc6fa5-8dd4-4f82-83ab-6f21dd779c9d/auth/2974ee5a-2294-4e02-9832-ce494f2eac6f/payroll"
+                    }
+                ]
+            },
+            {
+                "label": "Projects",
+                "path": "/projects",
+                "icon": "FolderOpen",
+                "url": "http://localhost:3000/48fc6fa5-8dd4-4f82-83ab-6f21dd779c9d/auth/2974ee5a-2294-4e02-9832-ce494f2eac6f/projects",
+                "children": [
+                    {
+                        "label": "Create Project",
+                        "path": "/projects/create",
+                        "url": "http://localhost:3000/48fc6fa5-8dd4-4f82-83ab-6f21dd779c9d/auth/2974ee5a-2294-4e02-9832-ce494f2eac6f/projects/create",
+                        "priority": 0,
+                        "children": [],
+                        "id": "a00ce549-3846-4d66-adb6-08ffe3b0a2d1",
+                        "role": "USER",
+                        "type": "USER",
+                        "breadcrumb": [
+                            {
+                                "label": "Projects",
+                                "path": "/projects",
+                                "url": "http://localhost:3000/48fc6fa5-8dd4-4f82-83ab-6f21dd779c9d/auth/2974ee5a-2294-4e02-9832-ce494f2eac6f/projects"
+                            },
+                            {
+                                "label": "Create Project",
+                                "path": "/projects/create",
+                                "url": "http://localhost:3000/48fc6fa5-8dd4-4f82-83ab-6f21dd779c9d/auth/2974ee5a-2294-4e02-9832-ce494f2eac6f/projects/create"
+                            }
+                        ]
+                    },
+                    {
+                        "label": "My Projects",
+                        "path": "/projects/list",
+                        "url": "http://localhost:3000/48fc6fa5-8dd4-4f82-83ab-6f21dd779c9d/auth/2974ee5a-2294-4e02-9832-ce494f2eac6f/projects/list",
+                        "priority": 1,
+                        "children": [],
+                        "id": "5737a0f0-c7d3-4d63-8622-8c78bb61910c",
+                        "role": "USER",
+                        "type": "USER",
+                        "breadcrumb": [
+                            {
+                                "label": "Projects",
+                                "path": "/projects",
+                                "url": "http://localhost:3000/48fc6fa5-8dd4-4f82-83ab-6f21dd779c9d/auth/2974ee5a-2294-4e02-9832-ce494f2eac6f/projects"
+                            },
+                            {
+                                "label": "My Projects",
+                                "path": "/projects/list",
+                                "url": "http://localhost:3000/48fc6fa5-8dd4-4f82-83ab-6f21dd779c9d/auth/2974ee5a-2294-4e02-9832-ce494f2eac6f/projects/list"
+                            }
+                        ]
+                    },
+                    {
+                        "label": "Add Project Member",
+                        "path": "/projects/add-member",
+                        "url": "http://localhost:3000/48fc6fa5-8dd4-4f82-83ab-6f21dd779c9d/auth/2974ee5a-2294-4e02-9832-ce494f2eac6f/projects/add-member",
+                        "priority": 2,
+                        "children": [],
+                        "id": "90412964-cd6f-4f84-9e86-6a3d2303df4a",
+                        "role": "USER",
+                        "type": "USER",
+                        "breadcrumb": [
+                            {
+                                "label": "Projects",
+                                "path": "/projects",
+                                "url": "http://localhost:3000/48fc6fa5-8dd4-4f82-83ab-6f21dd779c9d/auth/2974ee5a-2294-4e02-9832-ce494f2eac6f/projects"
+                            },
+                            {
+                                "label": "Add Project Member",
+                                "path": "/projects/add-member",
+                                "url": "http://localhost:3000/48fc6fa5-8dd4-4f82-83ab-6f21dd779c9d/auth/2974ee5a-2294-4e02-9832-ce494f2eac6f/projects/add-member"
+                            }
+                        ]
+                    },
+                    {
+                        "label": "All Project Members",
+                        "path": "/projects/members-list",
+                        "url": "http://localhost:3000/48fc6fa5-8dd4-4f82-83ab-6f21dd779c9d/auth/2974ee5a-2294-4e02-9832-ce494f2eac6f/projects/members-list",
+                        "priority": 3,
+                        "children": [],
+                        "id": "97d11539-34e5-45da-8c9b-60b692a25530",
+                        "role": "USER",
+                        "type": "USER",
+                        "breadcrumb": [
+                            {
+                                "label": "Projects",
+                                "path": "/projects",
+                                "url": "http://localhost:3000/48fc6fa5-8dd4-4f82-83ab-6f21dd779c9d/auth/2974ee5a-2294-4e02-9832-ce494f2eac6f/projects"
+                            },
+                            {
+                                "label": "All Project Members",
+                                "path": "/projects/members-list",
+                                "url": "http://localhost:3000/48fc6fa5-8dd4-4f82-83ab-6f21dd779c9d/auth/2974ee5a-2294-4e02-9832-ce494f2eac6f/projects/members-list"
+                            }
+                        ]
+                    },
+                    {
+                        "label": "Project Details",
+                        "path": "/projects/details",
+                        "url": "http://localhost:3000/48fc6fa5-8dd4-4f82-83ab-6f21dd779c9d/auth/2974ee5a-2294-4e02-9832-ce494f2eac6f/projects/details",
+                        "priority": 4,
+                        "children": [],
+                        "id": "33c5ad73-8190-4349-91fb-45e3c64ca6e4",
+                        "role": "USER",
+                        "type": "USER",
+                        "breadcrumb": [
+                            {
+                                "label": "Projects",
+                                "path": "/projects",
+                                "url": "http://localhost:3000/48fc6fa5-8dd4-4f82-83ab-6f21dd779c9d/auth/2974ee5a-2294-4e02-9832-ce494f2eac6f/projects"
+                            },
+                            {
+                                "label": "Project Details",
+                                "path": "/projects/details",
+                                "url": "http://localhost:3000/48fc6fa5-8dd4-4f82-83ab-6f21dd779c9d/auth/2974ee5a-2294-4e02-9832-ce494f2eac6f/projects/details"
+                            }
+                        ]
+                    },
+                    {
+                        "label": "My Team",
+                        "path": "/projects/my-team",
+                        "url": "http://localhost:3000/48fc6fa5-8dd4-4f82-83ab-6f21dd779c9d/auth/2974ee5a-2294-4e02-9832-ce494f2eac6f/projects/my-team",
+                        "priority": 5,
+                        "children": [],
+                        "id": "42672cf6-bec4-48b5-8695-89410597fd5e",
+                        "role": "USER",
+                        "type": "USER",
+                        "breadcrumb": [
+                            {
+                                "label": "Projects",
+                                "path": "/projects",
+                                "url": "http://localhost:3000/48fc6fa5-8dd4-4f82-83ab-6f21dd779c9d/auth/2974ee5a-2294-4e02-9832-ce494f2eac6f/projects"
+                            },
+                            {
+                                "label": "My Team",
+                                "path": "/projects/my-team",
+                                "url": "http://localhost:3000/48fc6fa5-8dd4-4f82-83ab-6f21dd779c9d/auth/2974ee5a-2294-4e02-9832-ce494f2eac6f/projects/my-team"
+                            }
+                        ]
+                    }
+                ],
+                "id": "dc71a98e-032e-4fdb-b1e4-8581385d88b4",
+                "role": "USER",
+                "type": "USER",
+                "breadcrumb": [
+                    {
+                        "label": "Projects",
+                        "path": "/projects",
+                        "url": "http://localhost:3000/48fc6fa5-8dd4-4f82-83ab-6f21dd779c9d/auth/2974ee5a-2294-4e02-9832-ce494f2eac6f/projects"
+                    }
+                ]
+            }
+        ],
+        "projectFolderRoutes": [],
+        "user": {
+            "id": "2974ee5a-2294-4e02-9832-ce494f2eac6f",
+            "email": "krishnasaveetha191711254@gmail.com",
+            "role": "USER",
+            "name": "Krishna Saveetha A",
+            "designation": {
+                "id": "ef3bedd1-2a4a-4c9f-b305-dfeb5b7acc9a",
+                "title": "SE-1",
+                "level": 3,
+                "parentId": "0bde8622-2ea9-42d8-b38b-37f9d9721880",
+                "ancestry": [
+                    "34f04f0d-8855-4f70-b789-2a0732698f7a",
+                    "0bde8622-2ea9-42d8-b38b-37f9d9721880"
+                ],
+                "enabledRoutes": [
+                    "projects"
+                ]
+            },
+            "department": {
+                "id": "86451e82-ccf1-4d79-80c1-cce5b608a4cb",
+                "name": "HR"
+            }
+        },
+        "company": {
+            "id": "48fc6fa5-8dd4-4f82-83ab-6f21dd779c9d",
+            "name": "Mech",
+            "subdomain": "mech"
+        }
+    },
+    "timestamp": "2025-10-25T11:36:56.429Z"
+}

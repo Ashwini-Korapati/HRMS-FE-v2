@@ -3,8 +3,8 @@ import { Search as SearchIcon, Bell, UserCircle2, CheckCheck } from "lucide-reac
 import { ThemeSwitcher } from "../Buttons/SwitchButtons"
 import { useTheme } from '../../theme/ThemeProvider'
 import { useSelector, useDispatch } from 'react-redux'
-import { selectAuthUser, logout } from '../../Redux/Public/authSlice'
-import { Link, useNavigate } from 'react-router-dom'
+import { selectAuthUser, logout, selectBasePath } from '../../Redux/Public/authSlice'
+import { useNavigate } from 'react-router-dom'
 import { startNotifications, stopNotifications, markAsRead, markAllAsRead } from '../../Redux/Public/notificationsSlice'
 import { toAssetUrl } from '../../config/config'
 
@@ -26,6 +26,7 @@ export default function SmartNavbar({
   const dispatch = useDispatch()
   const authUser = useSelector(selectAuthUser)
   const authState = useSelector(state => state.auth)
+  const basePath = useSelector(selectBasePath)
 
   const userName = authUser?.name || authUser?.email || userNameProp || 'User'
   const avatarPath = authUser?.avatarUrl || authUser?.avatar || authUser?.photoUrl || authUser?.photo || ''
@@ -302,7 +303,16 @@ export default function SmartNavbar({
               <span className="hidden sm:inline leading-none">{userName}</span>
             </button>
             <div className="absolute right-0 mt-1 w-44 py-2 bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-700 rounded-md shadow-lg opacity-0 pointer-events-none group-hover:opacity-100 group-hover:pointer-events-auto transition-opacity z-20">
-              <Link to={`/${authState?.company?.id}/profile`} className="block px-3 py-1.5 text-xs text-neutral-700 dark:text-neutral-200 hover:bg-neutral-100 dark:hover:bg-neutral-700/60 transition-colors">My Profile</Link>
+              <button
+                onClick={() => {
+                  const base = (basePath || '').replace(/\/$/, '')
+                  const to = `${base}/profile`
+                  navigate(to || '/profile')
+                }}
+                className="w-full text-left px-3 py-1.5 text-xs text-neutral-700 dark:text-neutral-200 hover:bg-neutral-100 dark:hover:bg-neutral-700/60 transition-colors"
+              >
+                My Profile
+              </button>
               <button onClick={() => dispatch(logout())} className="w-full text-left px-3 py-1.5 text-xs text-neutral-600 dark:text-neutral-300 hover:bg-neutral-100 dark:hover:bg-neutral-700/60 transition-colors">Logout</button>
             </div>
           </div>

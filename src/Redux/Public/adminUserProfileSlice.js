@@ -1,7 +1,9 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit'
-import { httpGetService, httpPatchService, httpPostService, httpDeleteService, httpPostFormService } from '../../config/httphandler'
+import { httpGetService, httpPatchService, httpPostService, httpDeleteService, httpPostFormService, httpPutService } from '../../config/httphandler'
 
 const basePath = (companyId, userId) => `${companyId}/admin/users/${userId}/profile`
+// USER role own-profile endpoints
+const ownProfilePath = (companyId, userId) => `${companyId}/auth/${userId}/profile`
 
 export const fetchAdminUserProfile = createAsyncThunk('adminUserProfile/fetch', async ({ companyId, userId }) => {
   const res = await httpGetService(basePath(companyId, userId))
@@ -13,6 +15,27 @@ export const updateAdminUserProfile = createAsyncThunk('adminUserProfile/update'
   const res = await httpPatchService(basePath(companyId, userId), payload)
   if (res.status >= 200 && res.status < 300) return res.data?.data || res.data
   throw new Error(res.data?.message || 'Failed to update profile')
+})
+
+// USER: Get own profile
+export const fetchOwnProfile = createAsyncThunk('adminUserProfile/fetchOwn', async ({ companyId, userId }) => {
+  const res = await httpGetService(ownProfilePath(companyId, userId))
+  if (res.status >= 200 && res.status < 300) return res.data?.data || res.data
+  throw new Error(res.data?.message || 'Failed to load my profile')
+})
+
+// USER: Update own profile (PUT)
+export const updateOwnProfile = createAsyncThunk('adminUserProfile/updateOwn', async ({ companyId, userId, payload }) => {
+  const res = await httpPutService(ownProfilePath(companyId, userId), payload)
+  if (res.status >= 200 && res.status < 300) return res.data?.data || res.data
+  throw new Error(res.data?.message || 'Failed to update my profile')
+})
+
+// USER: Change own password
+export const changeOwnPassword = createAsyncThunk('adminUserProfile/changeOwnPassword', async ({ companyId, userId, currentPassword, newPassword }) => {
+  const res = await httpPostService(`${ownProfilePath(companyId, userId)}/password`, { currentPassword, newPassword })
+  if (res.status >= 200 && res.status < 300) return true
+  throw new Error(res.data?.message || 'Failed to change password')
 })
 
 // Avatar
@@ -146,6 +169,42 @@ const adminUserProfileSlice = createSlice({
       .addCase(fetchAdminUserProfile.rejected, (state, action) => {
         state.loading = 'failed'
         state.error = action.error?.message || 'Failed to load profile'
+      })
+      // USER own profile
+      .addCase(fetchOwnProfile.pending, (state) => {
+        state.loading = 'loading'
+        state.error = null
+      })
+      .addCase(fetchOwnProfile.fulfilled, (state, action) => {
+        state.loading = 'succeeded'
+        state.profile = action.payload || null
+      })
+      .addCase(fetchOwnProfile.rejected, (state, action) => {
+        state.loading = 'failed'
+        state.error = action.error?.message || 'Failed to load my profile'
+      })
+      .addCase(updateOwnProfile.pending, (state) => {
+        state.loading = 'loading'
+        state.error = null
+      })
+      .addCase(updateOwnProfile.fulfilled, (state, action) => {
+        state.loading = 'succeeded'
+        state.profile = action.payload || state.profile
+      })
+      .addCase(updateOwnProfile.rejected, (state, action) => {
+        state.loading = 'failed'
+        state.error = action.error?.message || 'Failed to update my profile'
+      })
+      .addCase(changeOwnPassword.pending, (state) => {
+        state.loading = state.loading === 'loading' ? 'loading' : 'updating'
+        state.error = null
+      })
+      .addCase(changeOwnPassword.fulfilled, (state) => {
+        state.loading = 'succeeded'
+      })
+      .addCase(changeOwnPassword.rejected, (state, action) => {
+        state.loading = 'failed'
+        state.error = action.error?.message || 'Failed to change password'
       })
   }
 })

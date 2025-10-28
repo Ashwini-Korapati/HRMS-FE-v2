@@ -120,17 +120,24 @@ export const startNotifications = createAsyncThunk(
     });
 
     const onNotification = (evt) => {
-      // Persist immediately for UI without reload
-      const normalized = normalizeNotification(evt);
-      dispatch(eventReceived(normalized));
       try {
         const t = evt?.type;
         // Unify payload extraction for both raw and wrapped messages
         const payload = evt?.data || evt || {};
         const targetDesignationId =
-          payload.designationId || payload.rootDesignationId;
+          payload.designationId || payload.rootDesignationId || payload.metadata?.designationId;
+
+        console.log('[notificationsSlice] Received event:', { 
+          type: t, 
+          targetDesignationId,
+          itemsCount: payload.items?.length || 0,
+          hasTree: !!payload.tree,
+          hasTitle: !!payload.title,
+          hasMessage: !!payload.message
+        });
 
         // Live attendance snapshot integration for designation dashboards
+        // PROCESS THESE FIRST before any early returns
         if (t === "attendance.monitoring.snapshot") {
           const itemsRaw = Array.isArray(payload.items) ? payload.items : [];
           const tree = payload.tree;
@@ -175,6 +182,13 @@ export const startNotifications = createAsyncThunk(
           }
           const suggestedLayout = payload.suggestedLayout;
           const timestamp = payload.timestamp || evt?.timestamp;
+          
+          console.log('[notificationsSlice] Processing snapshot:', {
+            targetDesignationId,
+            mergedItemsCount: mergedItems.length,
+            timestamp
+          });
+          
           if (targetDesignationId && mergedItems.length) {
             dispatch(
               setDesignationConnected({
@@ -192,11 +206,20 @@ export const startNotifications = createAsyncThunk(
               })
             );
           }
+          // Do NOT add monitoring snapshot to notification bell - it's for live table only
+          return;
         }
 
         // Incremental updates (check-in/out or small row patches)
+        // These events update DesignationLiveAttendance component, NOT notification bell
         if (t === "attendance.monitoring.update") {
           const items = Array.isArray(payload.items) ? payload.items : [];
+          console.log('[notificationsSlice] Processing monitoring update:', {
+            targetDesignationId,
+            itemsCount: items.length,
+            items: items.map(it => ({ userId: it.userId, status: it.status, checkInTime: it.checkInTime, checkOutTime: it.checkOutTime }))
+          });
+          
           if (targetDesignationId && items.length) {
             dispatch(
               setDesignationConnected({
@@ -212,39 +235,61 @@ export const startNotifications = createAsyncThunk(
               })
             );
           }
+          // Do NOT add monitoring update to notification bell - it's for live table only
+          return;
+        }
+
+        // CRITICAL: Skip ALL OTHER monitoring-related events for notification bell
+        // These are internal events for live table updates, NOT user notifications
+        if (t && (t.includes('monitoring') || t.includes('snapshot') || t.includes('update'))) {
+          console.log('[notificationsSlice] Skipping other monitoring/sync event:', t);
+          return;
         }
 
         // Optional: also reflect basic check-in/out into the live table if gateway only emits these
         if (t === "attendance.check_in" || t === "attendance.check_out") {
           const userId = payload.userId || evt.userId;
-          const designationId = targetDesignationId;
-          if (userId && designationId) {
+          const eventDesignationId = payload.metadata?.designationId || payload.designationId || targetDesignationId;
+          
+          console.log('[notificationsSlice] Processing check-in/out:', {
+            type: t,
+            userId,
+            eventDesignationId,
+            timestamp: payload.timestamp
+          });
+          
+          if (userId && eventDesignationId) {
             const patch =
               t === "attendance.check_in"
                 ? {
                     userId,
-                    checkInTime: payload.timestamp || new Date().toISOString(),
-                    status: "PRESENT",
+                    checkInTime: payload.timestamp || payload.checkInTime || new Date().toISOString(),
+                    status: payload.status || "PRESENT",
+                    location: payload.location || null,
                   }
                 : {
                     userId,
-                    checkOutTime: payload.timestamp || new Date().toISOString(),
+                    checkOutTime: payload.timestamp || payload.checkOutTime || new Date().toISOString(),
                     totalHours: payload.totalHours,
                     overtimeHours: payload.overtimeHours,
+                    status: payload.status || null,
                   };
             dispatch(
-              setDesignationConnected({ designationId, connected: true })
+              setDesignationConnected({ designationId: eventDesignationId, connected: true })
             );
             dispatch(
               upsertDesignationItems({
-                designationId,
+                designationId: eventDesignationId,
                 items: [patch],
                 timestamp: payload.timestamp || evt?.timestamp,
               })
             );
           }
+          // Do NOT add check-in/out events to notification bell - DB notifications will handle this
+          return;
         }
 
+        // Leave events - apply to leave slice AND add to notification bell
         if (
           t &&
           ["leave.created", "leave.approved", "leave.rejected"].includes(t) &&
@@ -264,8 +309,36 @@ export const startNotifications = createAsyncThunk(
               patch: { userId: evt.userId },
             })
           );
+          // Leave events should appear in notification bell - fall through to add
         }
-      } catch {}
+
+        // If this is a notification.created event, refresh DB feed and count immediately
+        if (t === 'notification.created') {
+          const state = getState();
+          const currentCompanyId = state.auth?.company?.id;
+          const currentUserId = state.auth?.user?.id;
+          if (currentCompanyId && currentUserId) {
+            dispatch(fetchFeed({ companyId: currentCompanyId, userId: currentUserId }));
+            dispatch(fetchUnreadCount({ companyId: currentCompanyId, userId: currentUserId }));
+          }
+          return; // Don't add notification.created to items (it's just a trigger)
+        }
+
+        // Only add to notification bell if it's a user-facing event
+        // Exclude monitoring events (already handled above with early returns)
+        if (t === 'leave.created' || 
+            t === 'leave.approved' || 
+            t === 'leave.rejected' ||
+            t === 'project.member_added' ||
+            t === 'employee.onboarded' ||
+            t === 'profile.avatar.updated') {
+          // Persist normalized notification for UI display
+          const normalized = normalizeNotification(evt);
+          dispatch(eventReceived(normalized));
+        }
+      } catch (err) {
+        console.error('[notificationsSlice] Error processing notification:', err);
+      }
     };
 
     // Support multiple event names that backend may use
@@ -404,10 +477,10 @@ export const fetchUnreadCount = createAsyncThunk(
   "notifications/fetchUnread",
   async ({ companyId, userId }, { getState }) => {
     const role = getState()?.auth?.user?.role;
-    const isAdmin = role === "ADMIN";
+    const isAdmin = role === "ADMIN" || role === "SUPER_ADMIN" || role === "IT";
     const path = isAdmin
       ? `${companyId}/notifications/unread-count`
-      : `${companyId}/auth/${userId}/profile/notifications/unread-count`;
+      : `${companyId}/auth/${userId}/notifications/unread-count`;
     const res = await httpGetService(path);
     if (res.status >= 200 && res.status < 300)
       return res.data?.data?.count ?? 0;
@@ -419,10 +492,10 @@ export const fetchFeed = createAsyncThunk(
   "notifications/fetchFeed",
   async ({ companyId, userId }, { getState }) => {
     const role = getState()?.auth?.user?.role;
-    const isAdmin = role === "ADMIN";
+    const isAdmin = role === "ADMIN" || role === "SUPER_ADMIN" || role === "IT";
     const path = isAdmin
       ? `${companyId}/notifications`
-      : `${companyId}/auth/${userId}/profile/notifications/feed`;
+      : `${companyId}/auth/${userId}/notifications/feed`;
     const res = await httpGetService(path);
     if (res.status >= 200 && res.status < 300)
       return res.data?.data?.items ?? [];
@@ -434,10 +507,10 @@ export const markAsRead = createAsyncThunk(
   "notifications/markAsRead",
   async ({ companyId, userId, notificationId }, { getState }) => {
     const role = getState()?.auth?.user?.role;
-    const isAdmin = role === "ADMIN";
+    const isAdmin = role === "ADMIN" || role === "SUPER_ADMIN" || role === "IT";
     const path = isAdmin
       ? `${companyId}/notifications/${notificationId}/read`
-      : `${companyId}/auth/${userId}/profile/notifications/${notificationId}/read`;
+      : `${companyId}/auth/${userId}/notifications/${notificationId}/read`;
     const res = await httpPatchService(path, {});
     return res.status >= 200 && res.status < 300;
   }
@@ -447,10 +520,10 @@ export const markAllAsRead = createAsyncThunk(
   "notifications/markAllAsRead",
   async ({ companyId, userId }, { getState }) => {
     const role = getState()?.auth?.user?.role;
-    const isAdmin = role === "ADMIN";
+    const isAdmin = role === "ADMIN" || role === "SUPER_ADMIN" || role === "IT";
     const path = isAdmin
       ? `${companyId}/notifications/read-all`
-      : `${companyId}/auth/${userId}/profile/notifications/read-all`;
+      : `${companyId}/auth/${userId}/notifications/read-all`;
     const res = await httpPatchService(path, {});
     return res.status >= 200 && res.status < 300;
   }

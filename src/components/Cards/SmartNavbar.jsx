@@ -5,7 +5,7 @@ import { useTheme } from '../../theme/ThemeProvider'
 import { useSelector, useDispatch } from 'react-redux'
 import { selectAuthUser, logout, selectBasePath } from '../../Redux/Public/authSlice'
 import { useNavigate } from 'react-router-dom'
-import { startNotifications, stopNotifications, markAsRead, markAllAsRead } from '../../Redux/Public/notificationsSlice'
+import { startNotifications, stopNotifications, markAsRead, markAllAsRead, fetchFeed, fetchUnreadCount } from '../../Redux/Public/notificationsSlice'
 import { toAssetUrl } from '../../config/config'
 
 export default function SmartNavbar({
@@ -53,6 +53,9 @@ export default function SmartNavbar({
   useEffect(() => {
     if (!companyId || !userId) return
     dispatch(startNotifications({ companyId, userId, designationId }))
+    // Fetch DB notifications on mount
+    dispatch(fetchFeed({ companyId, userId }))
+    dispatch(fetchUnreadCount({ companyId, userId }))
     return () => { dispatch(stopNotifications()) }
   }, [dispatch, companyId, userId, designationId])
 
@@ -78,9 +81,19 @@ export default function SmartNavbar({
     return () => { document.removeEventListener('mousedown', onDocClick); document.removeEventListener('keydown', onKey) }
   }, [profileOpen])
 
-  // Raw notifications from store
+  // Raw notifications from store (combined: DB + live socket events)
   const notifications = useSelector(state => state.notifications?.items || [])
   const unreadCount = useSelector(state => state.notifications?.unread || 0)
+  const connected = useSelector(state => state.notifications?.connected || false)
+
+  // Fetch DB notifications when socket connects or reconnects
+  useEffect(() => {
+    if (connected && companyId && userId) {
+      console.log('[SmartNavbar] Socket connected, fetching notifications from DB')
+      dispatch(fetchFeed({ companyId, userId }))
+      dispatch(fetchUnreadCount({ companyId, userId }))
+    }
+  }, [connected, companyId, userId, dispatch])
 
   // Filter by my designation and dedupe
   const items = useMemo(() => {
@@ -90,7 +103,23 @@ export default function SmartNavbar({
     // Keep relevant events:
     // - global/company-wide (no companyId set or matches mine)
     // - designation-targeted: metadata.designationId or metadata.designationParentId matches my designation
+    // - EXCLUDE monitoring snapshot/update events (those are for live attendance table, not notification bell)
+    // - EXCLUDE raw check-in/check-out socket events (DB notifications will have better messages)
     const relevant = notifications.filter(n => {
+      // Filter OUT monitoring events - they're for DesignationLiveAttendance component only
+      const eventType = (n.type || '').toLowerCase()
+      if (eventType.includes('attendance.monitoring.snapshot') || 
+          eventType.includes('attendance.monitoring.update')) {
+        return false
+      }
+      
+      // Filter OUT raw socket check-in/check-out events without DB backing
+      // DB-backed notifications will have title+message fields
+      if ((eventType === 'attendance.check_in' || eventType === 'attendance.check_out') && 
+          (!n.title || !n.message)) {
+        return false
+      }
+      
       const nCompany = n.companyId || n.metadata?.companyId
       const dId = n.metadata?.designationId || n.designationId
       const pId = n.metadata?.designationParentId || n.parentDesignationId
@@ -118,75 +147,34 @@ export default function SmartNavbar({
       if (seen.has(key)) continue
       seen.add(key)
 
-      // Normalize item for UI
+      // DB notifications have title + message fields - use directly without transformation
+      if (n.title && n.message) {
+        deduped.push({
+          id: n.id || n.eventId || key,
+          title: n.title,
+          message: n.message,
+          type: n.type || 'INFO',
+          isRead: !!n.isRead,
+          createdAt: n.createdAt || n.at || n.timestamp || n.time || new Date().toISOString(),
+          metadata: n.metadata || {}
+        })
+        continue
+      }
+
+      // Legacy socket events (should be rare now) - no event type display
       const base = {
         id: n.id || n.eventId || key,
         type: n.type || 'INFO',
         isRead: !!n.isRead,
         createdAt: n.at || n.createdAt || n.timestamp || n.time || new Date().toISOString(),
-        metadata: n.metadata || {
-          userId: n.userId,
-          leaveId: n.leaveId,
-          companyId: n.companyId,
-          projectId: n.projectId,
-          role: n.role,
-          shiftId: n.shiftId,
-          attendanceType: n.attendanceType,
-          designationId: n.designationId,
-        },
+        metadata: n.metadata || {}
       }
 
-      const t = String(n.type || '').toLowerCase()
-      if (t === 'project.member_added') {
-        const displayUser = n.userName || n.name || n.by || (n.userId ? `User ${n.userId}` : 'A user')
-        const projectLabel = n.projectName || (n.projectId ? `#${n.projectId}` : 'the project')
-        const roleText = n.role ? ` as ${n.role}` : ''
-        const attnText = n.attendanceType ? `, attendance: ${n.attendanceType}` : ''
-        const shiftText = n.shiftName ? `, shift: ${n.shiftName}` : (n.shiftId ? `, shift: ${n.shiftId}` : '')
-        deduped.push({
-          ...base,
-          title: 'Project member added',
-          message: `${displayUser} added to project ${projectLabel}${roleText}${attnText}${shiftText}`,
-        })
-        continue
-      }
-
-      if (t === 'attendance.monitoring.snapshot') {
-        const ts = n.dbTimestamp || n.timestamp || n.at || n.createdAt
-        const timeStr = ts ? new Date(ts).toLocaleTimeString() : ''
-        const status = n.metadata?.status || n.status
-        const total = n.metadata?.totalHours || n.totalHours
-        const ot = n.metadata?.overtimeHours || n.overtimeHours
-        const shift = n.metadata?.shift || n.shift || n.shiftId
-        const parts = [
-          timeStr ? `at ${timeStr}` : null,
-          status ? `status: ${status}` : null,
-          (total || total === 0) ? `hours: ${total}h${ot ? ` (+${ot}h OT)` : ''}` : null,
-          shift ? `shift: ${shift}` : null,
-        ].filter(Boolean)
-        deduped.push({
-          ...base,
-          title: 'Attendance snapshot',
-          message: parts.length ? parts.join(' • ') : (n.message || ''),
-        })
-        continue
-      }
-
-      if (t === 'profile.avatar.updated') {
-        const actor = n.metadata?.actor || n.actor || n.userName || 'You'
-        deduped.push({
-          ...base,
-          title: 'Profile photo updated',
-          message: n.message || `${actor} updated profile photo`,
-        })
-        continue
-      }
-
-      // Default formatting
+      // Default fallback: show message only if present
       deduped.push({
         ...base,
-        title: n.title || n.type || 'Notification',
-        message: n.message || n.reason || n.description || (t || 'You have a new notification'),
+        title: n.title || 'Notification',
+        message: n.message || n.reason || n.description || 'You have a new notification'
       })
     }
 
@@ -201,6 +189,22 @@ export default function SmartNavbar({
 
   const handleItemClick = (n) => {
     const kind = (n.type || n.title || '').toString().toLowerCase()
+    
+    // Attendance-related navigation
+    if (kind.includes('attendance') || kind.includes('check_in') || kind.includes('check_out')) {
+      setOpen(false)
+      const role = authState?.user?.role
+      const cId = authState?.company?.id
+      const uId = authState?.user?.id
+      if (cId) {
+        if (role === 'ADMIN') navigate(`/${cId}/attendance`)
+        else navigate(`/${cId}/auth/${uId}/attendance`)
+      } else {
+        navigate('/attendance')
+      }
+      return
+    }
+    
     // Leave-related navigation
     if (kind.includes('leave')) {
       setOpen(false)

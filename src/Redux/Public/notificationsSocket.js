@@ -72,13 +72,29 @@ export function connectSocket({ url, token, companyId, userId, designationId } =
   })
 
   socket.on('connect', () => {
+    console.log('[notificationsSocket] Connected, joining rooms');
     // Join company/designation rooms if your gateway uses them
     try {
-      if (companyId) socket.emit('joinCompany', { companyId })
-      if (designationId) socket.emit('joinDesignation', { designationId })
+      if (companyId) {
+        socket.emit('joinCompany', { companyId });
+        console.log('[notificationsSocket] Joined company room:', companyId);
+      }
+      if (designationId) {
+        socket.emit('joinDesignation', { designationId });
+        console.log('[notificationsSocket] Joined designation room:', designationId);
+      }
       // Optional: explicit subscription message some gateways expect
-      socket.emit('subscribe.notifications', { companyId, designationId, userId })
-    } catch {}
+      socket.emit('subscribe.notifications', { companyId, designationId, userId });
+      console.log('[notificationsSocket] Subscribed to notifications');
+      
+      // NEW: Request to join manager designation rooms (all subordinate designations where user is the manager)
+      if (companyId && designationId) {
+        socket.emit('joinManagerDesignations', { companyId, designationId, userId });
+        console.log('[notificationsSocket] Requested manager designation rooms for:', designationId);
+      }
+    } catch (e) {
+      console.warn('[notificationsSocket] Error joining rooms:', e.message);
+    }
     startHeartbeat(socket)
   })
   socket.on('disconnect', () => stopHeartbeat(socket))

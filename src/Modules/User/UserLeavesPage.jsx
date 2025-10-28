@@ -52,37 +52,92 @@ export default function UserLeavesPage() {
 
   // Subscribe to live leave events via notifications socket
   useEffect(() => {
+    if (!companyId || !parentDesignationId) {
+      console.log('[UserLeavesPage] Missing companyId or parentDesignationId:', { companyId, parentDesignationId })
+      return
+    }
     try {
       const { getSocket } = require('../../Redux/Public/notificationsSocket')
       const s = getSocket()
-      if (!s) return
+      if (!s) {
+        console.log('[UserLeavesPage] Socket not available')
+        return
+      }
+      console.log('[UserLeavesPage] Socket connected:', s.connected, 'id:', s.id)
+      
       const onNotification = (evt) => {
         const type = evt?.type
         if (!type || !['leave.created','leave.approved','leave.rejected'].includes(type)) return
+        
+        // Match if event is for my company OR my designation path
         const matchCompany = evt.companyId && String(evt.companyId) === String(companyId)
         const matchDesignation = evt.designationParentId && String(evt.designationParentId) === String(parentDesignationId)
+        
+        // Accept if either company or designation matches
         if (!matchCompany && !matchDesignation) return
-        setLiveEvents(prev => ([{
-          id: evt.id || `${type}:${evt.leaveId || evt.at || Date.now()}`,
+        
+        console.log('[UserLeavesPage] Received leave event:', {
           type,
-          userId: evt.userId,
           leaveId: evt.leaveId,
-          at: evt.at || new Date().toISOString(),
-          reason: evt.reason,
-        }, ...prev]).slice(0, 25))
+          userId: evt.userId,
+          companyId: evt.companyId,
+          designationParentId: evt.designationParentId,
+          matchCompany,
+          matchDesignation
+        })
+        
+        setLiveEvents(prev => {
+          // Generate unique ID with timestamp to avoid duplicates
+          const uniqueId = evt.id || `${type}:${evt.leaveId}:${Date.now()}:${Math.random().toString(36).substr(2, 9)}`
+          
+          // Check if this exact event already exists to prevent duplicates
+          const exists = prev.some(e => 
+            e.type === type && 
+            e.leaveId === evt.leaveId && 
+            e.userId === evt.userId &&
+            Math.abs(new Date(e.at).getTime() - new Date(evt.at || new Date()).getTime()) < 1000
+          )
+          
+          if (exists) {
+            console.log('[UserLeavesPage] Duplicate event detected, skipping')
+            return prev
+          }
+          
+          return ([{
+            id: uniqueId,
+            type,
+            userId: evt.userId,
+            leaveId: evt.leaveId,
+            at: evt.at || new Date().toISOString(),
+            reason: evt.reason,
+          }, ...prev]).slice(0, 25)
+        })
+        
         // Reflect status change for current user's history immediately
         try {
           if (['leave.approved','leave.rejected'].includes(type) && evt.leaveId) {
             const { applyLeaveEvent } = require('../../Redux/Public/UserleaveSlice')
             const newStatus = type === 'leave.approved' ? 'APPROVED' : 'REJECTED'
             dispatch(applyLeaveEvent({ leaveId: evt.leaveId, status: newStatus, at: evt.at || evt.timestamp }))
+            // Refresh pending approvals to update the list
+            if (companyId && userId && designationId) {
+              dispatch(fetchPendingApprovals({ companyId, userId, designationId }))
+            }
+          }
+          if (type === 'leave.created') {
+            // Newly created leave might add to pending list
+            if (companyId && userId && designationId) {
+              dispatch(fetchPendingApprovals({ companyId, userId, designationId }))
+            }
           }
         } catch {}
       }
       s.off('notification', onNotification).on('notification', onNotification)
       return () => { try { s.off('notification', onNotification) } catch {} }
-    } catch {}
-  }, [companyId, parentDesignationId, dispatch])
+    } catch (err) {
+      console.error('[UserLeavesPage] Socket setup error:', err)
+    }
+  }, [companyId, parentDesignationId, userId, designationId, dispatch])
 
   return (
     <div>

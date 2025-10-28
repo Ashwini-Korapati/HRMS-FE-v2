@@ -71,8 +71,20 @@ export default function DesignationLiveAttendance({
   // Load initial snapshot
   useEffect(() => {
     if (!designationId || !companyId) return
+    console.log('[DesignationLiveAttendance] Fetching initial snapshot', { designationId, companyId })
     dispatch(fetchDesignationSnapshot({ companyId, designationId }))
   }, [dispatch, companyId, designationId])
+  
+  // Log rows changes for debugging
+  useEffect(() => {
+    console.log('[DesignationLiveAttendance] Rows updated:', {
+      designationId,
+      rowsCount: rows?.length || 0,
+      connected,
+      loading,
+      rows: rows?.slice(0, 3) // Log first 3 for debugging
+    })
+  }, [rows, designationId, connected, loading])
 
   // Live updates flow via global notifications socket; this component only renders store data.
 

@@ -22,7 +22,7 @@ export const fetchPendingApprovals = createAsyncThunk(
   'leaveApprovals/fetchPending',
   async ({ companyId, userId, designationId }, { getState }) => {
     const role = getState()?.auth?.user?.role
-    const isAdmin = role === 'ADMIN'
+    const isAdmin = role === 'ADMIN' || role === 'SUPER_ADMIN' || role === 'IT'
     // Admin: use new format without auth prefix
     // User: preserve existing auth path
     const base = isAdmin
@@ -38,7 +38,7 @@ export const fetchApprovedApprovals = createAsyncThunk(
   'leaveApprovals/fetchApproved',
   async ({ companyId, userId, designationId }, { getState }) => {
     const role = getState()?.auth?.user?.role
-    const isAdmin = role === 'ADMIN'
+    const isAdmin = role === 'ADMIN' || role === 'SUPER_ADMIN' || role === 'IT'
     const base = isAdmin
       ? `${companyId}/leaves/approvals/designation/${designationId}`
       : `${companyId}/auth/${userId}/leaves/approvals/designation/${designationId}`
@@ -52,7 +52,7 @@ export const fetchRejectedApprovals = createAsyncThunk(
   'leaveApprovals/fetchRejected',
   async ({ companyId, userId, designationId }, { getState }) => {
     const role = getState()?.auth?.user?.role
-    const isAdmin = role === 'ADMIN'
+    const isAdmin = role === 'ADMIN' || role === 'SUPER_ADMIN' || role === 'IT'
     const base = isAdmin
       ? `${companyId}/leaves/approvals/designation/${designationId}`
       : `${companyId}/auth/${userId}/leaves/approvals/designation/${designationId}`
@@ -66,7 +66,7 @@ export const approveLeave = createAsyncThunk(
   'leaveApprovals/approve',
   async ({ companyId, userId, designationId, leaveId }, { getState }) => {
     const role = getState()?.auth?.user?.role
-    const isAdmin = role === 'ADMIN'
+    const isAdmin = role === 'ADMIN' || role === 'SUPER_ADMIN' || role === 'IT'
     const base = isAdmin
       ? `${companyId}/leaves/approvals/designation/${designationId}`
       : `${companyId}/auth/${userId}/leaves/approvals/designation/${designationId}`
@@ -79,7 +79,7 @@ export const rejectLeave = createAsyncThunk(
   'leaveApprovals/reject',
   async ({ companyId, userId, designationId, leaveId }, { getState }) => {
     const role = getState()?.auth?.user?.role
-    const isAdmin = role === 'ADMIN'
+    const isAdmin = role === 'ADMIN' || role === 'SUPER_ADMIN' || role === 'IT'
     const base = isAdmin
       ? `${companyId}/leaves/approvals/designation/${designationId}`
       : `${companyId}/auth/${userId}/leaves/approvals/designation/${designationId}`

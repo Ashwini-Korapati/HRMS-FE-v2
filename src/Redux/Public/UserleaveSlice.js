@@ -3,7 +3,7 @@ import { httpPostService, httpGetService, httpPatchService, httpDeleteService } 
 import { selectAuthUser, selectAuthCompany } from './authSlice'
 
 // Create leave application
-export const createLeave = createAsyncThunk('userleave/create', async (payload, { getState, rejectWithValue }) => {
+export const createLeave = createAsyncThunk('userleave/create', async (payload, { getState, rejectWithValue, dispatch }) => {
   try {
     const state = getState()
     const user = selectAuthUser(state)
@@ -20,7 +20,24 @@ export const createLeave = createAsyncThunk('userleave/create', async (payload, 
     })
     
     if (res.status >= 200 && res.status < 300) {
-      return res.data?.data || res.data
+      const result = res.data?.data || res.data
+      
+      // Immediately refresh pending approvals for user's designation
+      const designationId = user.designationId || user.designation?.id || user.designationParentId
+      if (designationId) {
+        try {
+          const { fetchPendingApprovals } = require('./leaveApprovalsSlice')
+          dispatch(fetchPendingApprovals({ 
+            companyId: company.id, 
+            userId: user.id, 
+            designationId 
+          }))
+        } catch (err) {
+          console.warn('[createLeave] Failed to refresh pending approvals:', err)
+        }
+      }
+      
+      return result
     }
     return rejectWithValue(res.data || { message: 'Failed to create leave application' })
   } catch (e) {

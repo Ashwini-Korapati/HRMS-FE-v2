@@ -24,7 +24,6 @@ export default function UserLeavesPage() {
   const companyId = auth?.company?.id
   const userId = auth?.user?.id
   const designationId = auth?.user?.designationId || auth?.user?.designation?.id || auth?.user?.designationParentId
-  const parentDesignationId = auth?.user?.designationParentId || auth?.user?.designation?.parentId || designationId
   const [liveEvents, setLiveEvents] = React.useState([])
 
   const pending = useSelector(selectPendingApprovals)
@@ -52,8 +51,8 @@ export default function UserLeavesPage() {
 
   // Subscribe to live leave events via notifications socket
   useEffect(() => {
-    if (!companyId || !parentDesignationId) {
-      console.log('[UserLeavesPage] Missing companyId or parentDesignationId:', { companyId, parentDesignationId })
+    if (!companyId) {
+      console.log('[UserLeavesPage] Missing companyId')
       return
     }
     try {
@@ -69,33 +68,37 @@ export default function UserLeavesPage() {
         const type = evt?.type
         if (!type || !['leave.created','leave.approved','leave.rejected'].includes(type)) return
         
-        // Match if event is for my company OR my designation path
-        const matchCompany = evt.companyId && String(evt.companyId) === String(companyId)
-        const matchDesignation = evt.designationParentId && String(evt.designationParentId) === String(parentDesignationId)
+        // Match if event is for my company (company-wide events get routed here)
+        const eventCompanyId = evt.companyId || evt.metadata?.companyId
+        const isMyCompany = !eventCompanyId || String(eventCompanyId) === String(companyId)
         
-        // Accept if either company or designation matches
-        if (!matchCompany && !matchDesignation) return
+        if (!isMyCompany) {
+          console.log('[UserLeavesPage] Event not for my company, skipping', { eventCompanyId, companyId })
+          return
+        }
         
         console.log('[UserLeavesPage] Received leave event:', {
           type,
           leaveId: evt.leaveId,
           userId: evt.userId,
-          companyId: evt.companyId,
+          companyId: eventCompanyId,
+          designationId: evt.designationId,
           designationParentId: evt.designationParentId,
-          matchCompany,
-          matchDesignation
+          metadata: evt.metadata,
+          at: evt.at || evt.timestamp
         })
         
         setLiveEvents(prev => {
-          // Generate unique ID with timestamp to avoid duplicates
-          const uniqueId = evt.id || `${type}:${evt.leaveId}:${Date.now()}:${Math.random().toString(36).substr(2, 9)}`
+          // Generate unique ID - prefer eventId, then construct stable key
+          const when = evt.at || evt.timestamp || new Date().toISOString()
+          const uniqueId = evt.eventId || evt.id || `${type}:${evt.leaveId}:${new Date(when).getTime()}`
           
           // Check if this exact event already exists to prevent duplicates
           const exists = prev.some(e => 
             e.type === type && 
             e.leaveId === evt.leaveId && 
             e.userId === evt.userId &&
-            Math.abs(new Date(e.at).getTime() - new Date(evt.at || new Date()).getTime()) < 1000
+            Math.abs(new Date(e.at).getTime() - new Date(when).getTime()) < 2000
           )
           
           if (exists) {
@@ -103,14 +106,17 @@ export default function UserLeavesPage() {
             return prev
           }
           
-          return ([{
+          const newEvent = {
             id: uniqueId,
             type,
             userId: evt.userId,
             leaveId: evt.leaveId,
-            at: evt.at || new Date().toISOString(),
-            reason: evt.reason,
-          }, ...prev]).slice(0, 25)
+            at: when,
+            reason: evt.reason || evt.metadata?.reason,
+          }
+          
+          console.log('[UserLeavesPage] Adding new event:', newEvent)
+          return ([newEvent, ...prev]).slice(0, 25)
         })
         
         // Reflect status change for current user's history immediately
@@ -137,7 +143,7 @@ export default function UserLeavesPage() {
     } catch (err) {
       console.error('[UserLeavesPage] Socket setup error:', err)
     }
-  }, [companyId, parentDesignationId, userId, designationId, dispatch])
+  }, [companyId, userId, designationId, dispatch])
 
   return (
     <div>

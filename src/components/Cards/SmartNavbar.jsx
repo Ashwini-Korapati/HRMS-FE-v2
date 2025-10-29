@@ -103,8 +103,9 @@ export default function SmartNavbar({
     // Keep relevant events:
     // - global/company-wide (no companyId set or matches mine)
     // - designation-targeted: metadata.designationId or metadata.designationParentId matches my designation
+    // - DB-backed notifications will have title+message fields
     // - EXCLUDE monitoring snapshot/update events (those are for live attendance table, not notification bell)
-    // - EXCLUDE raw check-in/check-out socket events (DB notifications will have better messages)
+    // - EXCLUDE raw check-in/check-out socket events without DB backing
     const relevant = notifications.filter(n => {
       // Filter OUT monitoring events - they're for DesignationLiveAttendance component only
       const eventType = (n.type || '').toLowerCase()
@@ -120,17 +121,26 @@ export default function SmartNavbar({
         return false
       }
       
+      // Extract company and designation context
       const nCompany = n.companyId || n.metadata?.companyId
       const dId = n.metadata?.designationId || n.designationId
       const pId = n.metadata?.designationParentId || n.parentDesignationId
       const channels = Array.isArray(n.channels) ? n.channels : []
+      
+      // Company match check
       const isCompanyOk = !nCompany || !myCompany || nCompany === myCompany
+      
+      // Designation match check - include events targeted to my designation or parent
       const isDesigOk =
         !myDesig ||
         dId === myDesig ||
         pId === myDesig ||
         channels.includes(`designation:${myDesig}`)
-      return isCompanyOk && isDesigOk
+      
+      // For leave/attendance events without designation routing, include them
+      const isLeaveFamiliar = eventType.includes('leave.') && (!dId && !pId) ? true : false
+      
+      return isCompanyOk && (isDesigOk || isLeaveFamiliar)
     })
 
     // Deduplicate:

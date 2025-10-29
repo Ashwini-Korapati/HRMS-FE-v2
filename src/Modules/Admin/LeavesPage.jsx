@@ -127,8 +127,8 @@ export default function LeavesPage() {
 
   // Live socket subscription for leave events
   useEffect(() => {
-    if (!companyId || !designationId) {
-      console.log('[LeavesPage] Missing companyId or designationId:', { companyId, designationId })
+    if (!companyId) {
+      console.log('[LeavesPage] Missing companyId')
       return
     }
     try {
@@ -144,33 +144,37 @@ export default function LeavesPage() {
         const type = evt?.type
         if (!type || !['leave.created','leave.approved','leave.rejected'].includes(type)) return
         
-        // Match if event is for my company OR my designation path
-        const matchCompany = evt.companyId && String(evt.companyId) === String(companyId)
-        const matchDesignation = evt.designationParentId && String(evt.designationParentId) === String(designationId)
+        // Match if event is for my company (company-wide events get routed here)
+        const eventCompanyId = evt.companyId || evt.metadata?.companyId
+        const isMyCompany = !eventCompanyId || String(eventCompanyId) === String(companyId)
         
-        // Accept if either company or designation matches
-        if (!matchCompany && !matchDesignation) return
+        if (!isMyCompany) {
+          console.log('[LeavesPage] Event not for my company, skipping', { eventCompanyId, companyId })
+          return
+        }
         
         console.log('[LeavesPage] Received leave event:', {
           type,
           leaveId: evt.leaveId,
           userId: evt.userId,
-          companyId: evt.companyId,
+          companyId: eventCompanyId,
+          designationId: evt.designationId,
           designationParentId: evt.designationParentId,
-          matchCompany,
-          matchDesignation
+          metadata: evt.metadata,
+          at: evt.at || evt.timestamp
         })
         
         setRecentLiveEvents(prev => {
-          // Generate unique ID with timestamp to avoid duplicates
-          const uniqueId = evt.id || `${type}:${evt.leaveId}:${Date.now()}:${Math.random().toString(36).substr(2, 9)}`
+          // Generate unique ID - prefer eventId, then construct stable key
+          const when = evt.at || evt.timestamp || new Date().toISOString()
+          const uniqueId = evt.eventId || evt.id || `${type}:${evt.leaveId}:${new Date(when).getTime()}`
           
           // Check if this exact event already exists to prevent duplicates
           const exists = prev.some(e => 
             e.type === type && 
             e.leaveId === evt.leaveId && 
             e.userId === evt.userId &&
-            Math.abs(new Date(e.at).getTime() - new Date(evt.at || evt.timestamp || new Date()).getTime()) < 1000
+            Math.abs(new Date(e.at).getTime() - new Date(when).getTime()) < 2000
           )
           
           if (exists) {
@@ -178,14 +182,17 @@ export default function LeavesPage() {
             return prev
           }
           
-          return ([{
+          const newEvent = {
             id: uniqueId,
             type,
             userId: evt.userId,
             leaveId: evt.leaveId,
-            at: evt.at || evt.timestamp || new Date().toISOString(),
+            at: when,
             message: evt.message,
-          }, ...prev]).slice(0, 25)
+          }
+          
+          console.log('[LeavesPage] Adding new event:', newEvent)
+          return ([newEvent, ...prev]).slice(0, 25)
         })
         
         // Reflect status change in user leave history slice when approved/rejected
@@ -212,7 +219,7 @@ export default function LeavesPage() {
     } catch (err) {
       console.error('[LeavesPage] Socket setup error:', err)
     }
-  }, [companyId, designationId, userId, dispatch])
+  }, [companyId, userId, designationId, dispatch])
 
   const getStatusBadge = (isActive) => {
     return isActive 

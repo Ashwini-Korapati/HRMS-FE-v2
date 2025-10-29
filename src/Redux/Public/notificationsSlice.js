@@ -310,6 +310,7 @@ export const startNotifications = createAsyncThunk(
             })
           );
           // Leave events should appear in notification bell - fall through to add
+          console.log('[notificationsSlice] Leave event routed:', { type: t, leaveId: evt.leaveId, userId: evt.userId });
         }
 
         // If this is a notification.created event, refresh DB feed and count immediately
@@ -331,9 +332,12 @@ export const startNotifications = createAsyncThunk(
             t === 'leave.rejected' ||
             t === 'project.member_added' ||
             t === 'employee.onboarded' ||
-            t === 'profile.avatar.updated') {
+            t === 'profile.avatar.updated' ||
+            t === 'attendance.check_in' ||
+            t === 'attendance.check_out') {
           // Persist normalized notification for UI display
           const normalized = normalizeNotification(evt);
+          console.log('[notificationsSlice] Adding to notification bell:', { id: normalized.id, type: normalized.type, title: normalized.title });
           dispatch(eventReceived(normalized));
         }
       } catch (err) {
@@ -425,9 +429,24 @@ const notificationsSlice = createSlice({
       })
       .addCase(fetchFeed.fulfilled, (state, action) => {
         if (Array.isArray(action.payload)) {
-          // merge without duplicates by id
+          // Normalize and merge REST API items without duplicates by id
           const existing = new Set(state.items.map((i) => i.id));
-          const fresh = action.payload.filter((i) => !existing.has(i.id));
+          const fresh = action.payload
+            .filter((i) => !existing.has(i.id))
+            .map((item) => ({
+              // Ensure all fields present for SmartNavbar rendering
+              id: item.id,
+              title: item.title || 'Notification',
+              message: item.message || '',
+              type: item.type || 'INFO',
+              isRead: !!item.isRead,
+              createdAt: item.createdAt || new Date().toISOString(),
+              companyId: item.companyId,
+              userId: item.userId,
+              designationId: item.designationId,
+              parentDesignationId: item.metadata?.designationParentId,
+              metadata: item.metadata || {},
+            }));
           state.items = [...fresh, ...state.items].slice(0, 200);
         }
       })

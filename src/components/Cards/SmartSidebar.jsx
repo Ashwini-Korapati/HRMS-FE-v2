@@ -282,7 +282,7 @@ export default function SmartSidebar({ items, className = "", onSelect, basePath
 					<aside
 						onMouseEnter={handleMouseEnter}
 						onMouseLeave={handleMouseLeave}
-						className={`group fixed top-12 left-0 bottom-0 z-[65] bg-neutral-50/40 dark:bg-transparent backdrop-blur supports-[backdrop-filter]:bg-neutral-50/60 dark:supports-[backdrop-filter]:bg-neutral-950/40 border-r border-orange-500/20 dark:border-orange-500/60 transition-all duration-300 ${
+						className={`group fixed top-12 left-0 bottom-0 z-[65] bg-white dark:bg-black backdrop-blur supports-[backdrop-filter]:bg-white/90 dark:supports-[backdrop-filter]:bg-black/80 border-r border-orange-500/20 dark:border-orange-500/60 transition-all duration-300 ${
 				mobileOpen ? 'translate-x-0' : '-translate-x-full'
 					} lg:translate-x-0 lg:block ${className}`}
 					>

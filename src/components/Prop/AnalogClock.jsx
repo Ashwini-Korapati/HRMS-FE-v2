@@ -10,7 +10,10 @@ export default function AnalogClock() {
   const auth = useSelector((s) => s.auth);
   const companyId = auth?.company?.id;
   const userId = auth?.user?.id;
-  const designationId = auth?.user?.designationId || auth?.user?.designation?.id || auth?.user?.designationParentId;
+  const designationId =
+    auth?.user?.designationId ||
+    auth?.user?.designation?.id ||
+    auth?.user?.designationParentId;
   const role = (auth?.user?.role || "").toUpperCase();
   const todayKey = useMemo(() => {
     const d = new Date();
@@ -85,7 +88,7 @@ export default function AnalogClock() {
     return (
       <div
         key={i}
-        className={`absolute ${tickWidth} ${tickHeight} bg-black`}
+        className={`absolute ${tickWidth} ${tickHeight} bg-black dark:bg-white transition-colors`}
         style={{
           left: `${x}%`,
           top: `${y}%`,
@@ -96,8 +99,8 @@ export default function AnalogClock() {
   });
 
   return (
-    <div className="  bg-white  p-4 rounded-2xl border border-orange-500 shadow-sm">
-      <div className="w-64 h-64 bg-white rounded-2xl border border-orange-500 p-6 flex flex-col items-center justify-center">
+    <div className="bg-white dark:bg-black p-4 rounded-2xl border border-orange-500/20 dark:border-orange-500/40 hover:border-orange-500/60 dark:hover:border-orange-500/80 hover:shadow-[0_0_20px_rgba(249,115,22,0.15)] dark:hover:shadow-[0_0_30px_rgba(249,115,22,0.2)] transition-all duration-300">
+      <div className="w-64 h-64 bg-white dark:bg-black rounded-2xl border border-orange-500/20 dark:border-orange-500/40 p-6 flex flex-col items-center justify-center transition-colors">
         {/* Clock Container */}
         <div className="relative w-full h-full flex items-center justify-center">
           <div className="relative w-48 h-48">
@@ -105,11 +108,11 @@ export default function AnalogClock() {
             <div className="absolute inset-0">{tickMarks}</div>
 
             {/* Clock Center Dot */}
-            <div className="absolute top-1/2 left-1/2 w-3 h-3 bg-black rounded-full transform -translate-x-1/2 -translate-y-1/2 z-30" />
+            <div className="absolute top-1/2 left-1/2 w-3 h-3 bg-black dark:bg-white rounded-full transform -translate-x-1/2 -translate-y-1/2 z-30 transition-colors" />
 
             {/* Hour Hand */}
             <div
-              className="absolute top-1/2 left-1/2 w-1 bg-black rounded-full origin-bottom z-20 transition-transform duration-1000 ease-in-out"
+              className="absolute top-1/2 left-1/2 w-1 bg-black dark:bg-white rounded-full origin-bottom z-20 transition-transform duration-1000 ease-in-out"
               style={{
                 height: "60px",
                 transform: `translate(-50%, -100%) rotate(${hourAngle}deg)`,
@@ -118,7 +121,7 @@ export default function AnalogClock() {
 
             {/* Minute Hand */}
             <div
-              className="absolute top-1/2 left-1/2 w-0.5 bg-black rounded-full origin-bottom z-20 transition-transform duration-1000 ease-in-out"
+              className="absolute top-1/2 left-1/2 w-0.5 bg-black dark:bg-white rounded-full origin-bottom z-20 transition-transform duration-1000 ease-in-out"
               style={{
                 height: "80px",
                 transform: `translate(-50%, -100%) rotate(${minuteAngle}deg)`,
@@ -127,7 +130,7 @@ export default function AnalogClock() {
 
             {/* Second Hand */}
             <div
-              className="absolute top-1/2 left-1/2 w-0.5 bg-orange-500 rounded-full origin-bottom z-20 transition-transform duration-75 ease-out"
+              className="absolute top-1/2 left-1/2 w-0.5 bg-black dark:bg-white rounded-full origin-bottom z-20 transition-transform duration-75 ease-out"
               style={{
                 height: "85px",
                 transform: `translate(-50%, -100%) rotate(${secondAngle}deg)`,
@@ -135,8 +138,8 @@ export default function AnalogClock() {
             />
 
             <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-center z-10">
-              <div className="bg-gray-900/80 backdrop-blur-sm px-3 py-1 rounded-md">
-                <div className="text-white text-sm font-normal tracking-wide">
+              <div className="bg-white dark:bg-black px-3 py-1 rounded-md border border-orange-500/20 dark:border-orange-500/40">
+                <div className="text-sm font-normal tracking-wide" style={{ color: 'var(--text-strong)' }}>
                   {dayOfWeek} {digitalTime}
                 </div>
               </div>
@@ -146,78 +149,147 @@ export default function AnalogClock() {
           {/* Toggle container moved below the clock */}
         </div>
       </div>
-            <div className="mt-4 w-full flex flex-col items-center gap-2">
+      <div className="mt-4 w-full flex flex-col items-center gap-2">
         <button
           disabled={isSubmitting || !companyId}
           onClick={async () => {
-            if (!companyId) return
-            setIsSubmitting(true)
-            setLastError('')
+            if (!companyId) return;
+            setIsSubmitting(true);
+            setLastError("");
             try {
               if (!checkedIn) {
-                  // Determine if this is the first check-in of the day
-                  const isFirstCheckIn = !attendanceId || !checkInAt
-                  const res = await dispatch(checkIn({ companyId, userId, role, attendanceId, isFirstCheckIn }))
-                if (res.error) throw new Error(res.error.message)
-                const payload = res.payload || {}
-                const ts = payload.checkInTime ? new Date(payload.checkInTime) : new Date()
-                setCheckedIn(true)
-                setCheckInAt(ts)
-                setCheckOutAt(null)
-                  const newAttendanceId = payload.attendanceId || payload.id || attendanceId
-                  setAttendanceId(newAttendanceId)
-                  persist({ checkedIn: true, checkInAt: ts, checkOutAt: null, lastAttendanceId: newAttendanceId })
-                  // Ask gateway to publish live snapshot for this designation
-                  if (designationId) requestDesignationSnapshot({ designationId, companyId })
+                // Determine if this is the first check-in of the day
+                const isFirstCheckIn = !attendanceId || !checkInAt;
+                const res = await dispatch(
+                  checkIn({
+                    companyId,
+                    userId,
+                    role,
+                    attendanceId,
+                    isFirstCheckIn,
+                  })
+                );
+                if (res.error) throw new Error(res.error.message);
+                const payload = res.payload || {};
+                const ts = payload.checkInTime
+                  ? new Date(payload.checkInTime)
+                  : new Date();
+                setCheckedIn(true);
+                setCheckInAt(ts);
+                setCheckOutAt(null);
+                const newAttendanceId =
+                  payload.attendanceId || payload.id || attendanceId;
+                setAttendanceId(newAttendanceId);
+                persist({
+                  checkedIn: true,
+                  checkInAt: ts,
+                  checkOutAt: null,
+                  lastAttendanceId: newAttendanceId,
+                });
+                // Ask gateway to publish live snapshot for this designation
+                if (designationId)
+                  requestDesignationSnapshot({ designationId, companyId });
               } else {
-                  // Determine if this is the first check-out of the day
-                  const isFirstCheckOut = !checkOutAt && !!checkInAt
-                  const res = await dispatch(checkOut({ companyId, userId, role, attendanceId, isFirstCheckOut }))
-                if (res.error) throw new Error(res.error.message)
-                const payload = res.payload || {}
-                const ts = payload.checkOutTime ? new Date(payload.checkOutTime) : new Date()
-                setCheckedIn(false)
-                setCheckOutAt(ts)
-                  const keepAttendanceId = payload.attendanceId || payload.id || attendanceId
-                  persist({ checkedIn: false, checkInAt, checkOutAt: ts, lastAttendanceId: keepAttendanceId })
-                  // Ask gateway to publish live snapshot for this designation
-                  if (designationId) requestDesignationSnapshot({ designationId, companyId })
+                // Determine if this is the first check-out of the day
+                const isFirstCheckOut = !checkOutAt && !!checkInAt;
+                const res = await dispatch(
+                  checkOut({
+                    companyId,
+                    userId,
+                    role,
+                    attendanceId,
+                    isFirstCheckOut,
+                  })
+                );
+                if (res.error) throw new Error(res.error.message);
+                const payload = res.payload || {};
+                const ts = payload.checkOutTime
+                  ? new Date(payload.checkOutTime)
+                  : new Date();
+                setCheckedIn(false);
+                setCheckOutAt(ts);
+                const keepAttendanceId =
+                  payload.attendanceId || payload.id || attendanceId;
+                persist({
+                  checkedIn: false,
+                  checkInAt,
+                  checkOutAt: ts,
+                  lastAttendanceId: keepAttendanceId,
+                });
+                // Ask gateway to publish live snapshot for this designation
+                if (designationId)
+                  requestDesignationSnapshot({ designationId, companyId });
               }
             } catch (e) {
-              setLastError(e?.message || 'Request failed')
+              setLastError(e?.message || "Request failed");
             } finally {
-              setIsSubmitting(false)
+              setIsSubmitting(false);
             }
           }}
           className={
-            `relative w-40 h-10 rounded-full border transition-all duration-300 ` +
+            `relative w-40 h-10 rounded-full border transition-all duration-300 hover:shadow-[0_0_18px_rgba(249,115,22,0.2)] ` +
             (checkedIn
-              ? 'bg-green-600/90 border-green-700 shadow-[0_0_0_3px_rgba(16,185,129,0.25)]'
-              : 'bg-neutral-800/90 border-neutral-900 shadow-[0_0_0_3px_rgba(0,0,0,0.25)]')
+              ? "bg-green-600/90 border-green-500 hover:border-green-400"
+              : "bg-orange-600/90 border-orange-500 hover:border-orange-400")
           }
         >
-          <span className={`absolute inset-0 flex items-center justify-${checkedIn ? 'end' : 'start'} px-1.5`}>
-            <span className={`w-8 h-8 rounded-full bg-white shadow transition-transform duration-300 ${isSubmitting ? 'scale-95' : 'scale-100'}`}/>
+          <span
+            className={`absolute inset-0 flex items-center justify-${
+              checkedIn ? "end" : "start"
+            } px-1.5 z-10`}
+          >
+            <span
+              className={`w-8 h-8 rounded-full bg-white dark:bg-black border border-orange-500/30 shadow transition-transform duration-300 ${
+                isSubmitting ? "scale-95" : "scale-100"
+              }`}
+            />
           </span>
-          <span className="absolute left-3 top-1/2 -translate-y-1/2 text-[11px] font-medium text-white opacity-80 select-none">
-            {checkedIn ? 'Checked In' : 'Check In'}
+          <span className="absolute left-3 top-1/2 -translate-y-1/2 text-[11px] font-medium text-white opacity-80 select-none z-0">
+            {checkedIn ? "Checked In" : "Check In"}
           </span>
-          <span className="absolute right-3 top-1/2 -translate-y-1/2 text-[11px] font-medium text-white opacity-80 select-none">
-            {checkedIn ? 'Check Out' : ''}
+          <span className="absolute right-3 top-1/2 -translate-y-1/2 text-[11px] font-medium text-white opacity-80 select-none z-0">
+            {checkedIn ? "Check Out" : ""}
           </span>
-          {isSubmitting && <span className="absolute inset-0 rounded-full animate-ping bg-white/10"/>}
+          {isSubmitting && (
+            <span className="absolute inset-0 rounded-full animate-ping bg-white/10" />
+          )}
         </button>
 
-        <div className="text-[11px] text-neutral-700 mt-18">
+        <div className="text-xs font-medium" style={{ color: 'var(--text)' }}>
+          {time.toLocaleDateString("en-US", {
+            weekday: "long",
+            year: "numeric",
+            month: "long",
+            day: "numeric",
+          })}
+        </div>
+
+        <div className="text-[11px] text-neutral-700 dark:text-neutral-200 mt-3 text-center">
           {checkedIn && checkInAt ? (
-            <span>In: {checkInAt.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>
+            <span>
+              In:{" "}
+              {checkInAt.toLocaleTimeString([], {
+                hour: "2-digit",
+                minute: "2-digit",
+              })}
+            </span>
           ) : checkOutAt ? (
-            <span>Out: {checkOutAt.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>
+            <span>
+              Out:{" "}
+              {checkOutAt.toLocaleTimeString([], {
+                hour: "2-digit",
+                minute: "2-digit",
+              })}
+            </span>
           ) : (
-            <span className="mb-20">Ready</span>
+            <span>Ready</span>
           )}
         </div>
-        {lastError && <div className="text-[10px] text-rose-600">{lastError}</div>}
+        {lastError && (
+          <div className="text-[10px] text-rose-600 dark:text-rose-300">
+            {lastError}
+          </div>
+        )}
       </div>
     </div>
   );

@@ -5,17 +5,36 @@ import { selectThemeMode, selectEffectiveThemeMode, setMode, setEffectiveMode } 
 const ThemeContext = createContext({ mode: "device", effectiveMode: "light", setMode: () => {} })
 
 function applyTheme(mode, mql) {
+  if (typeof document === 'undefined') return mode
   const root = document.documentElement
-  const effective = mode === "device" ? (mql.matches ? "dark" : "light") : mode
+  const body = document.body
+  const prefersDark = mql?.matches ?? false
+  const effective = mode === "device" ? (prefersDark ? "dark" : "light") : mode
+  const colorScheme = effective === "dark" ? "dark" : "light"
+
   root.setAttribute("data-theme", effective)
-  // Also toggle Tailwind dark class for components using dark: variants
-  if (effective === "dark") root.classList.add("dark")
-  else root.classList.remove("dark")
+  root.style.colorScheme = colorScheme
+  if (body) {
+    body.setAttribute("data-theme", effective)
+    body.style.colorScheme = colorScheme
+  }
+
+  if (effective === "dark") {
+    root.classList.add("dark")
+    if (body) body.classList.add("dark")
+  } else {
+    root.classList.remove("dark")
+    if (body) body.classList.remove("dark")
+  }
+
   return effective
 }
 
 export function ThemeProvider({ children }) {
-  const systemMql = useMemo(() => window.matchMedia("(prefers-color-scheme: dark)"), [])
+  const systemMql = useMemo(() => {
+    if (typeof window === 'undefined' || typeof window.matchMedia !== 'function') return null
+    return window.matchMedia("(prefers-color-scheme: dark)")
+  }, [])
   const dispatch = useDispatch()
   const mode = useSelector(selectThemeMode)
   const effectiveMode = useSelector(selectEffectiveThemeMode)
@@ -28,15 +47,20 @@ export function ThemeProvider({ children }) {
 
   // Listen to OS changes when in device mode
   useEffect(() => {
-    if (mode !== 'device') return
+    if (mode !== 'device' || !systemMql) return
     const handler = () => {
       const eff = applyTheme('device', systemMql)
       dispatch(setEffectiveMode(eff))
     }
-    systemMql.addEventListener ? systemMql.addEventListener('change', handler) : systemMql.addListener(handler)
-    return () => {
-      systemMql.removeEventListener ? systemMql.removeEventListener('change', handler) : systemMql.removeListener(handler)
+    if (systemMql.addEventListener) {
+      systemMql.addEventListener('change', handler)
+      return () => systemMql.removeEventListener('change', handler)
     }
+    if (systemMql.addListener) {
+      systemMql.addListener(handler)
+      return () => systemMql.removeListener(handler)
+    }
+    return undefined
   }, [mode, systemMql, dispatch])
 
   const value = useMemo(() => ({ mode, effectiveMode, setMode: (m) => dispatch(setMode(m)) }), [mode, effectiveMode, dispatch])

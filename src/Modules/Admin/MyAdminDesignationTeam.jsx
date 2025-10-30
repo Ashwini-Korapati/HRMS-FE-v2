@@ -97,8 +97,8 @@ export default function MyAdminDesignationTeam() {
   return (
     <div className="flex h-[calc(100vh-80px)] overflow-hidden bg-gradient-to-br from-white via-neutral-50 to-orange-50">
       {/* Left: Designation picker */}
-      <aside className="relative w-72 md:w-80 border-r border-orange-200 bg-white/80 backdrop-blur-sm flex flex-col">
-        <header className="sticky top-0 z-10 bg-white/80 backdrop-blur-sm border-b border-orange-100 px-3 py-3">
+      <aside className="relative w-72 md:w-80 border-r border-orange-200 bg-white dark:bg-neutral-900 flex flex-col">
+        <header className="sticky top-0 z-10 bg-white dark:bg-neutral-900 border-b border-orange-100 px-3 py-3">
           <div className="flex items-center justify-between">
             <h2 className="text-sm font-semibold text-orange-700 flex items-center gap-2">
               <Layers size={16} /> Designations
@@ -143,7 +143,7 @@ export default function MyAdminDesignationTeam() {
             </button>
           ))}
         </div>
-        <footer className="sticky bottom-0 z-10 bg-white/90 backdrop-blur-sm border-t border-orange-100 px-3 py-2 flex items-center justify-between text-[11px] text-neutral-600">
+        <footer className="sticky bottom-0 z-10 bg-white dark:bg-neutral-900 border-t border-orange-100 px-3 py-2 flex items-center justify-between text-[11px] text-neutral-600">
           <Link to={`/${companyUuid}/designations/list`} className="text-orange-700 hover:text-orange-900 font-medium">
             Open Architecture
           </Link>
@@ -184,8 +184,8 @@ export default function MyAdminDesignationTeam() {
                 </span>
               </div>
 
-              <div className="border border-orange-200 rounded-2xl overflow-hidden bg-white/80 backdrop-blur-sm">
-                <div className="px-4 py-3 border-b border-orange-100 bg-white/60">
+              <div className="border border-orange-200 rounded-2xl overflow-hidden bg-white dark:bg-neutral-900">
+                <div className="px-4 py-3 border-b border-orange-100 bg-white dark:bg-neutral-900">
                   {loading ? (
                     <div className="h-6 w-48 bg-neutral-100 rounded animate-pulse" />
                   ) : error ? (

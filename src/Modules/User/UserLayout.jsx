@@ -18,7 +18,7 @@ function LayoutShell() {
     console.debug('[UserLayout] theme mode', { mode, effectiveMode })
   }, [mode, effectiveMode])
   return (
-    <div className="min-h-screen bg-gradient-to-br from-neutral-50 via-white to-neutral-100 text-neutral-900 dark:from-neutral-950 dark:via-neutral-950 dark:to-neutral-900 dark:text-neutral-100 transition-colors">
+  <div className="min-h-screen bg-white text-neutral-900 dark:bg-black dark:text-neutral-50 transition-colors">
       <SmartNavbar logo="Smart HR" userName={user?.name || user?.email || 'User'} themeMode={mode} onThemeChange={setMode} />
       {/* Offset for fixed navbar (48px). Left padding is controlled by --sidebar-padding set by SmartSidebar. */}
       <div className="flex min-h-0 pt-12" style={{ paddingLeft: 'var(--sidebar-padding, 0px)' }}>

@@ -74,6 +74,16 @@ function ToastContainer({ toasts, onRemoveToast }) {
   )
 }
 
+// Field Component
+function Field({ label, children }) {
+  return (
+    <div>
+      <label className="text-xs text-neutral-500 mb-1 block">{label}</label>
+      {children}
+    </div>
+  )
+}
+
 export default function UserProfilePage() {
   const dispatch = useDispatch()
   const auth = useSelector(selectAuthState)
@@ -97,6 +107,7 @@ export default function UserProfilePage() {
   })
   
   const [formInitialized, setFormInitialized] = useState(false)
+  const [toast, setToast] = useState('')
 
   // Toast management functions
   const addToast = (message, type = 'success', details = null) => {
@@ -230,15 +241,6 @@ export default function UserProfilePage() {
     }
   }
 
-  const formatSalary = (salary) => {
-    if (!salary) return '-'
-    return new Intl.NumberFormat('en-IN', {
-      style: 'currency',
-      currency: 'INR',
-      maximumFractionDigits: 0
-    }).format(salary)
-  }
-
   const formatGender = (gender) => {
     const genderMap = {
       'MALE': 'Male',
@@ -306,48 +308,10 @@ export default function UserProfilePage() {
     }
   }
 
-  const styles = `
-    @keyframes fade-in {
-      from { opacity: 0; transform: translateY(10px); }
-      to { opacity: 1; transform: translateY(0); }
-    }
-    @keyframes scale-in {
-      from { opacity: 0; transform: scale(0.95); }
-      to { opacity: 1; transform: scale(1); }
-    }
-    @keyframes float {
-      0%, 100% { transform: translateY(0px); }
-      50% { transform: translateY(-5px); }
-    }
-    @keyframes glow {
-      0%, 100% { box-shadow: 0 0 20px rgba(249, 115, 22, 0.1); }
-      50% { box-shadow: 0 0 30px rgba(249, 115, 22, 0.2); }
-    }
-    .animate-fade-in { animation: fade-in 0.3s ease-out; }
-    .animate-scale-in { animation: scale-in 0.2s ease-out; }
-    .animate-float { animation: float 3s ease-in-out infinite; }
-    .animate-glow { animation: glow 2s ease-in-out infinite; }
-    .gradient-border {
-      background: linear-gradient(135deg, #f97316, #ec4899, #8b5cf6);
-      padding: 1px;
-      border-radius: 16px;
-    }
-    .glass-effect {
-      backdrop-filter: blur(16px);
-      background: rgba(255, 255, 255, 0.1);
-      border: 1px solid rgba(255, 255, 255, 0.2);
-    }
-    .clickable {
-      cursor: pointer;
-      transition: all 0.2s ease-in-out;
-    }
-    .clickable:hover {
-      transform: translateY(-2px);
-    }
-  `
-
   return (
     <div className="space-y-4">
+      <ToastContainer toasts={toasts} onRemoveToast={removeToast} />
+      
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-lg font-semibold">My Profile</h1>
@@ -355,7 +319,6 @@ export default function UserProfilePage() {
         </div>
         <div className="flex items-center gap-2">
           <button
-            ref={changeBtnRef}
             onClick={() => setPwOpen(v => !v)}
             className="px-3 py-1.5 rounded-md text-xs border border-orange-500/40 text-orange-700 hover:bg-orange-50 dark:text-orange-300 dark:hover:bg-orange-500/10"
           >
@@ -366,7 +329,7 @@ export default function UserProfilePage() {
           ) : (
             <div className="flex items-center gap-2">
               <button disabled={loading==='loading'} onClick={onSave} className="px-3 py-1.5 rounded-md text-xs bg-orange-600 text-white hover:bg-orange-700 disabled:opacity-60">Save</button>
-              <button onClick={() => { setEditing(false); setPwError('') }} className="px-3 py-1.5 rounded-md text-xs border border-neutral-300 text-neutral-700 hover:bg-neutral-100 dark:border-neutral-600 dark:text-neutral-200 dark:hover:bg-neutral-800/50">Cancel</button>
+              <button onClick={onCancel} className="px-3 py-1.5 rounded-md text-xs border border-neutral-300 text-neutral-700 hover:bg-neutral-100 dark:border-neutral-600 dark:text-neutral-200 dark:hover:bg-neutral-800/50">Cancel</button>
             </div>
           )}
         </div>
@@ -397,29 +360,14 @@ export default function UserProfilePage() {
                         onChange={async (e) => {
                           const file = e.target.files?.[0]
                           if (!file) return
-                          try {
-                            const res = await dispatch(uploadOwnAvatar({ companyId, userId, file }))
-                            if (res?.type?.endsWith('fulfilled')) setToast('Avatar updated')
-                            else setToast(res?.error?.message || 'Failed to update avatar')
-                          } catch (err) {
-                            setToast(err.message || 'Failed to update avatar')
-                          } finally {
-                            e.target.value = ''
-                          }
+                          await handleAvatarUpload(file)
+                          e.target.value = ''
                         }}
                       />
                     </label>
                     {avatarUrl ? (
                       <button
-                        onClick={async () => {
-                          try {
-                            const res = await dispatch(deleteOwnAvatar({ companyId, userId }))
-                            if (res?.type?.endsWith('fulfilled')) setToast('Avatar removed')
-                            else setToast(res?.error?.message || 'Failed to remove avatar')
-                          } catch (err) {
-                            setToast(err.message || 'Failed to remove avatar')
-                          }
-                        }}
+                        onClick={handleAvatarRemove}
                         className="px-2 py-1 rounded-md text-[11px] bg-white/90 text-neutral-800 border border-neutral-300"
                       >
                         Remove
@@ -429,61 +377,22 @@ export default function UserProfilePage() {
                 </div>
               </div>
             </div>
-
-            {/* Details Card */}
-            <div className="xl:col-span-2">
-              <div className="gradient-border">
-                <div className="rounded-2xl bg-white/80 dark:bg-neutral-800/80 backdrop-blur-xl p-6 shadow-xl">
-                  <h3 className="text-xl font-bold bg-gradient-to-r from-gray-800 to-gray-600 dark:from-white dark:to-gray-300 bg-clip-text text-transparent mb-6">
-                    Personal Details
-                  </h3>
-                  
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    {/* Personal Information */}
-                    <div className="space-y-4">
-                      <h4 className="font-semibold text-gray-800 dark:text-gray-200 flex items-center gap-2">
-                        <User size={16} className="text-orange-500" />
-                        Personal Info
-                      </h4>
-                      
-                      <div>
-                        <label className="text-xs text-gray-500 dark:text-gray-400 mb-1 block">Gender</label>
-                        {!editing ? (
-                          <div className="px-4 py-3 rounded-xl bg-gray-50 dark:bg-neutral-700/50 border border-gray-200 dark:border-neutral-600 text-gray-800 dark:text-gray-200 flex items-center gap-2">
-                            <VenetianMask size={14} className="text-orange-500" />
-                            {formatGender(profile.gender)}
-                          </div>
-                        ) : (
-                          <select
-                            value={form.gender}
-                            onChange={(e) => setForm(f => ({ ...f, gender: e.target.value }))}
-                            className="w-full px-4 py-3 rounded-xl border border-orange-300 bg-white dark:bg-neutral-700 text-gray-800 dark:text-gray-200 focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all"
-                          >
-                            <option value="">Select Gender</option>
-                            <option value="MALE">Male</option>
-                            <option value="FEMALE">Female</option>
-                            <option value="OTHER">Other</option>
-                          </select>
-                        )}
-                      </div>
-
-                      <div>
-                        <label className="text-xs text-gray-500 dark:text-gray-400 mb-1 block">Date of Birth</label>
-                        {!editing ? (
-                          <div className="px-4 py-3 rounded-xl bg-gray-50 dark:bg-neutral-700/50 border border-gray-200 dark:border-neutral-600 text-gray-800 dark:text-gray-200 flex items-center gap-2">
-                            <Cake size={14} className="text-orange-500" />
-                            {profile.dateOfBirth ? new Date(profile.dateOfBirth).toLocaleDateString() : 'Not provided'}
-                          </div>
-                        ) : (
-                          <input 
-                            type="date"
-                            value={form.dateOfBirth}
-                            onChange={(e) => setForm(f => ({ ...f, dateOfBirth: e.target.value }))}
-                            className="w-full px-4 py-3 rounded-xl border border-orange-300 bg-white dark:bg-neutral-700 text-gray-800 dark:text-gray-200 focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all"
-                          />
-                        )}
-                      </div>
-                    </div>
+          </div>
+          
+          <div className="flex-1">
+            <h2 className="text-lg font-semibold">
+              {profile?.firstName} {profile?.lastName}
+            </h2>
+            <p className="text-sm text-neutral-600 dark:text-neutral-400 flex items-center gap-1">
+              <Mail size={14} />
+              {profile?.email}
+            </p>
+            <p className="text-sm text-neutral-600 dark:text-neutral-400 flex items-center gap-1">
+              <Shield size={14} />
+              {profile?.role}
+            </p>
+          </div>
+        </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:flex-1">
           <Field label="Phone">

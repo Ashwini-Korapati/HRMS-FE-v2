@@ -637,7 +637,7 @@ export default function UsersListPage() {
             animate={{ opacity: 1, x: 0 }}
             className="text-3xl font-bold bg-gradient-to-r from-orange-600 via-rose-600 to-fuchsia-600 bg-clip-text text-transparent"
           >
-            Team Members
+           View All Users
           </motion.h1>
           <motion.p
             initial={{ opacity: 0, x: -20 }}

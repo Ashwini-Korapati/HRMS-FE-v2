@@ -47,7 +47,6 @@ import CreateUserPage from "./Modules/Admin/CreateUserPage";
 import ImportUsersPage from "./Modules/Admin/ImportUsersPage";
 import DepartmentsListPage from "./Modules/Admin/DepartmentsListPage";
 import CreateDepartmentPage from "./Modules/Admin/CreateDepartmentPage";
-import DesignationsListPage from "./Modules/Admin/DesignationsListPage";
 import CreateDesignationPage from "./Modules/Admin/CreateDesignationPage";
 import ProjectsListPage from "./Modules/Admin/ProjectsListPage";
 import CreateProjectPage from "./Modules/Admin/CreateProjectPage";
@@ -195,7 +194,6 @@ function AppRoutes() {
           <Route path="departments/list" element={<DepartmentsListPage />} />
           <Route path="departments/create" element={<CreateDepartmentPage />} />
           <Route path="designations" element={<DesignationsPage />} />
-          <Route path="designations/list" element={<DesignationsListPage />} />
           <Route
             path="designations/create"
             element={<CreateDesignationPage />}

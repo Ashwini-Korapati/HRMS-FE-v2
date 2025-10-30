@@ -1,21 +1,13 @@
-import React from 'react'
+import React, { useEffect, useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { selectAuthState } from '../../Redux/Public/authSlice'
 import { fetchOwnProfile, updateOwnProfile, changeOwnPassword, uploadOwnAvatar, deleteOwnAvatar, selectAdminProfile, selectAdminProfileLoading } from '../../Redux/Public/adminUserProfileSlice'
 import SmartToster from '../../components/Prop/SmartToster'
 import { toAssetUrl } from '../../config/config'
-
-function Field({ label, children }) {
-  return (
-    <label className="block">
-      <span className="text-[11px] uppercase tracking-wide text-neutral-500">{label}</span>
-      <div className="mt-1">{children}</div>
-    </label>
-  )
-}
+import { User, Mail, Phone, MapPin, Calendar, Shield, Clock, Edit3, Key, Save, X, Building, VenetianMask, DollarSign, LogOut, Cake, Users, Target } from 'lucide-react'
 
 function SmartGlassModal({ open, onClose, children }) {
-  React.useEffect(() => {
+  useEffect(() => {
     if (!open) return
     const onKey = (e) => { if (e.key === 'Escape') onClose?.() }
     document.addEventListener('keydown', onKey)
@@ -25,15 +17,57 @@ function SmartGlassModal({ open, onClose, children }) {
   }, [open, onClose])
   if (!open) return null
   return (
-    <div className="fixed inset-0 z-[100]">
-      {/* Backdrop */}
-      <div className="absolute inset-0 bg-neutral-900/30 backdrop-blur-sm opacity-100 transition-opacity ease-out duration-200" onClick={onClose} />
-      {/* Dialog */}
-      <div className="absolute inset-0 grid place-items-center">
-        <div className="w-[92vw] max-w-sm md:max-w-md rounded-2xl border border-white/20 bg-white/80 dark:bg-neutral-900/70 backdrop-blur-xl shadow-2xl p-4 translate-y-0 opacity-100 transition-all ease-out duration-200">
+    <div className="fixed inset-0 z-[100] animate-fade-in">
+      <div className="absolute inset-0 bg-neutral-900/30 backdrop-blur-sm animate-fade-in" onClick={onClose} />
+      <div className="absolute inset-0 grid place-items-center p-4">
+        <div className="w-full max-w-md rounded-2xl border border-white/20 bg-white/80 dark:bg-neutral-900/70 backdrop-blur-xl shadow-2xl p-6 animate-scale-in">
           {children}
         </div>
       </div>
+    </div>
+  )
+}
+
+// Enhanced Toast System Component
+function ToastContainer({ toasts, onRemoveToast }) {
+  if (!toasts.length) return null
+
+  return (
+    <div className="fixed top-4 left-1/2 transform -translate-x-1/2 z-[1000] space-y-2 w-full max-w-md px-4">
+      {toasts.map((toast) => (
+        <div
+          key={toast.id}
+          className={`p-4 rounded-xl border-2 backdrop-blur-xl shadow-2xl animate-fade-in transition-all duration-300 ${
+            toast.type === 'error' 
+              ? 'bg-red-50/90 dark:bg-red-900/20 border-red-200 dark:border-red-800 text-red-800 dark:text-red-200' 
+              : 'bg-green-50/90 dark:bg-green-900/20 border-green-200 dark:border-green-800 text-green-800 dark:text-green-200'
+          }`}
+        >
+          <div className="flex items-start justify-between">
+            <div className="flex items-start gap-3 flex-1">
+              <div className={`w-6 h-6 rounded-full flex items-center justify-center flex-shrink-0 ${
+                toast.type === 'error' 
+                  ? 'bg-red-100 dark:bg-red-800 text-red-600 dark:text-red-300' 
+                  : 'bg-green-100 dark:bg-green-800 text-green-600 dark:text-green-300'
+              }`}>
+                {toast.type === 'error' ? '⚠️' : '✅'}
+              </div>
+              <div className="flex-1 min-w-0">
+                <p className="text-sm font-medium">{toast.message}</p>
+                {toast.details && (
+                  <p className="text-xs opacity-80 mt-1">{toast.details}</p>
+                )}
+              </div>
+            </div>
+            <button
+              onClick={() => onRemoveToast(toast.id)}
+              className="flex-shrink-0 w-5 h-5 rounded-full hover:bg-black/10 dark:hover:bg-white/10 flex items-center justify-center transition-colors ml-2"
+            >
+              <X size={14} />
+            </button>
+          </div>
+        </div>
+      ))}
     </div>
   )
 }
@@ -47,255 +81,771 @@ export default function UserProfilePage() {
   const companyId = auth?.company?.id
   const userId = auth?.user?.id
 
-  const [toast, setToast] = React.useState('')
-  const [editing, setEditing] = React.useState(false)
-  const [form, setForm] = React.useState({
+  const [toasts, setToasts] = useState([])
+  const [pwOpen, setPwOpen] = useState(false)
+  const [pw, setPw] = useState({ currentPassword: '', newPassword: '', confirm: '' })
+  const [pwError, setPwError] = useState('')
+  const [editing, setEditing] = useState(false)
+  const [form, setForm] = useState({
     phone: '',
     address: '',
     emergencyContact: { name: '', email: '', phone: '', relationship: '' },
+    gender: '',
+    dateOfBirth: '',
   })
+  
+  const [formInitialized, setFormInitialized] = useState(false)
 
-  const changeBtnRef = React.useRef(null)
-  const [pwOpen, setPwOpen] = React.useState(false)
-  const [pw, setPw] = React.useState({ currentPassword: '', newPassword: '', confirm: '' })
-  const [pwError, setPwError] = React.useState('')
+  // Toast management functions
+  const addToast = (message, type = 'success', details = null) => {
+    const id = Date.now().toString()
+    const toast = { id, message, type, details }
+    setToasts(prev => [toast, ...prev])
+    
+    // Auto remove after 5 seconds for success, 8 seconds for errors
+    const duration = type === 'error' ? 8000 : 5000
+    setTimeout(() => {
+      removeToast(id)
+    }, duration)
+  }
 
-  React.useEffect(() => {
+  const removeToast = (id) => {
+    setToasts(prev => prev.filter(toast => toast.id !== id))
+  }
+
+  const clearAllToasts = () => {
+    setToasts([])
+  }
+
+  useEffect(() => {
     if (!companyId || !userId) return
     dispatch(fetchOwnProfile({ companyId, userId }))
   }, [dispatch, companyId, userId])
 
-  React.useEffect(() => {
-    if (!profile) return
+  const avatarUrl = toAssetUrl(profile?.avatar)
+
+  useEffect(() => {
+    if (!profile || formInitialized) return
+    
     setForm({
       phone: profile.phone || '',
       address: profile.address || '',
-      emergencyContact: {
-        name: profile.emergencyContact?.name || '',
-        email: profile.emergencyContact?.email || '',
-        phone: profile.emergencyContact?.phone || '',
-        relationship: profile.emergencyContact?.relationship || ''
-      }
+      gender: profile.gender || '',
+      dateOfBirth: profile.dateOfBirth ? new Date(profile.dateOfBirth).toISOString().split('T')[0] : '',
+      emergencyContact: profile.emergencyContact ? {
+        name: profile.emergencyContact.name || '',
+        email: profile.emergencyContact.email || '',
+        phone: profile.emergencyContact.phone || '',
+        relationship: profile.emergencyContact.relationship || ''
+      } : { name: '', email: '', phone: '', relationship: '' }
     })
-  }, [profile])
+    setFormInitialized(true)
+  }, [profile, formInitialized])
+
+  useEffect(() => {
+    if (!editing) {
+      setFormInitialized(false)
+    }
+  }, [editing])
+
+  const transformGender = (gender) => {
+    if (!gender) return null
+    const genderMap = {
+      'MALE': 'Male',
+      'FEMALE': 'Female', 
+      'OTHER': 'Other'
+    }
+    return genderMap[gender] || gender
+  }
 
   const onSave = async () => {
     if (!companyId || !userId) return
     const payload = {
       phone: form.phone,
       address: form.address,
+      gender: transformGender(form.gender),
+      dateOfBirth: form.dateOfBirth,
       emergencyContact: form.emergencyContact,
     }
+    
     try {
       const res = await dispatch(updateOwnProfile({ companyId, userId, payload }))
       if (res?.type?.endsWith('fulfilled')) {
-        setToast('Profile updated successfully')
+        addToast('Profile updated successfully', 'success')
         setEditing(false)
+        dispatch(fetchOwnProfile({ companyId, userId }))
       } else {
-        setToast(res?.error?.message || 'Failed to update profile')
+        const errorMsg = res?.error?.message || 'Failed to update profile'
+        addToast('Update failed', 'error', errorMsg)
       }
     } catch (e) {
-      setToast(e.message || 'Failed to update profile')
+      addToast('Update failed', 'error', e.message || 'Failed to update profile')
     }
   }
 
   const onChangePassword = async () => {
     setPwError('')
-    if (!pw.currentPassword || !pw.newPassword) { setPwError('Please fill all fields'); return }
-    if (pw.newPassword !== pw.confirm) { setPwError('Passwords do not match'); return }
+    if (!pw.currentPassword || !pw.newPassword) { 
+      setPwError('Please fill all fields')
+      addToast('Password change failed', 'error', 'Please fill all fields')
+      return 
+    }
+    if (pw.newPassword !== pw.confirm) { 
+      setPwError('Passwords do not match')
+      addToast('Password change failed', 'error', 'Passwords do not match')
+      return 
+    }
     try {
       const res = await dispatch(changeOwnPassword({ companyId, userId, currentPassword: pw.currentPassword, newPassword: pw.newPassword }))
       if (res?.type?.endsWith('fulfilled')) {
-        setToast('Password changed successfully')
+        addToast('Password changed successfully', 'success')
         setPw({ currentPassword: '', newPassword: '', confirm: '' })
         setPwOpen(false)
       } else {
-        setToast(res?.error?.message || 'Failed to change password')
+        const errorMsg = res?.error?.message || 'Failed to change password'
+        addToast('Password change failed', 'error', errorMsg)
       }
     } catch (e) {
-      setToast(e.message || 'Failed to change password')
+      addToast('Password change failed', 'error', e.message || 'Failed to change password')
     }
   }
 
-  const avatarUrl = toAssetUrl(profile?.avatar)
+  const onCancel = () => {
+    setEditing(false)
+    if (profile) {
+      setForm({
+        phone: profile.phone || '',
+        address: profile.address || '',
+        gender: profile.gender || '',
+        dateOfBirth: profile.dateOfBirth ? new Date(profile.dateOfBirth).toISOString().split('T')[0] : '',
+        emergencyContact: profile.emergencyContact ? {
+          name: profile.emergencyContact.name || '',
+          email: profile.emergencyContact.email || '',
+          phone: profile.emergencyContact.phone || '',
+          relationship: profile.emergencyContact.relationship || ''
+        } : { name: '', email: '', phone: '', relationship: '' }
+      })
+    }
+  }
+
+  const formatSalary = (salary) => {
+    if (!salary) return '-'
+    return new Intl.NumberFormat('en-IN', {
+      style: 'currency',
+      currency: 'INR',
+      maximumFractionDigits: 0
+    }).format(salary)
+  }
+
+  const formatGender = (gender) => {
+    const genderMap = {
+      'MALE': 'Male',
+      'FEMALE': 'Female',
+      'OTHER': 'Other',
+      'Male': 'Male',
+      'Female': 'Female', 
+      'Other': 'Other'
+    }
+    return genderMap[gender] || gender || '-'
+  }
+
+  // Handle file upload with proper error handling
+  const handleAvatarUpload = async (file) => {
+    // Check file type
+    const allowedTypes = ['pdf', 'doc', 'docx', 'xls', 'xlsx', 'jpg', 'jpeg', 'png', 'gif']
+    const fileExtension = file.name.split('.').pop()?.toLowerCase()
+    
+    if (!fileExtension || !allowedTypes.includes(fileExtension)) {
+      const allowedTypesString = allowedTypes.map(type => `.${type}`).join(', ')
+      addToast(
+        'Invalid file type', 
+        'error', 
+        `File type .${fileExtension} is not allowed. Allowed types: ${allowedTypesString}`
+      )
+      return false
+    }
+
+    // Check file size (max 5MB)
+    const maxSize = 5 * 1024 * 1024 // 5MB in bytes
+    if (file.size > maxSize) {
+      addToast('File too large', 'error', 'Maximum file size is 5MB')
+      return false
+    }
+
+    try {
+      const res = await dispatch(uploadOwnAvatar({ companyId, userId, file }))
+      if (res?.type?.endsWith('fulfilled')) {
+        addToast('Avatar updated successfully!', 'success')
+        dispatch(fetchOwnProfile({ companyId, userId }))
+        return true
+      } else {
+        const errorMsg = res?.error?.message || 'Failed to update avatar'
+        addToast('Avatar update failed', 'error', errorMsg)
+        return false
+      }
+    } catch (err) {
+      addToast('Avatar update failed', 'error', err.message || 'Failed to update avatar')
+      return false
+    }
+  }
+
+  const handleAvatarRemove = async () => {
+    try {
+      const res = await dispatch(deleteOwnAvatar({ companyId, userId }))
+      if (res?.type?.endsWith('fulfilled')) {
+        addToast('Avatar removed successfully!', 'success')
+        dispatch(fetchOwnProfile({ companyId, userId }))
+      } else {
+        const errorMsg = res?.error?.message || 'Failed to remove avatar'
+        addToast('Avatar removal failed', 'error', errorMsg)
+      }
+    } catch (err) {
+      addToast('Avatar removal failed', 'error', err.message || 'Failed to remove avatar')
+    }
+  }
+
+  const styles = `
+    @keyframes fade-in {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    @keyframes scale-in {
+      from { opacity: 0; transform: scale(0.95); }
+      to { opacity: 1; transform: scale(1); }
+    }
+    @keyframes float {
+      0%, 100% { transform: translateY(0px); }
+      50% { transform: translateY(-5px); }
+    }
+    @keyframes glow {
+      0%, 100% { box-shadow: 0 0 20px rgba(249, 115, 22, 0.1); }
+      50% { box-shadow: 0 0 30px rgba(249, 115, 22, 0.2); }
+    }
+    .animate-fade-in { animation: fade-in 0.3s ease-out; }
+    .animate-scale-in { animation: scale-in 0.2s ease-out; }
+    .animate-float { animation: float 3s ease-in-out infinite; }
+    .animate-glow { animation: glow 2s ease-in-out infinite; }
+    .gradient-border {
+      background: linear-gradient(135deg, #f97316, #ec4899, #8b5cf6);
+      padding: 1px;
+      border-radius: 16px;
+    }
+    .glass-effect {
+      backdrop-filter: blur(16px);
+      background: rgba(255, 255, 255, 0.1);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+    }
+    .clickable {
+      cursor: pointer;
+      transition: all 0.2s ease-in-out;
+    }
+    .clickable:hover {
+      transform: translateY(-2px);
+    }
+  `
 
   return (
-    <div className="space-y-4">
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-lg font-semibold">My Profile</h1>
-          <p className="text-xs text-neutral-500">Personal details and settings</p>
-        </div>
-        <div className="flex items-center gap-2">
-          <button
-            ref={changeBtnRef}
-            onClick={() => setPwOpen(v => !v)}
-            className="px-3 py-1.5 rounded-md text-xs border border-orange-500/40 text-orange-700 hover:bg-orange-50 dark:text-orange-300 dark:hover:bg-orange-500/10"
-          >
-            Change Password
-          </button>
-          {!editing ? (
-            <button disabled={loading==='loading'} onClick={() => setEditing(true)} className="px-3 py-1.5 rounded-md text-xs border border-neutral-300 text-neutral-700 hover:bg-neutral-100 disabled:opacity-60 dark:border-neutral-600 dark:text-neutral-200 dark:hover:bg-neutral-800/50">Edit</button>
-          ) : (
-            <div className="flex items-center gap-2">
-              <button disabled={loading==='loading'} onClick={onSave} className="px-3 py-1.5 rounded-md text-xs bg-orange-600 text-white hover:bg-orange-700 disabled:opacity-60">Save</button>
-              <button onClick={() => { setEditing(false); setPwError('') }} className="px-3 py-1.5 rounded-md text-xs border border-neutral-300 text-neutral-700 hover:bg-neutral-100 dark:border-neutral-600 dark:text-neutral-200 dark:hover:bg-neutral-800/50">Cancel</button>
-            </div>
-          )}
-        </div>
+    <div className="min-h-screen bg-gradient-to-br from-orange-50 via-amber-50 to-rose-50 dark:from-neutral-900 dark:via-neutral-800 dark:to-neutral-900 p-4 md:p-6">
+      <style>{styles}</style>
+      
+      {/* Toast Container */}
+      <ToastContainer toasts={toasts} onRemoveToast={removeToast} />
+      
+      {/* Clear All Toasts Button - Only show when there are toasts */}
+      {toasts.length > 0 && (
+        <button
+          onClick={clearAllToasts}
+          className="fixed top-4 right-4 z-[1001] px-3 py-1.5 rounded-lg bg-gray-800/80 text-white text-xs backdrop-blur-sm hover:bg-gray-900/80 transition-colors clickable"
+        >
+          Clear All ({toasts.length})
+        </button>
+      )}
+
+      {/* Animated Background Elements */}
+      <div className="fixed inset-0 overflow-hidden pointer-events-none">
+        <div className="absolute -top-40 -right-32 w-80 h-80 bg-orange-200 rounded-full blur-3xl opacity-20 animate-float"></div>
+        <div className="absolute -bottom-40 -left-32 w-80 h-80 bg-rose-200 rounded-full blur-3xl opacity-20 animate-float" style={{animationDelay: '1.5s'}}></div>
+        <div className="absolute top-1/2 left-1/2 w-96 h-96 bg-amber-200 rounded-full blur-3xl opacity-10 animate-float" style={{animationDelay: '2.5s'}}></div>
       </div>
 
-      {/* Top card */}
-      <div className="rounded-xl border border-neutral-200 dark:border-neutral-800 bg-white/60 dark:bg-neutral-900/40 backdrop-blur p-4 flex flex-col md:flex-row gap-4">
-        <div className="flex items-start gap-4 md:w-1/3">
-          <div className="relative">
-            <div className="w-20 h-20 rounded-full bg-gradient-to-tr from-orange-200 to-amber-200 p-[2px]">
-              <div className="w-full h-full rounded-full bg-white overflow-hidden relative group">
-                {avatarUrl ? (
-                  <img src={avatarUrl} alt={profile?.firstName || 'Avatar'} className="w-full h-full object-cover" />
-                ) : (
-                  <div className="w-full h-full grid place-items-center text-lg font-semibold text-orange-700">
-                    {(profile?.firstName || profile?.email || 'U')[0]}
+      <div className="relative space-y-6 max-w-7xl mx-auto">
+        {/* Header */}
+        <header className="flex items-center justify-between animate-fade-in">
+          <div>
+            <h1 className="text-3xl font-bold bg-gradient-to-r from-orange-500 via-rose-500 to-purple-500 bg-clip-text text-transparent">
+              My Profile
+            </h1>
+            <p className="text-gray-600 dark:text-gray-400 text-sm mt-2">
+              Manage your personal information and preferences
+            </p>
+          </div>
+          <div className="flex items-center gap-3">
+            <button
+              onClick={() => setPwOpen(true)}
+              className="flex items-center gap-2 px-4 py-2 rounded-xl gradient-border hover:animate-glow transition-all duration-300 group clickable"
+            >
+              <div className="flex items-center gap-2 bg-white dark:bg-neutral-800 rounded-xl px-3 py-2 group-hover:bg-orange-50 dark:group-hover:bg-neutral-700 transition-colors">
+                <Key size={16} className="text-orange-600" />
+                <span className="text-sm font-medium text-gray-700 dark:text-gray-300">Password</span>
+              </div>
+            </button>
+            {!editing ? (
+              <button 
+                onClick={() => setEditing(true)}
+                className="flex items-center gap-2 px-4 py-2 rounded-xl bg-white dark:bg-neutral-800 border border-gray-200 dark:border-neutral-700 hover:border-orange-300 dark:hover:border-orange-600 text-gray-700 dark:text-gray-300 hover:text-orange-600 transition-all duration-300 clickable"
+              >
+                <Edit3 size={16} />
+                <span className="text-sm font-medium">Edit Profile</span>
+              </button>
+            ) : (
+              <div className="flex items-center gap-2">
+                <button 
+                  onClick={onSave}
+                  className="flex items-center gap-2 px-4 py-2 rounded-xl bg-gradient-to-r from-orange-500 to-rose-500 text-white hover:from-orange-600 hover:to-rose-600 transition-all duration-300 shadow-lg hover:shadow-xl clickable"
+                >
+                  <Save size={16} />
+                  <span className="text-sm font-medium">Save</span>
+                </button>
+                <button 
+                  onClick={onCancel}
+                  className="flex items-center gap-2 px-4 py-2 rounded-xl bg-white dark:bg-neutral-800 border border-gray-200 dark:border-neutral-700 hover:border-red-300 text-gray-700 dark:text-gray-300 hover:text-red-600 transition-all duration-300 clickable"
+                >
+                  <X size={16} />
+                  <span className="text-sm font-medium">Cancel</span>
+                </button>
+              </div>
+            )}
+          </div>
+        </header>
+
+        {loading === 'loading' ? (
+          <div className="gradient-border animate-pulse">
+            <div className="rounded-2xl bg-white/80 dark:bg-neutral-800/80 backdrop-blur-xl p-12 text-center shadow-xl">
+              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-orange-500 mx-auto"></div>
+              <p className="text-gray-600 dark:text-gray-400 mt-4">Loading profile...</p>
+            </div>
+          </div>
+        ) : !profile ? (
+          <div className="gradient-border">
+            <div className="rounded-2xl bg-white/80 dark:bg-neutral-800/80 backdrop-blur-xl p-12 text-center shadow-xl">
+              <div className="text-gray-400 text-4xl mb-4">👤</div>
+              <p className="text-gray-600 dark:text-gray-400">No profile data available</p>
+            </div>
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 xl:grid-cols-3 gap-6">
+            {/* Profile Card */}
+            <div className="xl:col-span-1 space-y-6">
+              <div className="gradient-border hover:animate-glow transition-all duration-500">
+                <div className="rounded-2xl bg-white/80 dark:bg-neutral-800/80 backdrop-blur-xl p-6 shadow-xl">
+                  <div className="flex flex-col items-center text-center">
+                    {/* Avatar */}
+                    <div className="relative mb-4">
+                      <div className="w-32 h-32 rounded-full bg-gradient-to-tr from-orange-400 via-rose-400 to-purple-400 p-1 shadow-2xl">
+                        <div className="w-full h-full rounded-full bg-white dark:bg-neutral-800 overflow-hidden relative group">
+                          {avatarUrl ? (
+                            <img 
+                              src={avatarUrl} 
+                              alt={profile?.firstName || 'Avatar'} 
+                              className="w-full h-full object-cover"
+                            />
+                          ) : (
+                            <div className="w-full h-full grid place-items-center text-2xl font-bold bg-gradient-to-br from-orange-100 to-rose-100 dark:from-neutral-700 dark:to-neutral-600 text-orange-600 dark:text-orange-400">
+                              {(profile?.firstName || profile?.email || 'U')[0]}
+                            </div>
+                          )}
+                          
+                          {/* Avatar Actions */}
+                          <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity rounded-full grid place-items-center">
+                            <div className="flex flex-col gap-2">
+                              <label className="px-3 py-1.5 rounded-full text-xs bg-white/95 text-gray-800 border border-gray-300 cursor-pointer hover:bg-white transition-colors clickable">
+                                📷 Change
+                                <input
+                                  type="file"
+                                  accept=".pdf,.doc,.docx,.xls,.xlsx,.jpg,.jpeg,.png,.gif"
+                                  className="hidden"
+                                  onChange={async (e) => {
+                                    const file = e.target.files?.[0]
+                                    if (!file) return
+                                    await handleAvatarUpload(file)
+                                    e.target.value = ''
+                                  }}
+                                />
+                              </label>
+                              {avatarUrl && (
+                                <button
+                                  onClick={handleAvatarRemove}
+                                  className="px-3 py-1.5 rounded-full text-xs bg-white/95 text-gray-800 border border-gray-300 hover:bg-white transition-colors clickable"
+                                >
+                                  🗑️ Remove
+                                </button>
+                              )}
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                      
+                      {/* Role Badge */}
+                      <div className="absolute -bottom-2 left-1/2 -translate-x-1/2 px-4 py-1.5 rounded-full bg-gradient-to-r from-orange-500 to-rose-500 text-white text-xs font-bold border-2 border-white dark:border-neutral-800 shadow-lg">
+                        {profile.role || auth?.user?.role || 'USER'}
+                      </div>
+                    </div>
+
+                    {/* User Info */}
+                    <h2 className="text-2xl font-bold bg-gradient-to-r from-gray-800 to-gray-600 dark:from-white dark:to-gray-300 bg-clip-text text-transparent">
+                      {profile.firstName} {profile.lastName}
+                    </h2>
+                    <div className="flex items-center gap-2 text-gray-600 dark:text-gray-400 mt-1">
+                      <Mail size={14} />
+                      <span className="text-sm">{profile.email}</span>
+                    </div>
+                    {profile.employeeId && (
+                      <div className="text-xs text-gray-500 dark:text-gray-500 bg-gray-100 dark:bg-neutral-700 px-3 py-1 rounded-full mt-2">
+                        ID: {profile.employeeId}
+                      </div>
+                    )}
+
+                    {/* Quick Stats */}
+                    <div className="grid grid-cols-2 gap-4 mt-6 w-full">
+                      <div className="text-center p-3 rounded-xl bg-orange-50 dark:bg-orange-900/20 border border-orange-200 dark:border-orange-800">
+                        <Phone size={16} className="mx-auto text-orange-600 dark:text-orange-400" />
+                        <div className="text-xs text-gray-600 dark:text-gray-400 mt-1">Phone</div>
+                        <div className="text-sm font-semibold text-gray-800 dark:text-gray-200">
+                          {profile.phone || 'Not set'}
+                        </div>
+                      </div>
+                      <div className="text-center p-3 rounded-xl bg-rose-50 dark:bg-rose-900/20 border border-rose-200 dark:border-rose-800">
+                        <Shield size={16} className="mx-auto text-rose-600 dark:text-rose-400" />
+                        <div className="text-xs text-gray-600 dark:text-gray-400 mt-1">Status</div>
+                        <div className="text-sm font-semibold text-gray-800 dark:text-gray-200">
+                          {profile.isActive ? 'Active' : 'Inactive'}
+                        </div>
+                      </div>
+                    </div>
                   </div>
-                )}
-                {/* Overlay controls */}
-                <div className="absolute inset-0 bg-neutral-900/30 opacity-0 group-hover:opacity-100 transition-opacity grid place-items-center">
-                  <div className="flex gap-2">
-                    <label className="px-2 py-1 rounded-md text-[11px] bg-white/90 text-neutral-800 border border-neutral-300 cursor-pointer">
-                      Change
-                      <input
-                        type="file"
-                        accept="image/*"
-                        className="hidden"
-                        onChange={async (e) => {
-                          const file = e.target.files?.[0]
-                          if (!file) return
-                          try {
-                            const res = await dispatch(uploadOwnAvatar({ companyId, userId, file }))
-                            if (res?.type?.endsWith('fulfilled')) setToast('Avatar updated')
-                            else setToast(res?.error?.message || 'Failed to update avatar')
-                          } catch (err) {
-                            setToast(err.message || 'Failed to update avatar')
-                          } finally {
-                            e.target.value = ''
-                          }
-                        }}
-                      />
-                    </label>
-                    {avatarUrl ? (
-                      <button
-                        onClick={async () => {
-                          try {
-                            const res = await dispatch(deleteOwnAvatar({ companyId, userId }))
-                            if (res?.type?.endsWith('fulfilled')) setToast('Avatar removed')
-                            else setToast(res?.error?.message || 'Failed to remove avatar')
-                          } catch (err) {
-                            setToast(err.message || 'Failed to remove avatar')
-                          }
-                        }}
-                        className="px-2 py-1 rounded-md text-[11px] bg-white/90 text-neutral-800 border border-neutral-300"
-                      >
-                        Remove
-                      </button>
-                    ) : null}
+                </div>
+              </div>
+
+              {/* Company & Department Info Card */}
+              <div className="gradient-border">
+                <div className="rounded-2xl bg-white/80 dark:bg-neutral-800/80 backdrop-blur-xl p-6 shadow-xl">
+                  <h3 className="font-semibold text-gray-800 dark:text-gray-200 mb-4 flex items-center gap-2">
+                    <Building size={18} className="text-orange-500" />
+                    Organization
+                  </h3>
+                  <div className="space-y-3">
+                    <div className="flex justify-between items-center py-2 border-b border-gray-100 dark:border-neutral-700">
+                      <span className="text-sm text-gray-600 dark:text-gray-400">Company</span>
+                      <span className="text-sm font-medium text-gray-800 dark:text-gray-200">
+                        {profile.company?.name || '-'}
+                      </span>
+                    </div>
+                    <div className="flex justify-between items-center py-2 border-b border-gray-100 dark:border-neutral-700">
+                      <span className="text-sm text-gray-600 dark:text-gray-400">Designation</span>
+                      <span className="text-sm font-medium text-gray-800 dark:text-gray-200">
+                        {profile.designation?.title || '-'}
+                      </span>
+                    </div>
+                    <div className="flex justify-between items-center py-2 border-b border-gray-100 dark:border-neutral-700">
+                      <span className="text-sm text-gray-600 dark:text-gray-400">Department</span>
+                      <span className="text-sm font-medium text-gray-800 dark:text-gray-200">
+                        {profile.department?.name || '-'}
+                      </span>
+                    </div>
+                    <div className="flex justify-between items-center py-2">
+                      <span className="text-sm text-gray-600 dark:text-gray-400">Joined</span>
+                      <span className="text-sm font-medium text-gray-800 dark:text-gray-200">
+                        {profile.joiningDate ? new Date(profile.joiningDate).toLocaleDateString() : '-'}
+                      </span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Additional Info Card */}
+              <div className="gradient-border">
+                <div className="rounded-2xl bg-white/80 dark:bg-neutral-800/80 backdrop-blur-xl p-6 shadow-xl">
+                  <h3 className="font-semibold text-gray-800 dark:text-gray-200 mb-4 flex items-center gap-2">
+                    <Target size={18} className="text-orange-500" />
+                    Additional Info
+                  </h3>
+                  <div className="space-y-3">
+                    <div className="flex justify-between items-center py-2 border-b border-gray-100 dark:border-neutral-700">
+                      <span className="text-sm text-gray-600 dark:text-gray-400">Platform</span>
+                      <span className="text-sm font-medium text-gray-800 dark:text-gray-200">
+                        {profile.platform || '-'}
+                      </span>
+                    </div>
+                    <div className="flex justify-between items-center py-2 border-b border-gray-100 dark:border-neutral-700">
+                      <span className="text-sm text-gray-600 dark:text-gray-400">Verified</span>
+                      <span className={`text-sm font-medium ${profile.isVerified ? 'text-green-600' : 'text-red-600'}`}>
+                        {profile.isVerified ? 'Yes' : 'No'}
+                      </span>
+                    </div>
+                    <div className="flex justify-between items-center py-2 border-b border-gray-100 dark:border-neutral-700">
+                      <span className="text-sm text-gray-600 dark:text-gray-400">Project Status</span>
+                      <span className={`text-sm font-medium ${profile.isActiveInProject ? 'text-green-600' : 'text-yellow-600'}`}>
+                        {profile.isActiveInProject ? 'Active' : 'Inactive'}
+                      </span>
+                    </div>
+                    <div className="flex justify-between items-center py-2">
+                      <span className="text-sm text-gray-600 dark:text-gray-400">Salary</span>
+                      <span className="text-sm font-medium text-gray-800 dark:text-gray-200">
+                        {formatSalary(profile.salary)}
+                      </span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Details Card */}
+            <div className="xl:col-span-2">
+              <div className="gradient-border">
+                <div className="rounded-2xl bg-white/80 dark:bg-neutral-800/80 backdrop-blur-xl p-6 shadow-xl">
+                  <h3 className="text-xl font-bold bg-gradient-to-r from-gray-800 to-gray-600 dark:from-white dark:to-gray-300 bg-clip-text text-transparent mb-6">
+                    Personal Details
+                  </h3>
+                  
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    {/* Personal Information */}
+                    <div className="space-y-4">
+                      <h4 className="font-semibold text-gray-800 dark:text-gray-200 flex items-center gap-2">
+                        <User size={16} className="text-orange-500" />
+                        Personal Info
+                      </h4>
+                      
+                      <div>
+                        <label className="text-xs text-gray-500 dark:text-gray-400 mb-1 block">Gender</label>
+                        {!editing ? (
+                          <div className="px-4 py-3 rounded-xl bg-gray-50 dark:bg-neutral-700/50 border border-gray-200 dark:border-neutral-600 text-gray-800 dark:text-gray-200 flex items-center gap-2">
+                            <VenetianMask size={14} className="text-orange-500" />
+                            {formatGender(profile.gender)}
+                          </div>
+                        ) : (
+                          <select
+                            value={form.gender}
+                            onChange={(e) => setForm(f => ({ ...f, gender: e.target.value }))}
+                            className="w-full px-4 py-3 rounded-xl border border-orange-300 bg-white dark:bg-neutral-700 text-gray-800 dark:text-gray-200 focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all"
+                          >
+                            <option value="">Select Gender</option>
+                            <option value="MALE">Male</option>
+                            <option value="FEMALE">Female</option>
+                            <option value="OTHER">Other</option>
+                          </select>
+                        )}
+                      </div>
+
+                      <div>
+                        <label className="text-xs text-gray-500 dark:text-gray-400 mb-1 block">Date of Birth</label>
+                        {!editing ? (
+                          <div className="px-4 py-3 rounded-xl bg-gray-50 dark:bg-neutral-700/50 border border-gray-200 dark:border-neutral-600 text-gray-800 dark:text-gray-200 flex items-center gap-2">
+                            <Cake size={14} className="text-orange-500" />
+                            {profile.dateOfBirth ? new Date(profile.dateOfBirth).toLocaleDateString() : 'Not provided'}
+                          </div>
+                        ) : (
+                          <input 
+                            type="date"
+                            value={form.dateOfBirth}
+                            onChange={(e) => setForm(f => ({ ...f, dateOfBirth: e.target.value }))}
+                            className="w-full px-4 py-3 rounded-xl border border-orange-300 bg-white dark:bg-neutral-700 text-gray-800 dark:text-gray-200 focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all"
+                          />
+                        )}
+                      </div>
+                    </div>
+
+                    {/* Contact Information */}
+                    <div className="space-y-4">
+                      <h4 className="font-semibold text-gray-800 dark:text-gray-200 flex items-center gap-2">
+                        <Phone size={16} className="text-orange-500" />
+                        Contact Info
+                      </h4>
+                      
+                      <div>
+                        <label className="text-xs text-gray-500 dark:text-gray-400 mb-1 block">Phone Number</label>
+                        {!editing ? (
+                          <div className="px-4 py-3 rounded-xl bg-gray-50 dark:bg-neutral-700/50 border border-gray-200 dark:border-neutral-600 text-gray-800 dark:text-gray-200">
+                            {profile.phone || 'Not provided'}
+                          </div>
+                        ) : (
+                          <input 
+                            value={form.phone} 
+                            onChange={(e) => setForm(f => ({ ...f, phone: e.target.value }))}
+                            className="w-full px-4 py-3 rounded-xl border border-orange-300 bg-white dark:bg-neutral-700 text-gray-800 dark:text-gray-200 focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all"
+                            placeholder="Enter phone number"
+                          />
+                        )}
+                      </div>
+
+                      <div>
+                        <label className="text-xs text-gray-500 dark:text-gray-400 mb-1 block">Last Login</label>
+                        <div className="px-4 py-3 rounded-xl bg-gray-50 dark:bg-neutral-700/50 border border-gray-200 dark:border-neutral-600 text-gray-800 dark:text-gray-200 flex items-center gap-2">
+                          <Clock size={14} className="text-orange-500" />
+                          {profile.lastLogin ? new Date(profile.lastLogin).toLocaleString() : 'Never logged in'}
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Address */}
+                    <div className="md:col-span-2">
+                      <h4 className="font-semibold text-gray-800 dark:text-gray-200 flex items-center gap-2 mb-3">
+                        <MapPin size={16} className="text-orange-500" />
+                        Address
+                      </h4>
+                      {!editing ? (
+                        <div className="px-4 py-3 rounded-xl bg-gray-50 dark:bg-neutral-700/50 border border-gray-200 dark:border-neutral-600 text-gray-800 dark:text-gray-200 min-h-[80px]">
+                          {profile.address || 'No address provided'}
+                        </div>
+                      ) : (
+                        <textarea 
+                          value={form.address} 
+                          onChange={(e) => setForm(f => ({ ...f, address: e.target.value }))}
+                          rows={3}
+                          className="w-full px-4 py-3 rounded-xl border border-orange-300 bg-white dark:bg-neutral-700 text-gray-800 dark:text-gray-200 focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all resize-none"
+                          placeholder="Enter your address"
+                        />
+                      )}
+                    </div>
+
+                    {/* Emergency Contact */}
+                    <div className="md:col-span-2">
+                      <h4 className="font-semibold text-gray-800 dark:text-gray-200 mb-4 flex items-center gap-2">
+                        <Shield size={16} className="text-orange-500" />
+                        Emergency Contact
+                      </h4>
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 p-4 rounded-xl bg-gradient-to-r from-orange-50 to-rose-50 dark:from-neutral-700/50 dark:to-neutral-700/30 border border-orange-200 dark:border-orange-800">
+                        <div>
+                          <label className="text-xs text-gray-500 dark:text-gray-400 mb-1 block">Name</label>
+                          {!editing ? (
+                            <div className="px-3 py-2 rounded-lg bg-white dark:bg-neutral-600 border border-gray-200 dark:border-neutral-500 text-gray-800 dark:text-gray-200">
+                              {profile.emergencyContact?.name || '-'}
+                            </div>
+                          ) : (
+                            <input 
+                              value={form.emergencyContact.name} 
+                              onChange={(e) => setForm(f => ({ ...f, emergencyContact: { ...f.emergencyContact, name: e.target.value } }))}
+                              className="w-full px-3 py-2 rounded-lg border border-orange-300 bg-white dark:bg-neutral-600 text-gray-800 dark:text-gray-200 focus:ring-1 focus:ring-orange-500"
+                            />
+                          )}
+                        </div>
+                        <div>
+                          <label className="text-xs text-gray-500 dark:text-gray-400 mb-1 block">Phone</label>
+                          {!editing ? (
+                            <div className="px-3 py-2 rounded-lg bg-white dark:bg-neutral-600 border border-gray-200 dark:border-neutral-500 text-gray-800 dark:text-gray-200">
+                              {profile.emergencyContact?.phone || '-'}
+                            </div>
+                          ) : (
+                            <input 
+                              value={form.emergencyContact.phone} 
+                              onChange={(e) => setForm(f => ({ ...f, emergencyContact: { ...f.emergencyContact, phone: e.target.value } }))}
+                              className="w-full px-3 py-2 rounded-lg border border-orange-300 bg-white dark:bg-neutral-600 text-gray-800 dark:text-gray-200 focus:ring-1 focus:ring-orange-500"
+                            />
+                          )}
+                        </div>
+                        <div>
+                          <label className="text-xs text-gray-500 dark:text-gray-400 mb-1 block">Email</label>
+                          {!editing ? (
+                            <div className="px-3 py-2 rounded-lg bg-white dark:bg-neutral-600 border border-gray-200 dark:border-neutral-500 text-gray-800 dark:text-gray-200">
+                              {profile.emergencyContact?.email || '-'}
+                            </div>
+                          ) : (
+                            <input 
+                              value={form.emergencyContact.email} 
+                              onChange={(e) => setForm(f => ({ ...f, emergencyContact: { ...f.emergencyContact, email: e.target.value } }))}
+                              className="w-full px-3 py-2 rounded-lg border border-orange-300 bg-white dark:bg-neutral-600 text-gray-800 dark:text-gray-200 focus:ring-1 focus:ring-orange-500"
+                            />
+                          )}
+                        </div>
+                        <div>
+                          <label className="text-xs text-gray-500 dark:text-gray-400 mb-1 block">Relationship</label>
+                          {!editing ? (
+                            <div className="px-3 py-2 rounded-lg bg-white dark:bg-neutral-600 border border-gray-200 dark:border-neutral-500 text-gray-800 dark:text-gray-200">
+                              {profile.emergencyContact?.relationship || '-'}
+                            </div>
+                          ) : (
+                            <input 
+                              value={form.emergencyContact.relationship} 
+                              onChange={(e) => setForm(f => ({ ...f, emergencyContact: { ...f.emergencyContact, relationship: e.target.value } }))}
+                              className="w-full px-3 py-2 rounded-lg border border-orange-300 bg-white dark:bg-neutral-600 text-gray-800 dark:text-gray-200 focus:ring-1 focus:ring-orange-500"
+                            />
+                          )}
+                        </div>
+                      </div>
+                    </div>
                   </div>
                 </div>
               </div>
             </div>
           </div>
-          <div className="space-y-0.5">
-            <div className="text-sm font-semibold">{profile?.firstName} {profile?.lastName}</div>
-            <div className="text-xs text-neutral-500">{profile?.email}</div>
-            <div className="text-xs text-neutral-600">
-              <span className="font-medium">{profile?.designation?.title}</span>
-              {profile?.department?.name ? <span className="text-neutral-400"> • {profile?.department?.name}</span> : null}
+        )}
+
+        {/* Password Change Modal */}
+        <SmartGlassModal open={pwOpen} onClose={() => setPwOpen(false)}>
+          <div className="text-center mb-4">
+            <div className="w-12 h-12 bg-gradient-to-r from-orange-500 to-rose-500 rounded-full grid place-items-center mx-auto mb-3">
+              <Key size={24} className="text-white" />
             </div>
-            {profile?.employeeId && <div className="text-[11px] text-neutral-500">Employee ID: {profile.employeeId}</div>}
+            <h3 className="text-lg font-bold bg-gradient-to-r from-gray-800 to-gray-600 bg-clip-text text-transparent">
+              Change Password
+            </h3>
+            <p className="text-gray-600 dark:text-gray-400 text-sm mt-1">
+              Enter your current and new password
+            </p>
           </div>
-        </div>
-
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:flex-1">
-          <Field label="Phone">
-            {editing ? (
-              <input value={form.phone} onChange={(e) => setForm(f => ({ ...f, phone: e.target.value }))} className="w-full px-3 py-1.5 rounded-md border border-neutral-300 dark:border-neutral-700 bg-white/80 dark:bg-neutral-900/60 text-sm" />
-            ) : (
-              <div className="text-sm text-neutral-800 dark:text-neutral-200">{profile?.phone || '—'}</div>
+          
+          <div className="space-y-4">
+            <div>
+              <input 
+                type="password" 
+                value={pw.currentPassword} 
+                onChange={(e) => setPw(p => ({ ...p, currentPassword: e.target.value }))}
+                placeholder="Current password" 
+                className="w-full px-4 py-3 rounded-xl border border-gray-300 dark:border-neutral-600 bg-white dark:bg-neutral-700 text-gray-800 dark:text-gray-200 focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all"
+              />
+            </div>
+            <div>
+              <input 
+                type="password" 
+                value={pw.newPassword} 
+                onChange={(e) => setPw(p => ({ ...p, newPassword: e.target.value }))}
+                placeholder="New password" 
+                className="w-full px-4 py-3 rounded-xl border border-gray-300 dark:border-neutral-600 bg-white dark:bg-neutral-700 text-gray-800 dark:text-gray-200 focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all"
+              />
+            </div>
+            <div>
+              <input 
+                type="password" 
+                value={pw.confirm} 
+                onChange={(e) => setPw(p => ({ ...p, confirm: e.target.value }))}
+                placeholder="Confirm new password" 
+                className="w-full px-4 py-3 rounded-xl border border-gray-300 dark:border-neutral-600 bg-white dark:bg-neutral-700 text-gray-800 dark:text-gray-200 focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all"
+              />
+            </div>
+            
+            {pwError && (
+              <div className="p-3 rounded-xl bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 text-red-700 dark:text-red-300 text-sm">
+                {pwError}
+              </div>
             )}
-          </Field>
-          <Field label="Date of Birth">
-            <div className="text-sm text-neutral-800 dark:text-neutral-200">{profile?.dateOfBirth ? new Date(profile.dateOfBirth).toLocaleDateString() : '—'}</div>
-          </Field>
-          <Field label="Joining Date">
-            <div className="text-sm text-neutral-800 dark:text-neutral-200">{profile?.joiningDate ? new Date(profile.joiningDate).toLocaleDateString() : '—'}</div>
-          </Field>
-          <Field label="Last Login">
-            <div className="text-sm text-neutral-800 dark:text-neutral-200">{profile?.lastLogin ? new Date(profile.lastLogin).toLocaleString() : '—'}</div>
-          </Field>
-        </div>
-      </div>
-
-      {/* Details cards */}
-      <div className="grid md:grid-cols-2 gap-4">
-        <div className="rounded-xl border border-neutral-200 dark:border-neutral-800 bg-white/60 dark:bg-neutral-900/40 backdrop-blur p-4">
-          <div className="text-sm font-semibold mb-3">Address</div>
-          {editing ? (
-            <textarea value={form.address} onChange={(e) => setForm(f => ({ ...f, address: e.target.value }))} rows={4} className="w-full px-3 py-2 rounded-md border border-neutral-300 dark:border-neutral-700 bg-white/80 dark:bg-neutral-900/60 text-sm" />
-          ) : (
-            <p className="text-sm text-neutral-700 dark:text-neutral-300 whitespace-pre-line min-h-[72px]">{profile?.address || '—'}</p>
-          )}
-        </div>
-        <div className="rounded-xl border border-neutral-200 dark:border-neutral-800 bg-white/60 dark:bg-neutral-900/40 backdrop-blur p-4">
-          <div className="text-sm font-semibold mb-3">Emergency Contact</div>
-          <div className="grid grid-cols-2 gap-3">
-            <Field label="Name">
-              {editing ? (
-                <input value={form.emergencyContact.name} onChange={(e) => setForm(f => ({ ...f, emergencyContact: { ...f.emergencyContact, name: e.target.value } }))} className="w-full px-3 py-1.5 rounded-md border border-neutral-300 dark:border-neutral-700 bg-white/80 dark:bg-neutral-900/60 text-sm" />
-              ) : (
-                <div className="text-sm">{profile?.emergencyContact?.name || '—'}</div>
-              )}
-            </Field>
-            <Field label="Phone">
-              {editing ? (
-                <input value={form.emergencyContact.phone} onChange={(e) => setForm(f => ({ ...f, emergencyContact: { ...f.emergencyContact, phone: e.target.value } }))} className="w-full px-3 py-1.5 rounded-md border border-neutral-300 dark:border-neutral-700 bg-white/80 dark:bg-neutral-900/60 text-sm" />
-              ) : (
-                <div className="text-sm">{profile?.emergencyContact?.phone || '—'}</div>
-              )}
-            </Field>
-            <Field label="Email">
-              {editing ? (
-                <input value={form.emergencyContact.email} onChange={(e) => setForm(f => ({ ...f, emergencyContact: { ...f.emergencyContact, email: e.target.value } }))} className="w-full px-3 py-1.5 rounded-md border border-neutral-300 dark:border-neutral-700 bg-white/80 dark:bg-neutral-900/60 text-sm" />
-              ) : (
-                <div className="text-sm">{profile?.emergencyContact?.email || '—'}</div>
-              )}
-            </Field>
-            <Field label="Relationship">
-              {editing ? (
-                <input value={form.emergencyContact.relationship} onChange={(e) => setForm(f => ({ ...f, emergencyContact: { ...f.emergencyContact, relationship: e.target.value } }))} className="w-full px-3 py-1.5 rounded-md border border-neutral-300 dark:border-neutral-700 bg-white/80 dark:bg-neutral-900/60 text-sm" />
-              ) : (
-                <div className="text-sm">{profile?.emergencyContact?.relationship || '—'}</div>
-              )}
-            </Field>
+            
+            <div className="flex items-center justify-end gap-3 pt-2">
+              <button 
+                onClick={() => setPwOpen(false)}
+                className="px-6 py-2.5 rounded-xl border border-gray-300 dark:border-neutral-600 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-neutral-700 transition-colors font-medium clickable"
+              >
+                Cancel
+              </button>
+              <button 
+                disabled={loading === 'loading'}
+                onClick={onChangePassword}
+                className="px-6 py-2.5 rounded-xl bg-gradient-to-r from-orange-500 to-rose-500 text-white hover:from-orange-600 hover:to-rose-600 disabled:opacity-50 transition-all duration-300 font-medium shadow-lg hover:shadow-xl clickable"
+              >
+                Update Password
+              </button>
+            </div>
           </div>
-        </div>
+        </SmartGlassModal>
       </div>
-
-      {/* Change password full-screen glass modal */}
-      <SmartGlassModal open={pwOpen} onClose={() => setPwOpen(false)}>
-        <div className="text-sm font-semibold mb-2">Change Password</div>
-        <div className="space-y-2">
-          <input type="password" value={pw.currentPassword} onChange={(e) => setPw(p => ({ ...p, currentPassword: e.target.value }))} placeholder="Current password" className="w-full px-3 py-1.5 rounded-md border border-neutral-300 dark:border-neutral-700 bg-white/90 dark:bg-neutral-900/70 text-sm" />
-          <input type="password" value={pw.newPassword} onChange={(e) => setPw(p => ({ ...p, newPassword: e.target.value }))} placeholder="New password" className="w-full px-3 py-1.5 rounded-md border border-neutral-300 dark:border-neutral-700 bg-white/90 dark:bg-neutral-900/70 text-sm" />
-          <input type="password" value={pw.confirm} onChange={(e) => setPw(p => ({ ...p, confirm: e.target.value }))} placeholder="Confirm password" className="w-full px-3 py-1.5 rounded-md border border-neutral-300 dark:border-neutral-700 bg-white/90 dark:bg-neutral-900/70 text-sm" />
-          {pwError && <div className="text-xs text-red-600">{pwError}</div>}
-          <div className="flex items-center justify-end gap-2 pt-1">
-            <button onClick={() => setPwOpen(false)} className="px-3 py-1.5 rounded-md text-xs border border-neutral-300 dark:border-neutral-600">Cancel</button>
-            <button disabled={loading==='loading'} onClick={onChangePassword} className="px-3 py-1.5 rounded-md text-xs bg-orange-600 text-white hover:bg-orange-700 disabled:opacity-60">Update</button>
-          </div>
-        </div>
-      </SmartGlassModal>
-
-      {/* Toast */}
-      <SmartToster message={toast} onClose={() => setToast('')} duration={2500} />
     </div>
   )
 }

@@ -21,7 +21,7 @@ function SmartGlassModal({ open, onClose, children }) {
     <div className="fixed inset-0 z-[100] animate-fade-in">
       <div className="absolute inset-0 bg-neutral-900/30 backdrop-blur-sm animate-fade-in" onClick={onClose} />
       <div className="absolute inset-0 grid place-items-center p-4">
-        <div className="w-full max-w-md rounded-2xl border border-white/20 bg-white/80 dark:bg-neutral-900/70 backdrop-blur-xl shadow-2xl p-6 animate-scale-in">
+        <div className="w-full max-w-md rounded-2xl border border-orange-500/20 dark:border-orange-500/40 bg-white dark:bg-neutral-900 backdrop-blur-xl shadow-2xl p-6 animate-scale-in">
           {children}
         </div>
       </div>
@@ -286,7 +286,7 @@ export default function AdminSelfProfilePage() {
 
         {loading === 'loading' ? (
           <div className="gradient-border animate-pulse">
-            <div className="rounded-2xl bg-white/80 dark:bg-neutral-800/80 backdrop-blur-xl p-12 text-center shadow-xl">
+            <div className="rounded-2xl bg-white dark:bg-neutral-900 p-12 text-center shadow-xl">
               <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-orange-500 mx-auto"></div>
               <p className="text-gray-600 dark:text-gray-400 mt-4">Loading profile...</p>
             </div>
@@ -300,7 +300,7 @@ export default function AdminSelfProfilePage() {
           </div>
         ) : !profile ? (
           <div className="gradient-border">
-            <div className="rounded-2xl bg-white/80 dark:bg-neutral-800/80 backdrop-blur-xl p-12 text-center shadow-xl">
+            <div className="rounded-2xl bg-white dark:bg-neutral-900 p-12 text-center shadow-xl">
               <div className="text-gray-400 text-4xl mb-4">👤</div>
               <p className="text-gray-600 dark:text-gray-400">No profile data available</p>
             </div>
@@ -310,7 +310,7 @@ export default function AdminSelfProfilePage() {
             {/* Profile Card */}
             <div className="xl:col-span-1 space-y-6">
               <div className="gradient-border hover:animate-glow transition-all duration-500">
-                <div className="rounded-2xl bg-white/80 dark:bg-neutral-800/80 backdrop-blur-xl p-6 shadow-xl">
+                <div className="rounded-2xl bg-white dark:bg-neutral-900 p-6 shadow-xl">
                   <div className="flex flex-col items-center text-center">
                     {/* Avatar */}
                     <div className="relative mb-4">
@@ -331,7 +331,7 @@ export default function AdminSelfProfilePage() {
                           {/* Avatar Actions */}
                           <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity rounded-full grid place-items-center">
                             <div className="flex flex-col gap-2">
-                              <label className="px-3 py-1.5 rounded-full text-xs bg-white/95 text-gray-800 border border-gray-300 cursor-pointer hover:bg-white transition-colors clickable">
+                              <label className="px-3 py-1.5 rounded-full text-xs bg-white dark:bg-neutral-800 text-gray-800 dark:text-neutral-100 border border-gray-300 cursor-pointer hover:bg-neutral-50 dark:hover:bg-neutral-700 transition-colors clickable">
                                 📷 Change
                                 <input
                                   type="file"
@@ -373,7 +373,7 @@ export default function AdminSelfProfilePage() {
                                       setToast(err.message || 'Failed to remove avatar')
                                     }
                                   }}
-                                  className="px-3 py-1.5 rounded-full text-xs bg-white/95 text-gray-800 border border-gray-300 hover:bg-white transition-colors clickable"
+                                  className="px-3 py-1.5 rounded-full text-xs bg-white dark:bg-neutral-800 text-gray-800 dark:text-neutral-100 border border-gray-300 hover:bg-neutral-50 dark:hover:bg-neutral-700 transition-colors clickable"
                                 >
                                   🗑️ Remove
                                 </button>
@@ -426,7 +426,7 @@ export default function AdminSelfProfilePage() {
 
               {/* Company & Department Info Card */}
               <div className="gradient-border">
-                <div className="rounded-2xl bg-white/80 dark:bg-neutral-800/80 backdrop-blur-xl p-6 shadow-xl">
+                <div className="rounded-2xl bg-white dark:bg-neutral-900 p-6 shadow-xl">
                   <h3 className="font-semibold text-gray-800 dark:text-gray-200 mb-4 flex items-center gap-2">
                     <Building size={18} className="text-orange-500" />
                     Organization
@@ -462,7 +462,7 @@ export default function AdminSelfProfilePage() {
 
               {/* Additional Info Card */}
               <div className="gradient-border">
-                <div className="rounded-2xl bg-white/80 dark:bg-neutral-800/80 backdrop-blur-xl p-6 shadow-xl">
+                <div className="rounded-2xl bg-white dark:bg-neutral-900 p-6 shadow-xl">
                   <h3 className="font-semibold text-gray-800 dark:text-gray-200 mb-4 flex items-center gap-2">
                     <Target size={18} className="text-orange-500" />
                     Additional Info
@@ -500,7 +500,7 @@ export default function AdminSelfProfilePage() {
             {/* Details Card */}
             <div className="xl:col-span-2">
               <div className="gradient-border">
-                <div className="rounded-2xl bg-white/80 dark:bg-neutral-800/80 backdrop-blur-xl p-6 shadow-xl">
+                <div className="rounded-2xl bg-white dark:bg-neutral-900 p-6 shadow-xl">
                   <h3 className="text-xl font-bold bg-gradient-to-r from-gray-800 to-gray-600 dark:from-white dark:to-gray-300 bg-clip-text text-transparent mb-6">
                     Personal Details
                   </h3>
@@ -516,7 +516,7 @@ export default function AdminSelfProfilePage() {
                       <div>
                         <label className="text-xs text-gray-500 dark:text-gray-400 mb-1 block">Gender</label>
                         {!editing ? (
-                          <div className="px-4 py-3 rounded-xl bg-gray-50 dark:bg-neutral-700/50 border border-gray-200 dark:border-neutral-600 text-gray-800 dark:text-gray-200 flex items-center gap-2">
+                          <div className="px-4 py-3 rounded-xl bg-neutral-50 dark:bg-neutral-800 border border-gray-200 dark:border-neutral-600 text-gray-800 dark:text-gray-200 flex items-center gap-2">
                             <VenetianMask size={14} className="text-orange-500" />
                             {formatGender(profile.gender)}
                           </div>
@@ -537,7 +537,7 @@ export default function AdminSelfProfilePage() {
                       <div>
                         <label className="text-xs text-gray-500 dark:text-gray-400 mb-1 block">Date of Birth</label>
                         {!editing ? (
-                          <div className="px-4 py-3 rounded-xl bg-gray-50 dark:bg-neutral-700/50 border border-gray-200 dark:border-neutral-600 text-gray-800 dark:text-gray-200 flex items-center gap-2">
+                          <div className="px-4 py-3 rounded-xl bg-neutral-50 dark:bg-neutral-800 border border-gray-200 dark:border-neutral-600 text-gray-800 dark:text-gray-200 flex items-center gap-2">
                             <Cake size={14} className="text-orange-500" />
                             {profile.dateOfBirth ? new Date(profile.dateOfBirth).toLocaleDateString() : 'Not provided'}
                           </div>
@@ -562,7 +562,7 @@ export default function AdminSelfProfilePage() {
                       <div>
                         <label className="text-xs text-gray-500 dark:text-gray-400 mb-1 block">Phone Number</label>
                         {!editing ? (
-                          <div className="px-4 py-3 rounded-xl bg-gray-50 dark:bg-neutral-700/50 border border-gray-200 dark:border-neutral-600 text-gray-800 dark:text-gray-200">
+                          <div className="px-4 py-3 rounded-xl bg-neutral-50 dark:bg-neutral-800 border border-gray-200 dark:border-neutral-600 text-gray-800 dark:text-gray-200">
                             {profile.phone || 'Not provided'}
                           </div>
                         ) : (
@@ -577,7 +577,7 @@ export default function AdminSelfProfilePage() {
 
                       <div>
                         <label className="text-xs text-gray-500 dark:text-gray-400 mb-1 block">Last Login</label>
-                        <div className="px-4 py-3 rounded-xl bg-gray-50 dark:bg-neutral-700/50 border border-gray-200 dark:border-neutral-600 text-gray-800 dark:text-gray-200 flex items-center gap-2">
+                        <div className="px-4 py-3 rounded-xl bg-neutral-50 dark:bg-neutral-800 border border-gray-200 dark:border-neutral-600 text-gray-800 dark:text-gray-200 flex items-center gap-2">
                           <Clock size={14} className="text-orange-500" />
                           {profile.lastLogin ? new Date(profile.lastLogin).toLocaleString() : 'Never logged in'}
                         </div>
@@ -591,7 +591,7 @@ export default function AdminSelfProfilePage() {
                         Address
                       </h4>
                       {!editing ? (
-                        <div className="px-4 py-3 rounded-xl bg-gray-50 dark:bg-neutral-700/50 border border-gray-200 dark:border-neutral-600 text-gray-800 dark:text-gray-200 min-h-[80px]">
+                        <div className="px-4 py-3 rounded-xl bg-neutral-50 dark:bg-neutral-800 border border-gray-200 dark:border-neutral-600 text-gray-800 dark:text-gray-200 min-h-[80px]">
                           {profile.address || 'No address provided'}
                         </div>
                       ) : (

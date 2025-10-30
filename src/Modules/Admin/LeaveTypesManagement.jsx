@@ -560,7 +560,7 @@ export default function LeaveTypesManagement() {
               <div className="text-sm">{successMessage}</div>
               <button
                 onClick={handleCloseSuccess}
-                className="ml-2 p-1 hover:bg-white/10 rounded"
+                className="ml-2 p-1 hover:bg-neutral-100 dark:hover:bg-neutral-800 rounded"
                 aria-label="close"
               >
                 <X className="w-4 h-4" />

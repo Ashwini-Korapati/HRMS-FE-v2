@@ -1,7 +1,7 @@
 import React from 'react'
 import { BarChart3, Server, Users, Building2 } from 'lucide-react'
 
-const cardClass = "rounded-2xl border border-orange-500/30 bg-neutral-50/40 dark:bg-neutral-900/40 backdrop-blur p-4 flex flex-col gap-2 hover:border-orange-500/60 transition-colors shadow-sm"
+const cardClass = "rounded-2xl border border-orange-500/30 bg-white dark:bg-neutral-900 p-4 flex flex-col gap-2 hover:border-orange-500/60 transition-colors shadow-sm"
 
 export default function PlatformOverviewPage() {
   const stats = [

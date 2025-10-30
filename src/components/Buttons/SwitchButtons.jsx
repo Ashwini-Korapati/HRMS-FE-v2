@@ -1,12 +1,20 @@
-import { useState } from "react"
+import { useEffect, useMemo, useState } from "react"
 import { Sun, Moon, Monitor } from "lucide-react"
+import { useTheme } from "../../theme/ThemeProvider"
 
-export function ThemeSwitcher({ defaultValue = "device", onChange, className = "" }) {
-  const [selectedTheme, setSelectedTheme] = useState(defaultValue)
+export function ThemeSwitcher({ defaultValue, onChange, className = "" }) {
+  const { mode: contextMode, setMode: contextSetMode } = useTheme()
+  const resolvedOnChange = useMemo(() => onChange || contextSetMode, [onChange, contextSetMode])
+  const resolvedDefault = defaultValue ?? contextMode ?? "device"
+  const [selectedTheme, setSelectedTheme] = useState(resolvedDefault)
+
+  useEffect(() => {
+    setSelectedTheme(resolvedDefault)
+  }, [resolvedDefault])
 
   const handleThemeChange = (theme) => {
     setSelectedTheme(theme)
-    onChange?.(theme)
+    resolvedOnChange?.(theme)
   }
 
   const options = [

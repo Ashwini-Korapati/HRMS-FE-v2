@@ -13,7 +13,7 @@ export default function OverviewPage() {
   const designationId = auth?.user?.designationId || auth?.user?.designation?.id || auth?.user?.designationParentId
   
   return (
-    <div className="flex flex-col gap-6 p-4 md:p-6 bg-gradient-to-br from-slate-50 via-blue-50/20 to-orange-50/10 dark:from-neutral-900 dark:via-neutral-900 dark:to-neutral-900 min-h-screen">
+    <div className="flex flex-col gap-6 p-4 md:p-6  dark:from-neutral-900 dark:via-neutral-900 dark:to-neutral-900 min-h-screen">
       {/* Header + Clock Row */}
       <div className="grid grid-cols-1 xl:grid-cols-3 gap-6 items-start">
         {/* Left Column - Page Heading and Stats */}
@@ -82,7 +82,7 @@ export default function OverviewPage() {
               <p className="text-sm text-slate-600 dark:text-slate-400">Local Time Zone</p>
             </div>
             <div className="flex justify-center mb-4">
-              <div className="w-48 h-48 bg-white/90 rounded-full shadow-inner border border-slate-200/50 dark:bg-neutral-700/90 dark:border-neutral-600/50 flex items-center justify-center">
+              <div className="w-48 h-48 bg-white dark:bg-neutral-800 rounded-full shadow-inner border border-slate-200/50 dark:bg-neutral-800 dark:border-neutral-600/50 flex items-center justify-center">
                 <AnalogClock />
               </div>
             </div>

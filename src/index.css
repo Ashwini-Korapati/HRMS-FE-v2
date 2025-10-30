@@ -43,20 +43,19 @@ html, body, #root { height: 100%; }
 
 /* Theme variables and base colors */
 :root {
-  /* Light theme: soft diagonal gradient approximating tailwind from-gray-50 via-white to-blue-50 */
-  --bg: linear-gradient(135deg, #f8fafc 0%, #ffffff 50%, #eff6ff 100%);
+  --bg: #ffffff;
   --text: #171717; /* neutral-900 */
   --text-strong: #000000;
-  --text-muted: #525252;   /* neutral-600 */
+  --text-muted: #4b5563;   /* neutral-600 */
   --text-subtle: #6b7280;  /* neutral-500 */
 }
 
 [data-theme="dark"] {
-  --bg: #171717; /* neutral-900 solid */
-  --text: #f5f5f5; /* neutral-100 */
+  --bg: #000000;
+  --text: #f8fafc;
   --text-strong: #ffffff;
-  --text-muted: #a3a3a3;   /* neutral-400 */
-  --text-subtle: #9ca3af;  /* neutral-400-ish */
+  --text-muted: #d1d5db;
+  --text-subtle: #9ca3af;
 }
 
 body {
@@ -72,4 +71,166 @@ body {
   /* Force white placeholder in light mode, neutral in dark */
   .placeholder-force-white::placeholder { color:#fff !important; opacity:1; }
   [data-theme="dark"] .placeholder-force-white::placeholder { color:#9ca3af !important; }
+}
+
+@layer base {
+  /* Override Tailwind's bg-white in dark mode to use solid black */
+  [data-theme="dark"] .bg-white { background-color: #000000 !important; }
+  [data-theme="dark"] .bg-neutral-50 { background-color: #171717 !important; }
+  [data-theme="dark"] .bg-neutral-100 { background-color: #262626 !important; }
+  [data-theme="dark"] .bg-gray-50 { background-color: #171717 !important; }
+  
+  /* Ensure light mode uses pure white */
+  [data-theme="light"] .bg-white { background-color: #ffffff !important; }
+  [data-theme="light"] .bg-neutral-50 { background-color: #fafafa !important; }
+  [data-theme="light"] .bg-neutral-100 { background-color: #f5f5f5 !important; }
+
+  [data-theme="dark"] .bg-gray-100,
+  [data-theme="dark"] .bg-gray-200,
+  [data-theme="dark"] .bg-gray-300,
+  [data-theme="dark"] .bg-slate-50,
+  [data-theme="dark"] .bg-neutral-800,
+  [data-theme="dark"] .bg-neutral-900,
+  [data-theme="dark"] .bg-neutral-950,
+  [data-theme="dark"] .bg-neutral-200,
+  [data-theme="dark"] .bg-neutral-300 { background-color: #000000 !important; }
+
+  [data-theme="dark"] .bg-orange-500\/10 { background-color: rgba(249,115,22,0.12) !important; }
+  [data-theme="dark"] .bg-orange-500\/5 { background-color: rgba(249,115,22,0.08) !important; }
+
+  [data-theme="dark"] .text-gray-900,
+  [data-theme="dark"] .text-slate-900,
+  [data-theme="dark"] .text-neutral-900,
+  [data-theme="dark"] .text-gray-800,
+  [data-theme="dark"] .text-gray-700 { color: #f8fafc !important; }
+  [data-theme="dark"] .text-gray-600,
+  [data-theme="dark"] .text-gray-500,
+  [data-theme="dark"] .text-gray-400,
+  [data-theme="dark"] .text-neutral-500 { color: #cbd5f5 !important; }
+  [data-theme="dark"] .text-slate-500,
+  [data-theme="dark"] .text-slate-600 { color: #b6c3ff !important; }
+
+  [data-theme="dark"] .border-gray-100,
+  [data-theme="dark"] .border-gray-200,
+  [data-theme="dark"] .border-gray-300,
+  [data-theme="dark"] .border-slate-200,
+  [data-theme="dark"] .border-neutral-200,
+  [data-theme="dark"] .border-neutral-300,
+  [data-theme="dark"] .border-orange-500\/20 { border-color: rgba(148,163,184,0.3) !important; }
+  [data-theme="dark"] .border-orange-500\/30,
+  [data-theme="dark"] .border-orange-500\/40,
+  [data-theme="dark"] .border-orange-500\/60 { border-color: rgba(249,115,22,0.45) !important; }
+
+  [data-theme="dark"] .divide-gray-100 > :not([hidden]) ~ :not([hidden]),
+  [data-theme="dark"] .divide-gray-200 > :not([hidden]) ~ :not([hidden]) { border-color: #374151 !important; }
+
+  [data-theme="dark"] table thead { background-color: #050505; }
+  [data-theme="dark"] table tbody tr:hover { background-color: rgba(255,255,255,0.03); }
+  [data-theme="dark"] .shadow { box-shadow: 0 10px 30px rgba(0,0,0,0.35) !important; }
+
+  /* Clock theme overrides - ensure proper colors in light/dark modes */
+  [data-theme="light"] .bg-black { background-color: #000000 !important; }
+  [data-theme="dark"] .bg-black { background-color: #ffffff !important; }
+
+  /* DesignationsListPage theme overrides */
+  /* Sidebar backgrounds */
+  [data-theme="light"] .designation-sidebar { background-color: rgba(255, 255, 255, 0.9) !important; }
+  [data-theme="dark"] .designation-sidebar { background-color: rgba(0, 0, 0, 0.9) !important; }
+  
+  [data-theme="light"] .designation-card { background-color: rgba(255, 255, 255, 0.8) !important; }
+  [data-theme="dark"] .designation-card { background-color: rgba(0, 0, 0, 0.8) !important; }
+
+  /* Node card backgrounds */
+  [data-theme="light"] .designation-node { background-color: rgba(255, 255, 255, 0.9) !important; }
+  [data-theme="dark"] .designation-node { background-color: rgba(0, 0, 0, 0.9) !important; }
+
+  /* Text colors */
+  [data-theme="light"] .designation-title { color: #000000 !important; }
+  [data-theme="dark"] .designation-title { color: #ffffff !important; }
+  
+  [data-theme="light"] .designation-description { color: #525252 !important; }
+  [data-theme="dark"] .designation-description { color: #a3a3a3 !important; }
+
+  /* Badge styles - Level */
+  [data-theme="light"] .designation-badge-level {
+    background-color: rgba(255, 237, 213, 1) !important;
+    border-color: rgba(251, 146, 60, 1) !important;
+    color: #ea580c !important;
+  }
+  [data-theme="dark"] .designation-badge-level {
+    background-color: rgba(249, 115, 22, 0.3) !important;
+    border-color: rgba(249, 115, 22, 0.5) !important;
+    color: #fed7aa !important;
+  }
+
+  /* Badge styles - Routes */
+  [data-theme="light"] .designation-badge-route {
+    background-color: rgba(255, 247, 237, 1) !important;
+    border-color: rgba(253, 186, 116, 1) !important;
+    color: #c2410c !important;
+  }
+  [data-theme="dark"] .designation-badge-route {
+    background-color: rgba(249, 115, 22, 0.2) !important;
+    border-color: rgba(249, 115, 22, 0.4) !important;
+    color: #fdba74 !important;
+  }
+
+  /* ReactFlow canvas */
+  [data-theme="light"] .designation-canvas { background-color: #ffffff !important; }
+  [data-theme="dark"] .designation-canvas { background-color: #171717 !important; }
+
+  /* ReactFlow MiniMap */
+  [data-theme="light"] .react-flow__minimap { background-color: #f5f5f5 !important; }
+  [data-theme="dark"] .react-flow__minimap { background-color: #262626 !important; }
+
+  /* ReactFlow Controls */
+  [data-theme="light"] .react-flow__controls button {
+    background-color: #ffffff !important;
+    border-color: rgba(249, 115, 22, 0.3) !important;
+    color: #000000 !important;
+  }
+  [data-theme="dark"] .react-flow__controls button {
+    background-color: #262626 !important;
+    border-color: rgba(249, 115, 22, 0.5) !important;
+    color: #ffffff !important;
+  }
+
+  /* ReactFlow Background */
+  [data-theme="light"] .react-flow__background { color: rgba(249, 115, 22, 0.15) !important; }
+  [data-theme="dark"] .react-flow__background { color: rgba(249, 115, 22, 0.3) !important; }
+
+  /* ReactFlow pane */
+  [data-theme="light"] .react-flow__pane { background-color: #ffffff !important; }
+  [data-theme="dark"] .react-flow__pane { background-color: #171717 !important; }
+
+  /* MyTeamArchitecture theme overrides */
+  /* Team sidebar */
+  [data-theme="light"] .team-sidebar { background-color: #ffffff !important; }
+  [data-theme="dark"] .team-sidebar { background-color: #0a0a0a !important; }
+  
+  [data-theme="light"] .team-card { background-color: #ffffff !important; }
+  [data-theme="dark"] .team-card { background-color: #0a0a0a !important; }
+
+  /* User node */
+  [data-theme="light"] .team-user-node { background-color: #ffffff !important; }
+  [data-theme="dark"] .team-user-node { background-color: #0a0a0a !important; }
+
+  /* Text colors for team */
+  [data-theme="light"] .team-text-primary { color: #000000 !important; }
+  [data-theme="dark"] .team-text-primary { color: #ffffff !important; }
+  
+  [data-theme="light"] .team-text-secondary { color: #525252 !important; }
+  [data-theme="dark"] .team-text-secondary { color: #a3a3a3 !important; }
+
+  /* Team canvas */
+  [data-theme="light"] .team-canvas { background-color: #ffffff !important; }
+  [data-theme="dark"] .team-canvas { background-color: #171717 !important; }
+
+  /* Team container */
+  [data-theme="light"] .team-container { 
+    background: linear-gradient(to bottom right, #ffffff, #fafafa, #fff7ed) !important; 
+  }
+  [data-theme="dark"] .team-container { 
+    background: linear-gradient(to bottom right, #000000, #0a0a0a, #18181b) !important; 
+  }
 }

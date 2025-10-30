@@ -38,7 +38,7 @@ function StatBox({ label, value, loading, accent='orange' }) {
     rose: 'border-rose-500/25 dark:border-rose-500/40'
   }[accent] || 'border-orange-500/25 dark:border-orange-500/40'
   return (
-    <div className={`flex flex-col rounded-lg ${color} bg-white/60 dark:bg-neutral-900/40 backdrop-blur p-3 min-w-[130px] border`}> 
+    <div className={`flex flex-col rounded-lg ${color} bg-white dark:bg-neutral-900 p-3 min-w-[130px] border`}> 
       <span className="text-[10px] uppercase tracking-wide font-medium text-neutral-500 dark:text-neutral-400">{label}</span>
       <span className="mt-1 text-sm font-semibold text-neutral-700 dark:text-neutral-100">{loading ? '…' : (value ?? '—')}</span>
     </div>
@@ -162,7 +162,7 @@ function ProjectMembers({ members, loading }) {
   return (
     <div className="space-y-2">
       {members.items.map(member => (
-        <div key={member.id} className="flex items-center gap-3 p-2 rounded-lg bg-white/50 dark:bg-neutral-800/50 border border-orange-500/10 dark:border-orange-500/20">
+        <div key={member.id} className="flex items-center gap-3 p-2 rounded-lg bg-white dark:bg-neutral-800 border border-orange-500/10 dark:border-orange-500/20">
           <UserAvatar 
             src={member.user?.avatar} 
             alt={member.user?.name || 'User avatar'}

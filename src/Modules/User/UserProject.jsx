@@ -5,7 +5,7 @@ import { fetchProjectsInsights, selectProjectsInsights, selectProjectsInsightsLo
 
 function Metric({ label, value, suffix, loading }) {
   return (
-    <div className="flex flex-col px-3 py-2 rounded-md bg-white/60 dark:bg-neutral-900/40 border border-orange-500/20 dark:border-orange-500/40 backdrop-blur min-w-[110px]">
+    <div className="flex flex-col px-3 py-2 rounded-md bg-white dark:bg-neutral-900 border border-orange-500/20 dark:border-orange-500/40 min-w-[110px]">
       <span className="text-[10px] uppercase tracking-wide font-medium text-neutral-500 dark:text-neutral-400">{label}</span>
       <span className="mt-0.5 text-sm font-semibold text-neutral-700 dark:text-neutral-200">{loading ? '…' : (value ?? '—')}{!loading && suffix ? suffix : ''}</span>
     </div>
@@ -39,7 +39,7 @@ const UserProject = () => {
         </div>
         {error && <div className="mt-2 text-xs text-rose-500">{error}</div>}
         {insights && !(total||active||planning||completed||utilization) && (
-          <div className="mt-2 text-[10px] font-mono p-2 rounded bg-neutral-100/60 dark:bg-neutral-900/60 border border-neutral-300/40 dark:border-neutral-700/40 max-h-48 overflow-auto">
+          <div className="mt-2 text-[10px] font-mono p-2 rounded bg-neutral-50 dark:bg-neutral-800 border border-neutral-300/40 dark:border-neutral-700/40 max-h-48 overflow-auto">
             <pre className="whitespace-pre-wrap break-all">{JSON.stringify(insights, null, 2)}</pre>
           </div>
         )}

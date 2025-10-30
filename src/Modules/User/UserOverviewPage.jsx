@@ -14,9 +14,9 @@ export default function UserOverviewPage() {
       <PageHeading title="My Dashboard" subtitle="Personal overview" />
       <StatGrid>
         <StatCard label="Pending Tasks" value={8} icon={LayoutDashboard} />
-        <div className="bg-white rounded-xl border border-gray-200 p-4 flex items-center justify-center">
+        <div className="bg-white dark:bg-neutral-900 rounded-xl border border-orange-500/20 dark:border-orange-500/40 p-4 flex items-center justify-center">
           <div className="flex flex-col items-center">
-            <div className="mb-2 text-xs text-gray-500 flex items-center gap-1"><Clock size={14}/> Today's Attendance</div>
+            <div className="mb-2 text-xs text-neutral-600 dark:text-neutral-400 flex items-center gap-1"><Clock size={14}/> Today's Attendance</div>
             <AnalogClock />
           </div>
         </div>

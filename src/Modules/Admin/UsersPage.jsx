@@ -49,14 +49,14 @@ const SearchBar = ({ value, onChange, onFilter, onCreateEmployee }) => (
         placeholder="Search employees by name, email, or department..."
         value={value}
         onChange={(e) => onChange(e.target.value)}
-        className="w-full pl-10 pr-4 py-3 rounded-xl border border-gray-200 bg-white/80 backdrop-blur-sm focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all duration-200"
+        className="w-full pl-10 pr-4 py-3 rounded-xl border border-gray-200 bg-white dark:bg-neutral-900 focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all duration-200"
       />
     </div>
     <motion.button
       whileHover={{ scale: 1.05 }}
       whileTap={{ scale: 0.95 }}
       onClick={onFilter}
-      className="px-4 py-3 rounded-xl border border-gray-200 bg-white/80 backdrop-blur-sm hover:bg-gray-50 transition-all duration-200 flex items-center gap-2"
+      className="px-4 py-3 rounded-xl border border-gray-200 bg-white dark:bg-neutral-900 hover:bg-gray-50 transition-all duration-200 flex items-center gap-2"
     >
       <Filter className="w-5 h-5" />
       <span className="hidden sm:block">Filters</span>
@@ -83,7 +83,7 @@ const DownloadMenu = ({ onDownloadExcel, onDownloadPDF }) => {
         whileHover={{ scale: 1.05 }}
         whileTap={{ scale: 0.95 }}
         onClick={() => setIsOpen(!isOpen)}
-        className="px-4 py-3 rounded-xl bg-white/80 backdrop-blur-sm border border-gray-200 text-gray-700 hover:bg-gray-50 transition-all duration-200 flex items-center gap-2 shadow-sm"
+        className="px-4 py-3 rounded-xl bg-white dark:bg-neutral-900 border border-gray-200 text-gray-700 hover:bg-gray-50 transition-all duration-200 flex items-center gap-2 shadow-sm"
       >
         <Download className="w-5 h-5" />
         <span className="hidden sm:block">Download</span>
@@ -161,7 +161,7 @@ const EmployeeTable = ({ employees, onViewProfile, companyId }) => {
     <motion.div
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
-      className="bg-white/80 backdrop-blur-sm rounded-2xl border border-gray-200/50 shadow-sm overflow-hidden"
+      className="bg-white dark:bg-neutral-900 rounded-2xl border border-gray-200/50 shadow-sm overflow-hidden"
     >
       <div className="overflow-x-auto">
         <table className="w-full">
@@ -655,7 +655,7 @@ export default function UsersListPage() {
             whileTap={{ scale: 0.95 }}
             onClick={handleRefresh}
             disabled={status === 'loading'}
-            className="px-4 py-3 rounded-xl bg-white/80 backdrop-blur-sm border border-gray-200 text-gray-700 hover:bg-gray-50 disabled:opacity-50 transition-all duration-200 flex items-center gap-2 shadow-sm"
+            className="px-4 py-3 rounded-xl bg-white dark:bg-neutral-900 border border-gray-200 text-gray-700 hover:bg-gray-50 disabled:opacity-50 transition-all duration-200 flex items-center gap-2 shadow-sm"
           >
             <Download className={`w-5 h-5 ${status === 'loading' ? 'animate-spin' : ''}`} />
             <span className="hidden sm:block">Refresh</span>
@@ -669,7 +669,7 @@ export default function UsersListPage() {
           <motion.button
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
-            className="px-4 py-3 rounded-xl bg-white/80 backdrop-blur-sm border border-gray-200 text-gray-700 hover:bg-gray-50 transition-all duration-200 flex items-center gap-2 shadow-sm"
+            className="px-4 py-3 rounded-xl bg-white dark:bg-neutral-900 border border-gray-200 text-gray-700 hover:bg-gray-50 transition-all duration-200 flex items-center gap-2 shadow-sm"
           >
             <Share2 className="w-5 h-5" />
             <span className="hidden sm:block">Share</span>
@@ -703,7 +703,7 @@ export default function UsersListPage() {
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
-            className="rounded-2xl border border-gray-200/50 bg-white/80 backdrop-blur-sm p-12 text-center"
+            className="rounded-2xl border border-gray-200/50 bg-white dark:bg-neutral-900 p-12 text-center"
           >
             <motion.div
               animate={{ rotate: 360 }}
@@ -774,7 +774,7 @@ export default function UsersListPage() {
               <motion.div
                 initial={{ opacity: 0, scale: 0.9 }}
                 animate={{ opacity: 1, scale: 1 }}
-                className="rounded-2xl border border-gray-200/50 bg-white/80 backdrop-blur-sm p-12 text-center"
+                className="rounded-2xl border border-gray-200/50 bg-white dark:bg-neutral-900 p-12 text-center"
               >
                 <motion.div
                   animate={{ y: [0, -10, 0] }}
@@ -813,7 +813,7 @@ export default function UsersListPage() {
           <motion.div
             initial={{ opacity: 0, scale: 0.9 }}
             animate={{ opacity: 1, scale: 1 }}
-            className="rounded-2xl border border-gray-200/50 bg-white/80 backdrop-blur-sm p-12 text-center"
+            className="rounded-2xl border border-gray-200/50 bg-white dark:bg-neutral-900 p-12 text-center"
           >
             <motion.div
               animate={{ rotate: [0, 180, 360] }}

@@ -1,7 +1,7 @@
 import React from 'react'
 import { Building2, Search, Plus } from 'lucide-react'
 
-const shell = "rounded-2xl border border-orange-500/30 bg-neutral-50/40 dark:bg-neutral-900/40 backdrop-blur"
+const shell = "rounded-2xl border border-orange-500/30 bg-white dark:bg-neutral-900"
 
 export default function PlatformCompaniesPage() {
   const companies = [

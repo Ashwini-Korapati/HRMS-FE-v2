@@ -24,8 +24,8 @@ export default function UserProjectList() {
         </button>
       </div>
       {error && <div className="text-xs text-rose-500">{error}</div>}
-      <div className="rounded-xl border border-orange-500/20 dark:border-orange-500/30 bg-white/60 dark:bg-neutral-900/40 backdrop-blur overflow-hidden">
-        <div className="grid text-[11px] font-medium uppercase tracking-wide text-neutral-600 dark:text-neutral-400 bg-neutral-100/60 dark:bg-neutral-900/60" style={{ gridTemplateColumns: '1.4fr 1fr 1fr' }}>
+      <div className="rounded-xl border border-orange-500/20 dark:border-orange-500/30 bg-white dark:bg-neutral-900 overflow-hidden">
+        <div className="grid text-[11px] font-medium uppercase tracking-wide text-neutral-600 dark:text-neutral-400 bg-neutral-50 dark:bg-neutral-800" style={{ gridTemplateColumns: '1.4fr 1fr 1fr' }}>
           <div className="px-2 py-2">Name</div>
           <div className="px-2 py-2">Code</div>
           <div className="px-2 py-2">Status</div>

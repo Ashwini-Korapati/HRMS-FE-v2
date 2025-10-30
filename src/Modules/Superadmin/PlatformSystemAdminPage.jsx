@@ -1,7 +1,7 @@
 import React from 'react'
 import { ShieldCheck, UserPlus, Wrench } from 'lucide-react'
 
-const panel = "rounded-2xl border border-orange-500/30 bg-neutral-50/40 dark:bg-neutral-900/40 backdrop-blur p-4 flex flex-col gap-2"
+const panel = "rounded-2xl border border-orange-500/30 bg-white dark:bg-neutral-900 p-4 flex flex-col gap-2"
 
 export default function PlatformSystemAdminPage() {
   const admins = [

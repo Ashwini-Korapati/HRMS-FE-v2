@@ -111,7 +111,7 @@ export default function ProjectsListPage() {
   return (
     <div className="flex flex-col h-full">
       {/* Top Toolbar */}
-      <div className="flex items-center justify-between px-4 py-2 border-b bg-white/80 dark:bg-neutral-900/80 backdrop-blur">
+      <div className="flex items-center justify-between px-4 py-2 border-b bg-white dark:bg-neutral-900">
         <div className="flex items-center gap-2">
           <ToolbarButton icon={RefreshCw} disabled={loading === 'loading'} onClick={() => dispatch(fetchProjects())}>Refresh</ToolbarButton>
           <ToolbarButton icon={Trash2} variant="danger" disabled={!selectedIds.size || deleting === 'loading'} onClick={handleBulkDelete}>Delete</ToolbarButton>
@@ -198,7 +198,7 @@ export default function ProjectsListPage() {
             <div className="p-4">
               <div className="border rounded-lg overflow-hidden">
                 {/* Table Header */}
-                <div className="grid text-[11px] font-medium uppercase tracking-wide text-neutral-600 dark:text-neutral-400 bg-neutral-100/60 dark:bg-neutral-900/60"
+                <div className="grid text-[11px] font-medium uppercase tracking-wide text-neutral-600 dark:text-neutral-400 bg-neutral-50 dark:bg-neutral-800"
                      style={{ gridTemplateColumns: '1.2fr 0.6fr 0.6fr 0.6fr 100px' }}>
                   <div className="px-2 py-2">Name</div>
                   <div className="px-2 py-2">Type</div>
@@ -367,7 +367,7 @@ export default function ProjectsListPage() {
 //   return (
 //     <div className="flex flex-col h-full">
 //       {/* Top Toolbar */}
-//       <div className="flex items-center justify-between px-4 py-2 border-b bg-white/80 dark:bg-neutral-900/80 backdrop-blur">
+//       <div className="flex items-center justify-between px-4 py-2 border-b bg-white dark:bg-neutral-900">
 //         <div className="flex items-center gap-2">
 //           <ToolbarButton icon={RefreshCw} disabled={loading === 'loading'} onClick={() => dispatch(fetchProjects())}>Refresh</ToolbarButton>
 //           <ToolbarButton icon={Trash2} variant="danger" disabled={!selectedIds.size || deleting === 'loading'} onClick={handleBulkDelete}>Delete</ToolbarButton>
@@ -440,7 +440,7 @@ export default function ProjectsListPage() {
 //             <div className="p-4">
 //               <div className="border rounded-lg overflow-hidden">
 //                 {/* Table Header */}
-//                 <div className="grid text-[11px] font-medium uppercase tracking-wide text-neutral-600 dark:text-neutral-400 bg-neutral-100/60 dark:bg-neutral-900/60" 
+//                 <div className="grid text-[11px] font-medium uppercase tracking-wide text-neutral-600 dark:text-neutral-400 bg-neutral-50 dark:bg-neutral-800" 
 //                   style={{ gridTemplateColumns: '1.2fr 0.6fr 0.6fr 0.6fr 100px' }}>
 //                   <div className="px-2 py-2">Name</div>
 //                   <div className="px-2 py-2">Type</div>
@@ -693,7 +693,7 @@ export default function ProjectsListPage() {
 //           {listError && <div className="text-xs text-rose-500">{listError}</div>}
 
 //           <div className="rounded-xl border border-orange-500/20 dark:border-orange-500/30 bg-white/60 dark:bg-neutral-900/40 backdrop-blur overflow-hidden">
-//             <div className="grid text-[11px] font-medium uppercase tracking-wide text-neutral-600 dark:text-neutral-400 bg-neutral-100/60 dark:bg-neutral-900/60" style={{ gridTemplateColumns: '40px 1.2fr 1fr 0.9fr 0.9fr 0.8fr 0.8fr 120px' }}>
+//             <div className="grid text-[11px] font-medium uppercase tracking-wide text-neutral-600 dark:text-neutral-400 bg-neutral-50 dark:bg-neutral-800" style={{ gridTemplateColumns: '40px 1.2fr 1fr 0.9fr 0.9fr 0.8fr 0.8fr 120px' }}>
 //               <div className="px-2 py-2 flex items-center justify-center">
 //                 <button onClick={toggleSelectAll} className="text-orange-600 dark:text-orange-400">
 //                   {allSelected ? <CheckSquare size={14} /> : <Square size={14} />}
@@ -854,7 +854,7 @@ export default function ProjectsListPage() {
 
 //                 {/* Smart Table for Documents */}
 //                 <div className="border rounded-lg overflow-hidden">
-//                   <div className="grid text-[11px] font-medium uppercase tracking-wide text-neutral-600 dark:text-neutral-400 bg-neutral-100/60 dark:bg-neutral-900/60" style={{ gridTemplateColumns: '1.2fr 0.8fr 0.8fr 0.6fr 100px' }}>
+//                   <div className="grid text-[11px] font-medium uppercase tracking-wide text-neutral-600 dark:text-neutral-400 bg-neutral-50 dark:bg-neutral-800" style={{ gridTemplateColumns: '1.2fr 0.8fr 0.8fr 0.6fr 100px' }}>
 //                     <div className="px-2 py-2">Name</div>
 //                     <div className="px-2 py-2">Type</div>
 //                     <div className="px-2 py-2">Size</div>

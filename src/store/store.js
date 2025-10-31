@@ -20,6 +20,7 @@ import  WorkShiftsReducer from '../Redux/Public/WorkShiftsSlice'
 import attendanceReducer from '../Redux/Public/attendanceSlice'
 import designationMonitoringReducer from '../Redux/Public/designationMonitoringSlice'
 import connectionReducer from '../Redux/Public/connectionSlice'
+import kebabActionsReducer from '../Redux/Public/kebabActionsSlice'
 // Simple action logger (dev only)
 const actionLogger = store => next => action => {
   if (process.env.NODE_ENV === 'development') {
@@ -61,6 +62,7 @@ export const store = configureStore({
     attendance: attendanceReducer,
     designationMonitoring: designationMonitoringReducer,
     connection: connectionReducer,
+    kebabActions: kebabActionsReducer,
 
   },
   middleware: getDefault => getDefault({ serializableCheck: false }).concat(actionLogger, errorReporter)

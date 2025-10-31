@@ -595,7 +595,7 @@ export default function UsersListPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-50 via-orange-50/30 to-rose-50/30 p-4 md:p-6 space-y-6">
+    <div className="min-h-screen p-4 md:p-6 space-y-6">
       {/* Animated background elements */}
       <div className="fixed inset-0 overflow-hidden pointer-events-none -z-10">
         <motion.div

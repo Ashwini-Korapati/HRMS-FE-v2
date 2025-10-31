@@ -7,8 +7,8 @@ import { toAssetUrl } from '../../config/config'
 function RoleBadge({ role }) {
   const r = (role || '').toUpperCase()
   const style = r === 'ADMIN'
-    ? 'bg-purple-100 text-purple-800 border border-purple-200'
-    : 'bg-blue-100 text-blue-800 border border-blue-200'
+    ? 'bg-purple-100 dark:bg-purple-900/30 text-purple-800 dark:text-purple-300 border border-purple-200 dark:border-purple-700'
+    : 'bg-blue-100 dark:bg-blue-900/30 text-blue-800 dark:text-blue-300 border border-blue-200 dark:border-blue-700'
   const text = r === 'ADMIN' ? 'Administrator' : (r || 'User')
   return (
     <span className={`px-2 py-0.5 rounded text-[10px] font-medium whitespace-nowrap ${style}`}>{text}</span>
@@ -19,7 +19,7 @@ function Avatar({ employee, size = 36 }) {
   const path = employee?.avatarUrl || employee?.avatar || employee?.photoUrl || employee?.photo || ''
   const url = toAssetUrl(path) || null
   const initials = (employee?.firstName?.[0] || employee?.name?.[0] || employee?.email?.[0] || 'U').toUpperCase()
-  const cls = `rounded-full border border-neutral-300 bg-neutral-100 text-neutral-700 grid place-items-center`;
+  const cls = `rounded-full border border-neutral-300 dark:border-neutral-700 bg-neutral-100 dark:bg-neutral-800 text-neutral-700 dark:text-neutral-200 grid place-items-center`;
   if (url) return <img src={url} alt={employee?.name || employee?.email || 'avatar'} className={cls} style={{ width: size, height: size, objectFit: 'cover' }} />
   return <div className={cls} style={{ width: size, height: size, fontSize: size * 0.45 }}>{initials}</div>
 }
@@ -54,10 +54,10 @@ export default function SmartEmployeeLeftBar() {
         <div className="px-4 py-3 border-b border-neutral-200 dark:border-neutral-800">
           <h3 className="text-sm font-semibold text-neutral-800 dark:text-neutral-100">Team Members</h3>
           {status === 'loading' && (
-            <div className="mt-1 text-[10px] text-neutral-500">Loading…</div>
+            <div className="mt-1 text-[10px] text-neutral-500 dark:text-neutral-400">Loading…</div>
           )}
           {status === 'failed' && (
-            <div className="mt-1 text-xs text-red-600">{String(error || 'Failed to load')}</div>
+            <div className="mt-1 text-xs text-red-600 dark:text-red-400">{String(error || 'Failed to load')}</div>
           )}
         </div>
 
@@ -85,7 +85,7 @@ export default function SmartEmployeeLeftBar() {
             )
           })}
           {(!employees || employees.length === 0) && status === 'succeeded' && (
-            <li className="px-4 py-6 text-center text-xs text-neutral-500">No employees found</li>
+            <li className="px-4 py-6 text-center text-xs text-neutral-500 dark:text-neutral-400">No employees found</li>
           )}
         </ul>
       </div>

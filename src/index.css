@@ -233,4 +233,545 @@ body {
   [data-theme="dark"] .team-container { 
     background: linear-gradient(to bottom right, #000000, #0a0a0a, #18181b) !important; 
   }
+
+  /* ============================================ */
+  /* COMPREHENSIVE TEXT COLOR OVERRIDES */
+  /* ============================================ */
+  
+  /* UsersListPage - Employee cards and text */
+  [data-theme="light"] .user-card { background-color: #ffffff !important; }
+  [data-theme="dark"] .user-card { background-color: #1a1a1a !important; }
+  
+  [data-theme="light"] .user-name { color: #000000 !important; }
+  [data-theme="dark"] .user-name { color: #ffffff !important; }
+  
+  [data-theme="light"] .user-email { color: #525252 !important; }
+  [data-theme="dark"] .user-email { color: #d1d5db !important; }
+  
+  [data-theme="light"] .user-role { color: #404040 !important; }
+  [data-theme="dark"] .user-role { color: #e5e7eb !important; }
+  
+  [data-theme="light"] .user-status { color: #525252 !important; }
+  [data-theme="dark"] .user-status { color: #cbd5e1 !important; }
+
+  /* AdminUserProfilePage - Profile text */
+  [data-theme="light"] .profile-title { color: #000000 !important; }
+  [data-theme="dark"] .profile-title { color: #ffffff !important; }
+  
+  [data-theme="light"] .profile-label { color: #525252 !important; }
+  [data-theme="dark"] .profile-label { color: #d1d5db !important; }
+  
+  [data-theme="light"] .profile-value { color: #171717 !important; }
+  [data-theme="dark"] .profile-value { color: #f1f5f9 !important; }
+  
+  [data-theme="light"] .profile-section { background-color: #fafafa !important; }
+  [data-theme="dark"] .profile-section { background-color: #262626 !important; }
+
+  /* CreateDesignationPage - Form text */
+  [data-theme="light"] .form-label { color: #404040 !important; }
+  [data-theme="dark"] .form-label { color: #e5e7eb !important; }
+  
+  [data-theme="light"] .form-text { color: #171717 !important; }
+  [data-theme="dark"] .form-text { color: #f8fafc !important; }
+  
+  [data-theme="light"] .form-hint { color: #737373 !important; }
+  [data-theme="dark"] .form-hint { color: #9ca3af !important; }
+  
+  [data-theme="light"] .form-error { color: #991b1b !important; }
+  [data-theme="dark"] .form-error { color: #fecaca !important; }
+  
+  [data-theme="light"] .form-card { background-color: #ffffff !important; }
+  [data-theme="dark"] .form-card { background-color: #1a1a1a !important; }
+
+  /* AttendancePage - Attendance records */
+  [data-theme="light"] .attendance-row { color: #171717 !important; }
+  [data-theme="dark"] .attendance-row { color: #f1f5f9 !important; }
+  
+  [data-theme="light"] .attendance-header { 
+    background-color: #f3f4f6 !important; 
+    color: #000000 !important;
+  }
+  [data-theme="dark"] .attendance-header { 
+    background-color: #1f2937 !important; 
+    color: #ffffff !important;
+  }
+  
+  [data-theme="light"] .attendance-label { color: #525252 !important; }
+  [data-theme="dark"] .attendance-label { color: #cbd5e1 !important; }
+  
+  [data-theme="light"] .attendance-value { color: #171717 !important; }
+  [data-theme="dark"] .attendance-value { color: #f8fafc !important; }
+  
+  [data-theme="light"] .attendance-time { color: #737373 !important; }
+  [data-theme="dark"] .attendance-time { color: #d1d5db !important; }
+
+  /* ProjectsListPage - Project text */
+  [data-theme="light"] .project-title { color: #000000 !important; }
+  [data-theme="dark"] .project-title { color: #ffffff !important; }
+  
+  [data-theme="light"] .project-description { color: #525252 !important; }
+  [data-theme="dark"] .project-description { color: #d1d5db !important; }
+  
+  [data-theme="light"] .project-meta { color: #737373 !important; }
+  [data-theme="dark"] .project-meta { color: #9ca3af !important; }
+  
+  [data-theme="light"] .project-card { background-color: #ffffff !important; }
+  [data-theme="dark"] .project-card { background-color: #1a1a1a !important; }
+  
+  [data-theme="light"] .folder-name { color: #171717 !important; }
+  [data-theme="dark"] .folder-name { color: #f8fafc !important; }
+  
+  [data-theme="light"] .folder-path { color: #737373 !important; }
+  [data-theme="dark"] .folder-path { color: #9ca3af !important; }
+
+  /* UserProjectList - User project text */
+  [data-theme="light"] .user-project-title { color: #000000 !important; }
+  [data-theme="dark"] .user-project-title { color: #ffffff !important; }
+  
+  [data-theme="light"] .user-project-desc { color: #525252 !important; }
+  [data-theme="dark"] .user-project-desc { color: #d1d5db !important; }
+  
+  [data-theme="light"] .user-folder-item { color: #171717 !important; }
+  [data-theme="dark"] .user-folder-item { color: #f8fafc !important; }
+  
+  [data-theme="light"] .user-file-list { color: #404040 !important; }
+  [data-theme="dark"] .user-file-list { color: #e5e7eb !important; }
+
+  /* CreateDepartmentPage (similar to designation) - Form elements */
+  [data-theme="light"] .dept-form-label { color: #404040 !important; }
+  [data-theme="dark"] .dept-form-label { color: #e5e7eb !important; }
+  
+  [data-theme="light"] .dept-form-input { color: #171717 !important; }
+  [data-theme="dark"] .dept-form-input { color: #f8fafc !important; }
+  
+  [data-theme="light"] .dept-form-hint { color: #737373 !important; }
+  [data-theme="dark"] .dept-form-hint { color: #9ca3af !important; }
+
+  /* Generic page elements */
+  [data-theme="light"] .page-title { color: #000000 !important; }
+  [data-theme="dark"] .page-title { color: #ffffff !important; }
+  
+  [data-theme="light"] .page-subtitle { color: #525252 !important; }
+  [data-theme="dark"] .page-subtitle { color: #d1d5db !important; }
+  
+  [data-theme="light"] .section-header { color: #171717 !important; }
+  [data-theme="dark"] .section-header { color: #f1f5f9 !important; }
+  
+  [data-theme="light"] .section-text { color: #404040 !important; }
+  [data-theme="dark"] .section-text { color: #e5e7eb !important; }
+
+  /* Table elements */
+  [data-theme="light"] table th { 
+    background-color: #f3f4f6 !important;
+    color: #000000 !important;
+  }
+  [data-theme="dark"] table th { 
+    background-color: #1f2937 !important;
+    color: #ffffff !important;
+  }
+  
+  [data-theme="light"] table td { color: #171717 !important; }
+  [data-theme="dark"] table td { color: #f1f5f9 !important; }
+  
+  [data-theme="light"] table tr:hover { background-color: rgba(249, 115, 22, 0.05) !important; }
+  [data-theme="dark"] table tr:hover { background-color: rgba(249, 115, 22, 0.1) !important; }
+
+  /* Button text */
+  [data-theme="light"] .btn-primary { color: #ffffff !important; }
+  [data-theme="dark"] .btn-primary { color: #ffffff !important; }
+  
+  [data-theme="light"] .btn-secondary { color: #000000 !important; }
+  [data-theme="dark"] .btn-secondary { color: #ffffff !important; }
+
+  /* Badge and status elements */
+  [data-theme="light"] .status-badge { color: #000000 !important; }
+  [data-theme="dark"] .status-badge { color: #ffffff !important; }
+  
+  [data-theme="light"] .info-badge { color: #0066cc !important; }
+  [data-theme="dark"] .info-badge { color: #93c5fd !important; }
+
+  /* Modal/Dialog text */
+  [data-theme="light"] .modal-title { color: #000000 !important; }
+  [data-theme="dark"] .modal-title { color: #ffffff !important; }
+  
+  [data-theme="light"] .modal-text { color: #404040 !important; }
+  [data-theme="dark"] .modal-text { color: #e5e7eb !important; }
+
+  /* Alerts and messages */
+  [data-theme="light"] .alert-text { color: #402820 !important; }
+  [data-theme="dark"] .alert-text { color: #fef3c7 !important; }
+  
+  [data-theme="light"] .error-text { color: #7f1d1d !important; }
+  [data-theme="dark"] .error-text { color: #fecaca !important; }
+  
+  [data-theme="light"] .success-text { color: #166534 !important; }
+  [data-theme="dark"] .success-text { color: #86efac !important; }
+
+  /* INPUT & FORM ELEMENTS - DARK MODE TEXT COLOR FIXES */
+  
+  /* Input placeholders */
+  [data-theme="dark"] input::placeholder,
+  [data-theme="dark"] textarea::placeholder,
+  [data-theme="dark"] select::placeholder {
+    color: #9ca3af !important;
+    opacity: 1 !important;
+  }
+  
+  /* Light mode placeholders */
+  [data-theme="light"] input::placeholder,
+  [data-theme="light"] textarea::placeholder,
+  [data-theme="light"] select::placeholder {
+    color: #d1d5db !important;
+    opacity: 1 !important;
+  }
+
+  /* Input text colors */
+  [data-theme="dark"] input[type="text"],
+  [data-theme="dark"] input[type="email"],
+  [data-theme="dark"] input[type="password"],
+  [data-theme="dark"] input[type="number"],
+  [data-theme="dark"] input[type="date"],
+  [data-theme="dark"] input[type="time"],
+  [data-theme="dark"] input[type="search"],
+  [data-theme="dark"] textarea,
+  [data-theme="dark"] select {
+    background-color: #1f2937 !important;
+    color: #f3f4f6 !important;
+    border-color: #374151 !important;
+  }
+
+  [data-theme="light"] input[type="text"],
+  [data-theme="light"] input[type="email"],
+  [data-theme="light"] input[type="password"],
+  [data-theme="light"] input[type="number"],
+  [data-theme="light"] input[type="date"],
+  [data-theme="light"] input[type="time"],
+  [data-theme="light"] input[type="search"],
+  [data-theme="light"] textarea,
+  [data-theme="light"] select {
+    background-color: #ffffff !important;
+    color: #171717 !important;
+    border-color: #e5e7eb !important;
+  }
+
+  /* Input focus states */
+  [data-theme="dark"] input:focus,
+  [data-theme="dark"] textarea:focus,
+  [data-theme="dark"] select:focus {
+    border-color: #ea580c !important;
+    outline: none !important;
+    box-shadow: 0 0 0 3px rgba(234, 88, 12, 0.1) !important;
+  }
+
+  [data-theme="light"] input:focus,
+  [data-theme="light"] textarea:focus,
+  [data-theme="light"] select:focus {
+    border-color: #ea580c !important;
+    outline: none !important;
+    box-shadow: 0 0 0 3px rgba(234, 88, 12, 0.1) !important;
+  }
+
+  /* Form labels */
+  [data-theme="light"] label { color: #171717 !important; }
+  [data-theme="dark"] label { color: #f3f4f6 !important; }
+
+  /* Form hints and descriptions */
+  [data-theme="light"] .form-hint,
+  [data-theme="light"] .form-description,
+  [data-theme="light"] .form-text {
+    color: #6b7280 !important;
+  }
+  
+  [data-theme="dark"] .form-hint,
+  [data-theme="dark"] .form-description,
+  [data-theme="dark"] .form-text {
+    color: #d1d5db !important;
+  }
+
+  /* Form error states */
+  [data-theme="light"] input:invalid,
+  [data-theme="light"] textarea:invalid,
+  [data-theme="light"] select:invalid {
+    border-color: #dc2626 !important;
+  }
+
+  [data-theme="dark"] input:invalid,
+  [data-theme="dark"] textarea:invalid,
+  [data-theme="dark"] select:invalid {
+    border-color: #ef4444 !important;
+  }
+
+  /* Disabled inputs */
+  [data-theme="dark"] input:disabled,
+  [data-theme="dark"] textarea:disabled,
+  [data-theme="dark"] select:disabled {
+    background-color: #111827 !important;
+    color: #6b7280 !important;
+    border-color: #374151 !important;
+    opacity: 0.6;
+  }
+
+  [data-theme="light"] input:disabled,
+  [data-theme="light"] textarea:disabled,
+  [data-theme="light"] select:disabled {
+    background-color: #f3f4f6 !important;
+    color: #9ca3af !important;
+    border-color: #e5e7eb !important;
+    opacity: 0.6;
+  }
+
+  /* COMPREHENSIVE TEXT COLOR FIXES FOR ALL PAGES */
+
+  /* UsersListPage, AdminUserProfilePage, etc. */
+  [data-theme="dark"] .text-gray-900 { color: #f3f4f6 !important; }
+  [data-theme="dark"] .text-gray-800 { color: #e5e7eb !important; }
+  [data-theme="dark"] .text-gray-700 { color: #d1d5db !important; }
+  [data-theme="dark"] .text-gray-600 { color: #9ca3af !important; }
+  [data-theme="dark"] .text-gray-500 { color: #6b7280 !important; }
+  [data-theme="dark"] .text-gray-400 { color: #4b5563 !important; }
+  [data-theme="dark"] .text-gray-300 { color: #d1d5db !important; }
+
+  [data-theme="light"] .text-gray-900 { color: #171717 !important; }
+  [data-theme="light"] .text-gray-800 { color: #1f2937 !important; }
+  [data-theme="light"] .text-gray-700 { color: #374151 !important; }
+  [data-theme="light"] .text-gray-600 { color: #4b5563 !important; }
+  [data-theme="light"] .text-gray-500 { color: #6b7280 !important; }
+  [data-theme="light"] .text-gray-400 { color: #9ca3af !important; }
+
+  /* Specific color text fixes */
+  [data-theme="dark"] .text-red-800 { color: #fca5a5 !important; }
+  [data-theme="dark"] .text-red-600 { color: #f87171 !important; }
+  [data-theme="dark"] .text-green-800 { color: #86efac !important; }
+  [data-theme="dark"] .text-green-600 { color: #4ade80 !important; }
+  [data-theme="dark"] .text-blue-800 { color: #93c5fd !important; }
+  [data-theme="dark"] .text-blue-600 { color: #60a5fa !important; }
+  [data-theme="dark"] .text-orange-800 { color: #fdba74 !important; }
+  [data-theme="dark"] .text-orange-600 { color: #fb923c !important; }
+  [data-theme="dark"] .text-purple-800 { color: #d8b4fe !important; }
+  [data-theme="dark"] .text-purple-600 { color: #c084fc !important; }
+
+  /* Neutral/slate text */
+  [data-theme="dark"] .text-slate-900 { color: #f1f5f9 !important; }
+  [data-theme="dark"] .text-slate-800 { color: #e2e8f0 !important; }
+  [data-theme="dark"] .text-slate-700 { color: #cbd5e1 !important; }
+  [data-theme="dark"] .text-slate-600 { color: #94a3b8 !important; }
+  [data-theme="dark"] .text-slate-500 { color: #64748b !important; }
+  [data-theme="dark"] .text-slate-400 { color: #475569 !important; }
+
+  [data-theme="light"] .text-slate-900 { color: #0f172a !important; }
+  [data-theme="light"] .text-slate-800 { color: #1e293b !important; }
+  [data-theme="light"] .text-slate-700 { color: #334155 !important; }
+  [data-theme="light"] .text-slate-600 { color: #475569 !important; }
+  [data-theme="light"] .text-slate-500 { color: #64748b !important; }
+  [data-theme="light"] .text-slate-400 { color: #94a3b8 !important; }
+
+  /* List items and content text */
+  [data-theme="dark"] li,
+  [data-theme="dark"] td,
+  [data-theme="dark"] .content-text,
+  [data-theme="dark"] .item-text {
+    color: #e5e7eb !important;
+  }
+
+  [data-theme="light"] li,
+  [data-theme="light"] td,
+  [data-theme="light"] .content-text,
+  [data-theme="light"] .item-text {
+    color: #1f2937 !important;
+  }
+
+  /* Links */
+  [data-theme="dark"] a { color: #60a5fa !important; }
+  [data-theme="dark"] a:hover { color: #93c5fd !important; }
+  
+  [data-theme="light"] a { color: #2563eb !important; }
+  [data-theme="light"] a:hover { color: #1d4ed8 !important; }
+
+  /* Headings */
+  [data-theme="dark"] h1, [data-theme="dark"] h2, [data-theme="dark"] h3, 
+  [data-theme="dark"] h4, [data-theme="dark"] h5, [data-theme="dark"] h6 {
+    color: #f3f4f6 !important;
+  }
+
+  [data-theme="light"] h1, [data-theme="light"] h2, [data-theme="light"] h3, 
+  [data-theme="light"] h4, [data-theme="light"] h5, [data-theme="light"] h6 {
+    color: #111827 !important;
+  }
+
+  /* ============= UNIVERSAL TEXT COLOR FIXES ============= */
+  
+  /* Neutral text scales - ALL instances */
+  [data-theme="dark"] .text-neutral-900 { color: #f3f4f6 !important; }
+  [data-theme="dark"] .text-neutral-800 { color: #e5e7eb !important; }
+  [data-theme="dark"] .text-neutral-700 { color: #d1d5db !important; }
+  [data-theme="dark"] .text-neutral-600 { color: #9ca3af !important; }
+  [data-theme="dark"] .text-neutral-500 { color: #6b7280 !important; }
+  [data-theme="dark"] .text-neutral-400 { color: #9ca3af !important; }
+  
+  /* Gray text scales */
+  [data-theme="dark"] .text-gray-900 { color: #f3f4f6 !important; }
+  [data-theme="dark"] .text-gray-800 { color: #e5e7eb !important; }
+  [data-theme="dark"] .text-gray-700 { color: #d1d5db !important; }
+  [data-theme="dark"] .text-gray-600 { color: #9ca3af !important; }
+  [data-theme="dark"] .text-gray-500 { color: #6b7280 !important; }
+  [data-theme="dark"] .text-gray-400 { color: #9ca3af !important; }
+  
+  /* Slate text scales */
+  [data-theme="dark"] .text-slate-900 { color: #f3f4f6 !important; }
+  [data-theme="dark"] .text-slate-800 { color: #e5e7eb !important; }
+  [data-theme="dark"] .text-slate-700 { color: #d1d5db !important; }
+  [data-theme="dark"] .text-slate-600 { color: #9ca3af !important; }
+  [data-theme="dark"] .text-slate-500 { color: #6b7280 !important; }
+  
+  /* Semantic colors */
+  [data-theme="dark"] .text-red-600 { color: #f87171 !important; }
+  [data-theme="dark"] .text-red-700 { color: #dc2626 !important; }
+  [data-theme="dark"] .text-red-800 { color: #b91c1c !important; }
+  
+  [data-theme="dark"] .text-green-600 { color: #4ade80 !important; }
+  [data-theme="dark"] .text-green-700 { color: #22c55e !important; }
+  [data-theme="dark"] .text-green-800 { color: #16a34a !important; }
+  
+  [data-theme="dark"] .text-blue-600 { color: #60a5fa !important; }
+  [data-theme="dark"] .text-blue-700 { color: #3b82f6 !important; }
+  [data-theme="dark"] .text-blue-800 { color: #1d4ed8 !important; }
+  
+  [data-theme="dark"] .text-orange-600 { color: #fb923c !important; }
+  [data-theme="dark"] .text-orange-700 { color: #ea580c !important; }
+  [data-theme="dark"] .text-orange-800 { color: #c2410c !important; }
+  
+  [data-theme="dark"] .text-purple-600 { color: #d8b4fe !important; }
+  [data-theme="dark"] .text-purple-700 { color: #c084fc !important; }
+  [data-theme="dark"] .text-purple-800 { color: #a855f7 !important; }
+  
+  [data-theme="dark"] .text-yellow-600 { color: #fbbf24 !important; }
+  [data-theme="dark"] .text-yellow-700 { color: #f59e0b !important; }
+  [data-theme="dark"] .text-yellow-800 { color: #d97706 !important; }
+  
+  /* Emphasis and opacity */
+  [data-theme="dark"] .font-semibold,
+  [data-theme="dark"] .font-bold { color: inherit !important; }
+  
+  /* Stroke and borders text */
+  [data-theme="dark"] .stroke-neutral-600 { stroke: #9ca3af !important; }
+  [data-theme="dark"] .stroke-gray-600 { stroke: #9ca3af !important; }
+  
+  /* Placeholder colors - ensure visibility */
+  [data-theme="dark"] input::placeholder { color: #9ca3af !important; opacity: 1 !important; }
+  [data-theme="dark"] textarea::placeholder { color: #9ca3af !important; opacity: 1 !important; }
+  [data-theme="dark"] select::placeholder { color: #9ca3af !important; }
+
+  /* ============= AGGRESSIVE TABLE & LIST TEXT FIXES ============= */
+  
+  /* Table elements */
+  [data-theme="dark"] table { color: #f3f4f6 !important; }
+  [data-theme="dark"] thead { background-color: #1f2937 !important; color: #f3f4f6 !important; }
+  [data-theme="dark"] tbody tr { color: #f3f4f6 !important; }
+  [data-theme="dark"] td { color: #f3f4f6 !important; }
+  [data-theme="dark"] th { color: #f3f4f6 !important; }
+  
+  /* List and card text */
+  [data-theme="dark"] li { color: #f3f4f6 !important; }
+  [data-theme="dark"] ul { color: #f3f4f6 !important; }
+  [data-theme="dark"] ol { color: #f3f4f6 !important; }
+  
+  /* Paragraph and text blocks */
+  [data-theme="dark"] p { color: #f3f4f6 !important; }
+  [data-theme="dark"] span { color: inherit !important; }
+  [data-theme="dark"] div { color: inherit !important; }
+  
+  /* Buttons with text */
+  [data-theme="dark"] button { color: inherit !important; }
+  
+  /* Small and emphasized text */
+  [data-theme="dark"] small { color: #d1d5db !important; }
+  [data-theme="dark"] em { color: #f3f4f6 !important; }
+  [data-theme="dark"] strong { color: #f3f4f6 !important; }
+  
+  /* ============= INPUT AND PLACEHOLDER FIXES ============= */
+  
+  /* Input fields - make text visible */
+  [data-theme="dark"] input { color: #f3f4f6 !important; background-color: #000000 !important; }
+  [data-theme="dark"] input[type="text"] { color: #f3f4f6 !important; }
+  [data-theme="dark"] input[type="email"] { color: #f3f4f6 !important; }
+  [data-theme="dark"] input[type="password"] { color: #f3f4f6 !important; }
+  [data-theme="dark"] input[type="number"] { color: #f3f4f6 !important; }
+  [data-theme="dark"] input[type="date"] { color: #f3f4f6 !important; }
+  [data-theme="dark"] input[type="search"] { color: #f3f4f6 !important; }
+  
+  /* Textarea - make text visible */
+  [data-theme="dark"] textarea { color: #f3f4f6 !important; background-color: #000000 !important; }
+  
+  /* Select fields - make text visible */
+  [data-theme="dark"] select { color: #f3f4f6 !important; background-color: #000000 !important; }
+  [data-theme="dark"] select option { color: #f3f4f6 !important; background-color: #1f2937 !important; }
+  
+  /* Placeholders - make them visible in ALL input types */
+  [data-theme="dark"] input::placeholder { color: #9ca3af !important; opacity: 1 !important; }
+  [data-theme="dark"] textarea::placeholder { color: #9ca3af !important; opacity: 1 !important; }
+  [data-theme="dark"] select::placeholder { color: #9ca3af !important; opacity: 1 !important; }
+  
+  /* Webkit browsers (Chrome, Safari, Edge) */
+  [data-theme="dark"] input::-webkit-input-placeholder { color: #9ca3af !important; opacity: 1 !important; }
+  [data-theme="dark"] textarea::-webkit-input-placeholder { color: #9ca3af !important; opacity: 1 !important; }
+  
+  /* Mozilla Firefox */
+  [data-theme="dark"] input::-moz-placeholder { color: #9ca3af !important; opacity: 1 !important; }
+  [data-theme="dark"] textarea::-moz-placeholder { color: #9ca3af !important; opacity: 1 !important; }
+  
+  /* Edge legacy */
+  [data-theme="dark"] input:-ms-input-placeholder { color: #9ca3af !important; opacity: 1 !important; }
+  [data-theme="dark"] textarea:-ms-input-placeholder { color: #9ca3af !important; opacity: 1 !important; }
+  
+  /* ============= SPECIFIC COMPONENT FIXES ============= */
+  
+  /* Projects page text */
+  [data-theme="dark"] .truncate { color: #f3f4f6 !important; }
+  [data-theme="dark"] [class*="folder"] { color: #f3f4f6 !important; }
+  [data-theme="dark"] [class*="project"] { color: #f3f4f6 !important; }
+  
+  /* Breadcrumb and navigation text */
+  [data-theme="dark"] .breadcrumb { color: #d1d5db !important; }
+  [data-theme="dark"] [class*="breadcrumb"] { color: #d1d5db !important; }
+  
+  /* File and folder names */
+  [data-theme="dark"] [class*="file"] { color: #f3f4f6 !important; }
+  [data-theme="dark"] [class*="folder"] { color: #f3f4f6 !important; }
+  
+  /* KebabMenu floating support - Dark Mode */
+  [data-theme="dark"] .relative [role="menu"] {
+    color: #f3f4f6 !important;
+    background-color: #0a0a0a !important;
+    border-color: #262626 !important;
+  }
+  
+  [data-theme="dark"] [role="menu"] button {
+    color: #d1d5db !important;
+  }
+  
+  [data-theme="dark"] [role="menu"] button:hover {
+    color: #f3f4f6 !important;
+    background-color: rgba(249, 115, 22, 0.1) !important;
+  }
+
+  /* KebabMenu floating support - Light Mode */
+  [data-theme="light"] [role="menu"] {
+    color: #000000 !important; /* pure black text */
+    background-color: #ffffff !important;
+    border-color: #e5e7eb !important;
+  }
+  
+  [data-theme="light"] [role="menu"] button {
+    color: #000000 !important; /* pure black for items */
+  }
+  
+  [data-theme="light"] [role="menu"] button:hover {
+    color: #000000 !important;
+    background-color: rgba(249, 115, 22, 0.08) !important;
+  }
+  
+  /* Folder and project text - Ensure black in light mode */
+  [data-theme="light"] .text-neutral-700 { color: #000000 !important; }
+  [data-theme="light"] [class*="folder"] span { color: #000000 !important; }
+  [data-theme="light"] [class*="project"] span { color: #000000 !important; }
 }

@@ -302,7 +302,7 @@ const CreateDesignationPage = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-white via-orange-50/30 to-white dark:from-neutral-950 dark:via-neutral-900 dark:to-neutral-950">
+    <div className="min-h-screen  dark:from-neutral-950 dark:via-neutral-900 dark:to-neutral-950">
       <main className="max-w-7xl mx-auto px-4 py-8">
         {/* Enhanced Page Header */}
         <div className="mb-8 animate-in slide-in-from-top-4 duration-700">

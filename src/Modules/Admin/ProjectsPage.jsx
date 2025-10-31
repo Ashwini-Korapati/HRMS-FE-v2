@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { PageHeading, TableSkeleton } from './components'
 import SmartStatusDonutGraph from '../../components/Graph/SmartStatusDonutGraph'
+import { toAssetUrl } from '../../config/config'
 import { 
   fetchProjectsInsights, 
   selectProjectsInsights, 
@@ -24,9 +25,6 @@ const DEFAULT_AVATAR_SVG = `data:image/svg+xml;base64,${btoa(`
     <path d="M16 32C22 32 26 28 26 22H6C6 28 10 32 16 32Z" fill="white"/>
   </svg>
 `)}`;
-
-// Base URL for API - adjust according to your environment
-const API_BASE_URL = process.env.REACT_APP_API_URL || 'http://localhost:5000';
 
 function StatBox({ label, value, loading, accent='orange' }) {
   const color = {
@@ -108,13 +106,8 @@ function UserAvatar({ src, alt, className = "w-8 h-8" }) {
 
   useEffect(() => {
     if (src) {
-      // Build the correct image URL
-      let imageUrl = src;
-      
-      // If it's a relative path (starts with /), prepend the API base URL
-      if (src.startsWith('/') && !src.startsWith('http')) {
-        imageUrl = `${API_BASE_URL}${src}`;
-      }
+      // Use toAssetUrl to build the correct image URL
+      const imageUrl = toAssetUrl(src);
       
       // Test if the image loads successfully
       const img = new Image();

@@ -181,43 +181,43 @@ export default function AdminUserProfilePage() {
         <h3 className="text-sm font-semibold text-neutral-900 dark:text-neutral-100 mb-3">Personal Details</h3>
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-sm">
           <div>
-            <div className="text-xs text-neutral-500 mb-1">First Name</div>
+            <div className="text-xs text-neutral-600 dark:text-neutral-300 mb-1">First Name</div>
             <InputBox value={profile.firstName} />
           </div>
           <div>
-            <div className="text-xs text-neutral-500 mb-1">Last Name</div>
+            <div className="text-xs text-neutral-600 dark:text-neutral-300 mb-1">Last Name</div>
             <InputBox value={profile.lastName} />
           </div>
           <div>
-            <div className="text-xs text-neutral-500 mb-1">Email address</div>
+            <div className="text-xs text-neutral-600 dark:text-neutral-300 mb-1">Email address</div>
             <InputBox value={profile.email} />
           </div>
           <div>
-            <div className="text-xs text-neutral-500 mb-1">Phone</div>
+            <div className="text-xs text-neutral-600 dark:text-neutral-300 mb-1">Phone</div>
             {!editing ? <InputBox value={profile.phone} /> : (
               <input value={form.phone} onChange={(e)=>setForm(f=>({...f, phone: e.target.value}))} className="rounded-md border border-neutral-200 dark:border-neutral-800 bg-white dark:bg-neutral-900 text-sm text-neutral-900 dark:text-neutral-100 px-3 py-2 min-h-[38px] w-full" />
             )}
           </div>
           <div>
-            <div className="text-xs text-neutral-500 mb-1">Bio</div>
+            <div className="text-xs text-neutral-600 dark:text-neutral-300 mb-1">Bio</div>
             {!editing ? <InputBox value={profile.bio} /> : (
               <textarea value={form.bio} onChange={(e)=>setForm(f=>({...f, bio: e.target.value}))} rows={2} className="rounded-md border border-neutral-200 dark:border-neutral-800 bg-white dark:bg-neutral-900 text-sm text-neutral-900 dark:text-neutral-100 px-3 py-2 w-full" />
             )}
           </div>
           <div>
-            <div className="text-xs text-neutral-500 mb-1">Gender</div>
+            <div className="text-xs text-neutral-600 dark:text-neutral-300 mb-1">Gender</div>
             {!editing ? <InputBox value={profile.gender} /> : (
               <input value={form.gender} onChange={(e)=>setForm(f=>({...f, gender: e.target.value}))} className="rounded-md border border-neutral-200 dark:border-neutral-800 bg-white dark:bg-neutral-900 text-sm text-neutral-900 dark:text-neutral-100 px-3 py-2 min-h-[38px] w-full" />
             )}
           </div>
           <div>
-            <div className="text-xs text-neutral-500 mb-1">Date of Birth</div>
+            <div className="text-xs text-neutral-600 dark:text-neutral-300 mb-1">Date  Birth</div>
             {!editing ? <InputBox value={formatDate(profile.dateOfBirth)} /> : (
               <input type="date" value={form.dateOfBirth} onChange={(e)=>setForm(f=>({...f, dateOfBirth: e.target.value}))} className="rounded-md border border-neutral-200 dark:border-neutral-800 bg-white dark:bg-neutral-900 text-sm text-neutral-900 dark:text-neutral-100 px-3 py-2 min-h-[38px] w-full" />
             )}
           </div>
           <div>
-            <div className="text-xs text-neutral-500 mb-1">National ID</div>
+            <div className="text-xs text-neutral-600 dark:text-neutral-300 mb-1">National ID</div>
             <InputBox value={profile.nationalId || profile.nationalID} />
           </div>
         </div>
@@ -226,25 +226,25 @@ export default function AdminUserProfilePage() {
         <h3 className="text-sm font-semibold text-neutral-900 dark:text-neutral-100 mt-6 mb-3">Address</h3>
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-sm">
           <div>
-            <div className="text-xs text-neutral-500 mb-1">Country</div>
+            <div className="text-xs text-neutral-600 dark:text-neutral-300 mb-1">Country</div>
             {!editing ? <InputBox value={profile.addressCountry || profile.country} /> : (
               <input value={form.addressCountry} onChange={(e)=>setForm(f=>({...f, addressCountry: e.target.value}))} className="rounded-md border border-neutral-200 dark:border-neutral-800 bg-white dark:bg-neutral-900 text-sm text-neutral-900 dark:text-neutral-100 px-3 py-2 min-h-[38px] w-full" />
             )}
           </div>
           <div>
-            <div className="text-xs text-neutral-500 mb-1">City/State</div>
+            <div className="text-xs text-neutral-600 dark:text-neutral-300 mb-1">City/State</div>
             {!editing ? <InputBox value={profile.addressCity || profile.city || profile.state} /> : (
               <input value={form.addressCity} onChange={(e)=>setForm(f=>({...f, addressCity: e.target.value}))} className="rounded-md border border-neutral-200 dark:border-neutral-800 bg-white dark:bg-neutral-900 text-sm text-neutral-900 dark:text-neutral-100 px-3 py-2 min-h-[38px] w-full" />
             )}
           </div>
           <div>
-            <div className="text-xs text-neutral-500 mb-1">Postal Code</div>
+            <div className="text-xs text-neutral-600 dark:text-neutral-300 mb-1">Postal Code</div>
             {!editing ? <InputBox value={profile.postalCode || profile.zip} /> : (
               <input value={form.postalCode} onChange={(e)=>setForm(f=>({...f, postalCode: e.target.value}))} className="rounded-md border border-neutral-200 dark:border-neutral-800 bg-white dark:bg-neutral-900 text-sm text-neutral-900 dark:text-neutral-100 px-3 py-2 min-h-[38px] w-full" />
             )}
           </div>
           <div>
-            <div className="text-xs text-neutral-500 mb-1">TAX ID</div>
+            <div className="text-xs text-neutral-600 dark:text-neutral-300 mb-1">TAX ID</div>
             {!editing ? <InputBox value={profile.taxId || profile.taxID} /> : (
               <input value={form.taxId} onChange={(e)=>setForm(f=>({...f, taxId: e.target.value}))} className="rounded-md border border-neutral-200 dark:border-neutral-800 bg-white dark:bg-neutral-900 text-sm text-neutral-900 dark:text-neutral-100 px-3 py-2 min-h-[38px] w-full" />
             )}

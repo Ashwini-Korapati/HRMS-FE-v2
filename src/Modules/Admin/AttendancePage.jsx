@@ -97,19 +97,19 @@ export default function WorkShiftsPage() {
         <div className="bg-white rounded-2xl shadow-md border border-gray-200 p-6">
           <div className="flex flex-col sm:flex-row justify-between items-center mb-6">
             <div>
-              <h1 className="text-xl font-semibold text-gray-900">Attendance</h1>
-              <p className="text-sm text-gray-600">
+              <h1 className="text-xl font-semibold text-gray-900 dark:text-neutral-100">Attendance</h1>
+              <p className="text-sm text-gray-600 dark:text-neutral-400">
                 Overview of employee daily check-ins and check-outs
               </p>
             </div>
             <div className="flex items-center gap-3 mt-4 sm:mt-0">
               <div className="relative">
-                <Search className="absolute left-3 top-2.5 text-gray-400 w-4 h-4" />
+                <Search className="absolute left-3 top-2.5 text-gray-400 dark:text-neutral-500 w-4 h-4" />
                 <input
                   value={query}
                   onChange={(e) => setQuery(e.target.value)}
                   placeholder="Search user, status, IP..."
-                  className="pl-9 pr-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500/30 focus:border-orange-500 text-sm text-gray-900 bg-white shadow-sm"
+                  className="pl-9 pr-3 py-2 border border-gray-300 dark:border-neutral-700 rounded-lg focus:ring-2 focus:ring-orange-500/30 focus:border-orange-500 text-sm text-gray-900 dark:text-neutral-100 bg-white dark:bg-neutral-900 shadow-sm"
                 />
               </div>
               <button
@@ -121,9 +121,9 @@ export default function WorkShiftsPage() {
             </div>
           </div>
 
-          <div className="overflow-auto rounded-xl border border-gray-200">
-            <table className="min-w-full text-sm text-gray-900">
-              <thead className="bg-gray-100 text-gray-800">
+          <div className="overflow-auto rounded-xl border border-gray-200 dark:border-neutral-800">
+            <table className="min-w-full text-sm text-gray-900 dark:text-neutral-100">
+              <thead className="bg-gray-100 dark:bg-neutral-800 text-gray-800 dark:text-neutral-200">
                 <tr>
                   {[
                     "Date",
@@ -184,7 +184,7 @@ export default function WorkShiftsPage() {
                   <tr>
                     <td
                       colSpan={11}
-                      className="text-center py-6 text-gray-500 font-medium"
+                      className="text-center py-6 text-gray-500 dark:text-neutral-400 font-medium"
                     >
                       No attendance records found.
                     </td>
@@ -196,11 +196,11 @@ export default function WorkShiftsPage() {
         </div>
 
         {/* ============== WORK SHIFTS CARDS ============== */}
-        <div className="bg-white rounded-2xl shadow-lg border border-gray-200 p-6">
+        <div className="bg-white dark:bg-neutral-900 rounded-2xl shadow-lg border border-gray-200 dark:border-neutral-800 p-6">
           <div className="flex justify-between items-center mb-5">
             <div>
-              <h2 className="text-xl font-semibold text-gray-900">Work Shifts</h2>
-              <p className="text-sm text-gray-600">
+              <h2 className="text-xl font-semibold text-gray-900 dark:text-neutral-100">Work Shifts</h2>
+              <p className="text-sm text-gray-600 dark:text-neutral-400">
                 Manage employee work shift schedules
               </p>
             </div>
@@ -253,19 +253,19 @@ export default function WorkShiftsPage() {
                   className="bg-gradient-to-br from-orange-50 via-white to-orange-100 border border-gray-200 rounded-xl shadow hover:shadow-lg hover:scale-[1.02] transition-transform duration-200 p-5"
                 >
                   <div className="flex justify-between items-start mb-2">
-                    <h3 className="font-semibold text-gray-900 text-sm flex items-center">
+                    <h3 className="font-semibold text-gray-900 dark:text-neutral-100 text-sm flex items-center">
                       {shift.name}
                       {shift.isDefault && (
-                        <span className="ml-2 text-xs bg-green-100 text-green-700 px-2 py-0.5 rounded-full">
+                        <span className="ml-2 text-xs bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-300 px-2 py-0.5 rounded-full">
                           Default
                         </span>
                       )}
                     </h3>
-                    <div className="text-xs text-gray-500">{shift.timeZone}</div>
+                    <div className="text-xs text-gray-500 dark:text-neutral-400">{shift.timeZone}</div>
                   </div>
-                  <p className="text-xs text-gray-600 mb-3">{shift.description}</p>
+                  <p className="text-xs text-gray-600 dark:text-neutral-400 mb-3">{shift.description}</p>
 
-                  <div className="grid grid-cols-2 gap-2 text-xs text-gray-800">
+                  <div className="grid grid-cols-2 gap-2 text-xs text-gray-800 dark:text-neutral-200">
                     <div className="flex justify-between">
                       <span>Time</span>
                       <span className="font-medium">
@@ -282,10 +282,10 @@ export default function WorkShiftsPage() {
                     </div>
                   </div>
 
-                  <div className="mt-4 flex justify-between items-center pt-2 border-t border-gray-100">
+                  <div className="mt-4 flex justify-between items-center pt-2 border-t border-gray-100 dark:border-neutral-800">
                     <button
                       onClick={() => handleEdit(shift)}
-                      className="text-orange-700 hover:text-orange-900 text-xs font-medium"
+                      className="text-orange-700 dark:text-orange-400 hover:text-orange-900 dark:hover:text-orange-300 text-xs font-medium"
                     >
                       ✏️ Edit
                     </button>
@@ -302,7 +302,7 @@ export default function WorkShiftsPage() {
                 </div>
               ))}
               {shifts.length === 0 && (
-                <div className="text-center text-gray-500 py-10 col-span-full">
+                <div className="text-center text-gray-500 dark:text-neutral-400 py-10 col-span-full">
                   No work shifts found.
                 </div>
               )}
@@ -322,7 +322,7 @@ export default function WorkShiftsPage() {
 {/* Monthly Report Popup Modal - Centered but Higher */}
 {showMonthlyReport && (
   <div className="fixed inset-0 bg-black bg-opacity-60 flex items-start justify-center p-4 z-50 pt-8">
-    <div className="bg-white rounded-2xl shadow-2xl w-full max-w-7xl h-[90vh] flex flex-col">
+    <div className="bg-white dark:bg-neutral-900 rounded-2xl shadow-2xl w-full max-w-7xl h-[90vh] flex flex-col">
       <MonthlyAttendance onClose={() => setShowMonthlyReport(false)} />
     </div>
   </div>

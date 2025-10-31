@@ -67,32 +67,32 @@ export default function DesignationsListPage() {
     return <div className="p-4 md:p-6 text-rose-600">Error: {error}</div>;
 
   return (
-    <div className="flex h-[calc(100vh-80px)] overflow-hidden bg-gradient-to-br from-white via-neutral-50 to-orange-50 border border-orange-200 rounded-2xl shadow-sm">
+    <div className="flex h-[calc(100vh-80px)] overflow-hidden bg-white dark:bg-black border border-orange-500/20 dark:border-orange-500/40 rounded-2xl shadow-sm">
       {/* 🧠 Smart Left Sidebar */}
-      <aside className="relative w-72 md:w-80 border-r border-orange-200 bg-white/80 backdrop-blur-sm flex flex-col">
+      <aside className="designation-sidebar relative w-72 md:w-80 border-r border-orange-500/20 dark:border-orange-500/40 backdrop-blur-sm flex flex-col">
         {/* Sticky Header */}
-        <header className="sticky top-0 z-10 bg-white/80 backdrop-blur-sm border-b border-orange-100 px-3 py-3 flex items-center justify-between">
-          <h2 className="text-sm font-semibold text-orange-700 flex items-center gap-2">
+        <header className="designation-sidebar sticky top-0 z-10 backdrop-blur-sm border-b border-orange-500/20 dark:border-orange-500/40 px-3 py-3 flex items-center justify-between">
+          <h2 className="text-sm font-semibold text-orange-600 dark:text-orange-400 flex items-center gap-2">
             <Layers size={16} /> Departments
           </h2>
-          <span className="text-[11px] bg-orange-100 text-orange-700 px-2 py-0.5 rounded-full font-medium">
+          <span className="text-[11px] bg-orange-100 dark:bg-orange-900/30 text-orange-700 dark:text-orange-300 px-2 py-0.5 rounded-full font-medium">
             {flow?.nodes?.length || 0}
           </span>
         </header>
 
         {/* Scrollable Content */}
-        <div className="flex-1 overflow-y-auto px-3 py-2 space-y-2 scrollbar-thin scrollbar-thumb-orange-300 hover:scrollbar-thumb-orange-400">
+        <div className="flex-1 overflow-y-auto px-3 py-2 space-y-2 scrollbar-thin scrollbar-thumb-orange-400 hover:scrollbar-thumb-orange-500">
           {(flow?.nodes || []).map((n) => (
             <div
               key={n.id}
-              className="group bg-white border border-orange-500/10 rounded-xl shadow-sm hover:shadow-md transition-all duration-200 p-2.5"
+              className="designation-card group backdrop-blur-sm border border-orange-500/30 dark:border-orange-500/50 rounded-xl shadow-sm hover:shadow-md hover:shadow-orange-500/20 transition-all duration-200 p-2.5"
             >
               <div className="flex items-center justify-between">
                 <div>
-                  <div className="text-[13px] font-semibold text-neutral-800 truncate">
+                  <div className="designation-title text-[13px] font-semibold truncate">
                     {n.title}
                   </div>
-                  <div className="text-[11px] text-neutral-500 truncate">
+                  <div className="designation-description text-[11px] truncate">
                     {n.description?.length > 20
                       ? n.description.slice(0, 20) + "…"
                       : n.description || "—"}
@@ -101,21 +101,21 @@ export default function DesignationsListPage() {
                 <span
                   className={`px-1.5 py-0.5 text-[10px] font-semibold rounded-full ${
                     n.isActive
-                      ? "bg-neutral-900 text-white"
-                      : "bg-neutral-200 text-neutral-700"
+                      ? "bg-orange-500 text-white"
+                      : "bg-neutral-300 dark:bg-neutral-700 text-neutral-700 dark:text-neutral-300"
                   }`}
                 >
                   {n.isActive ? "Active" : "Inactive"}
                 </span>
               </div>
               <div className="mt-1 flex flex-wrap gap-1">
-                <span className="text-[10px] px-1.5 py-0.5 rounded bg-neutral-100 border border-neutral-200 text-neutral-700">
+                <span className="designation-badge-level text-[10px] px-1.5 py-0.5 rounded border">
                   Lvl {n.level ?? "-"}
                 </span>
                 {(n.enabledRoutes || []).slice(0, 2).map((r) => (
                   <span
                     key={r}
-                    className="text-[10px] px-1.5 py-0.5 rounded bg-neutral-100 border border-neutral-200 text-neutral-700"
+                    className="designation-badge-route text-[10px] px-1.5 py-0.5 rounded border inline-flex items-center gap-0.5"
                   >
                     {r}
                   </span>
@@ -126,12 +126,12 @@ export default function DesignationsListPage() {
         </div>
 
         {/* Sticky Footer */}
-        <footer className="sticky bottom-0 z-10 bg-white/90 backdrop-blur-sm border-t border-orange-100 px-3 py-2 flex items-center justify-between text-[11px] text-neutral-600">
+        <footer className="designation-sidebar sticky bottom-0 z-10 backdrop-blur-sm border-t border-orange-500/20 dark:border-orange-500/40 px-3 py-2 flex items-center justify-between text-[11px] text-neutral-600 dark:text-neutral-400">
           <div className="flex items-center gap-1.5">
-            <Clock size={12} className="text-orange-500" />
+            <Clock size={12} className="text-orange-500 dark:text-orange-400" />
             <span>Updated just now</span>
           </div>
-          <button className="text-orange-700 hover:text-orange-900 font-medium">
+          <button className="text-orange-600 dark:text-orange-400 hover:text-orange-800 dark:hover:text-orange-300 font-medium">
             Refresh
           </button>
         </footer>
@@ -140,23 +140,23 @@ export default function DesignationsListPage() {
       {/* 🌐 Main React Flow Area */}
       <main className="flex-1 p-4 md:p-6 overflow-hidden">
         <div className="flex items-center justify-between mb-3">
-          <h1 className="text-lg font-semibold bg-gradient-to-r from-orange-500 to-orange-700 bg-clip-text text-transparent flex items-center gap-2">
+          <h1 className="text-lg font-semibold text-orange-600 dark:text-orange-400 flex items-center gap-2">
             <Activity size={18} /> Designation Architecture
           </h1>
           {flow?.metrics && (
-            <div className="flex gap-2 text-xs text-neutral-600">
-              <span className="px-2 py-1 bg-orange-50 border border-orange-200 rounded-full flex items-center gap-1">
+            <div className="flex gap-2 text-xs text-neutral-700 dark:text-neutral-300">
+              <span className="px-2 py-1 bg-orange-100 dark:bg-orange-900/30 border border-orange-300 dark:border-orange-500/50 rounded-full flex items-center gap-1">
                 <Layers size={14} /> {flow.metrics.total} total
               </span>
-              <span className="px-2 py-1 bg-neutral-50 border border-neutral-200 rounded-full flex items-center gap-1">
+              <span className="px-2 py-1 bg-orange-100 dark:bg-orange-900/30 border border-orange-300 dark:border-orange-500/50 rounded-full flex items-center gap-1">
                 <GitBranch size={14} /> depth {flow.metrics.maxDepth}
               </span>
             </div>
           )}
         </div>
 
-        <div className="border border-orange-200 rounded-2xl overflow-hidden bg-white/80 backdrop-blur-sm">
-          <div className="h-[calc(100vh-180px)] rounded-xl overflow-hidden rf-dark">
+        <div className="border border-orange-500/30 dark:border-orange-500/50 rounded-2xl overflow-hidden bg-white/80 dark:bg-black/80 backdrop-blur-sm">
+          <div className="designation-canvas h-[calc(100vh-180px)] rounded-xl overflow-hidden">
             <ReactFlow
               nodes={nodes}
               edges={edges}
@@ -169,21 +169,18 @@ export default function DesignationsListPage() {
               proOptions={{ hideAttribution: true }}
               defaultEdgeOptions={{
                 type: "smoothstep",
-                markerEnd: { type: MarkerType.ArrowClosed },
-                style: { stroke: "rgba(234,88,12,0.45)" },
+                markerEnd: { type: MarkerType.ArrowClosed, color: "#f97316" },
+                style: { stroke: "rgba(249,115,22,0.6)", strokeWidth: 2 },
               }}
               nodeTypes={{ designation: NodeCard }}
             >
               <MiniMap
-                maskColor="#fafafa"
                 nodeBorderRadius={10}
-                nodeStrokeColor={(n) =>
-                  n?.data?.isActive ? "#ea580c" : "#9ca3af"
-                }
-                nodeColor={(n) => (n?.data?.isActive ? "#fff7ed" : "#f3f4f6")}
+                nodeStrokeColor={(n) => n?.data?.isActive ? "#f97316" : "#9ca3af"}
+                nodeColor={(n) => n?.data?.isActive ? "#fed7aa" : "#e5e7eb"}
               />
               <Controls position="bottom-right" />
-              <Background gap={18} size={1} color="#f1f5f9" />
+              <Background gap={18} size={1} />
             </ReactFlow>
           </div>
         </div>
@@ -196,26 +193,27 @@ export default function DesignationsListPage() {
 function NodeCard({ data }) {
   const { label, description, isActive, level, enabledRoutes } = data || {};
   const ActiveIcon = isActive ? CheckCircle2 : Ban;
+  
   return (
     <div className="relative w-[220px] group">
       <Handle
         type="target"
         position={Position.Top}
-        className="!w-2 !h-2 !bg-neutral-900 !border !border-slate-900"
+        className="!w-2 !h-2 !bg-orange-500 dark:!bg-orange-400 !border-2 !border-orange-600 dark:!border-orange-500"
       />
       <div
-        className="relative z-20 rounded-xl border bg-white px-3 py-2 shadow-sm hover:shadow-md transition-shadow"
+        className="designation-node relative z-20 rounded-xl border backdrop-blur-sm px-3 py-2 shadow-sm hover:shadow-md hover:shadow-orange-500/20 transition-all"
         style={{
-          borderColor: isActive ? "rgba(234,88,12,0.55)" : "rgba(0,0,0,0.08)",
+          borderColor: isActive ? "rgba(249,115,22,0.6)" : "rgba(249,115,22,0.3)",
         }}
       >
         <div className="flex items-start justify-between gap-1.5">
           <div className="min-w-0">
-            <div className="text-[12px] font-semibold text-neutral-900 truncate">
+            <div className="designation-title text-[12px] font-semibold truncate">
               {label}
             </div>
             {description && (
-              <div className="text-[10px] text-neutral-500 truncate">
+              <div className="designation-description text-[10px] truncate">
                 {description}
               </div>
             )}
@@ -223,23 +221,23 @@ function NodeCard({ data }) {
           <span
             className={`inline-flex items-center gap-1 px-1.5 py-0.5 rounded-full text-[9px] font-semibold ${
               isActive
-                ? "bg-neutral-900 text-white"
-                : "bg-neutral-200 text-neutral-700"
+                ? "bg-orange-500 text-white"
+                : "bg-neutral-300 dark:bg-neutral-700 text-neutral-700 dark:text-neutral-300"
             }`}
           >
             <ActiveIcon size={10} /> {isActive ? "Active" : "Inactive"}
           </span>
         </div>
         <div className="mt-1 flex items-center gap-1 flex-wrap">
-          <span className="inline-flex items-center text-[9px] px-1.5 py-0.5 rounded-full bg-neutral-100 text-neutral-700 border border-neutral-200">
+          <span className="designation-badge-level inline-flex items-center text-[9px] px-1.5 py-0.5 rounded-full border">
             <Layers size={10} /> L{level ?? "-"}
           </span>
           {(enabledRoutes || []).slice(0, 2).map((r) => (
             <span
               key={r}
-              className="inline-flex items-center text-[9px] px-1.5 py-0.5 rounded-full bg-neutral-100 text-neutral-700 border border-neutral-200"
+              className="designation-badge-route inline-flex items-center gap-1 text-[9px] px-1.5 py-0.5 rounded-full border"
             >
-              <GitBranch size={10} /> {r}
+              <GitBranch size={9} /> {r}
             </span>
           ))}
         </div>
@@ -247,7 +245,7 @@ function NodeCard({ data }) {
       <Handle
         type="source"
         position={Position.Bottom}
-        className="!w-2 !h-2 !bg-neutral-900 !border !border-slate-900"
+        className="!w-2 !h-2 !bg-orange-500 dark:!bg-orange-400 !border-2 !border-orange-600 dark:!border-orange-500"
       />
     </div>
   );

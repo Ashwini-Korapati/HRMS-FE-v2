@@ -55,7 +55,7 @@ function UserAvatar({ src, alt, className = "w-12 h-12", placeholder }) {
   if (placeholder && (!src || src === DEFAULT_AVATAR_SVG)) {
     // Show text placeholder if no avatar image
     return (
-      <div className={`${className} bg-gradient-to-br from-gray-600 to-gray-800 rounded-full flex items-center justify-center border border-gray-300 font-semibold text-white shadow-sm`}>
+      <div className={`${className} bg-gradient-to-br from-gray-600 to-gray-800 dark:from-gray-700 dark:to-gray-900 rounded-full flex items-center justify-center border border-gray-300 dark:border-gray-600 font-semibold text-white shadow-sm`}>
         {placeholder}
       </div>
     );
@@ -65,7 +65,7 @@ function UserAvatar({ src, alt, className = "w-12 h-12", placeholder }) {
     <img 
       src={imgSrc}
       alt={alt}
-      className={`rounded-full object-cover border border-gray-300 shadow-sm ${className}`}
+      className={`rounded-full object-cover border border-gray-300 dark:border-gray-600 shadow-sm ${className}`}
       loading="lazy"
       onError={() => setImgSrc(DEFAULT_AVATAR_SVG)}
     />
@@ -155,7 +155,7 @@ export default function UsersListPage() {
           <h1 className="text-2xl font-bold bg-gradient-to-r from-orange-500 via-rose-500 to-fuchsia-500 bg-clip-text text-transparent">
             Team Members
           </h1>
-          <p className="text-gray-600 text-sm mt-1">
+          <p className="text-gray-600 dark:text-gray-400 text-sm mt-1">
             Manage and view all employees in your organization
           </p>
         </div>
@@ -212,32 +212,32 @@ export default function UsersListPage() {
 
       {/* Loading State */}
       {status === 'loading' && (
-        <div className="rounded-xl border border-gray-200 bg-white p-12 text-center shadow-sm">
+        <div className="rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 p-12 text-center shadow-sm">
           <div className="flex justify-center mb-4">
             <div className="w-12 h-12 border-4 border-orange-500/30 border-t-orange-500 rounded-full animate-spin" />
           </div>
-          <div className="text-gray-700 text-lg">Loading team members...</div>
-          <div className="text-gray-500 text-sm mt-2">Please wait while we fetch the employee data</div>
+          <div className="text-gray-700 dark:text-gray-200 text-lg">Loading team members...</div>
+          <div className="text-gray-500 dark:text-gray-400 text-sm mt-2">Please wait while we fetch the employee data</div>
         </div>
       )}
 
       {/* Error State */}
       {status === 'failed' && (
-        <div className="rounded-xl border border-red-200 bg-red-50 p-6 shadow-sm">
+        <div className="rounded-xl border border-red-200 dark:border-red-700 bg-red-50 dark:bg-red-900/30 p-6 shadow-sm">
           <div className="flex items-center gap-3 mb-3">
-            <div className="w-8 h-8 bg-red-100 rounded-full flex items-center justify-center">
-              <svg className="w-4 h-4 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <div className="w-8 h-8 bg-red-100 dark:bg-red-900/50 rounded-full flex items-center justify-center">
+              <svg className="w-4 h-4 text-red-600 dark:text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
               </svg>
             </div>
             <div>
-              <div className="text-red-800 font-medium">Failed to load employees</div>
-              <div className="text-red-600 text-sm">{error || 'Unknown error occurred'}</div>
+              <div className="text-red-800 dark:text-red-300 font-medium">Failed to load employees</div>
+              <div className="text-red-600 dark:text-red-400 text-sm">{error || 'Unknown error occurred'}</div>
             </div>
           </div>
           <button 
             onClick={handleRefresh}
-            className="px-4 py-2 rounded-lg text-sm bg-red-600 text-white hover:bg-red-700 transition-colors shadow-sm"
+            className="px-4 py-2 rounded-lg text-sm bg-red-600 dark:bg-red-700 text-white hover:bg-red-700 dark:hover:bg-red-600 transition-colors shadow-sm"
           >
             Try Again
           </button>
@@ -248,23 +248,23 @@ export default function UsersListPage() {
       {status === 'succeeded' && (
         <div>
           <div className="flex items-center justify-between mb-4">
-            <h2 className="text-lg font-semibold text-gray-800">
+            <h2 className="text-lg font-semibold text-gray-800 dark:text-gray-100">
               All Employees ({Array.isArray(employees) ? employees.length : 0})
             </h2>
-            <div className="text-gray-600 text-sm">
+            <div className="text-gray-600 dark:text-gray-400 text-sm">
               Sorted by latest join date
             </div>
           </div>
           
           {!Array.isArray(employees) || employees.length === 0 ? (
-            <div className="rounded-xl border border-gray-200 bg-white p-12 text-center shadow-sm">
-              <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                <svg className="w-8 h-8 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <div className="rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 p-12 text-center shadow-sm">
+              <div className="w-16 h-16 bg-gray-100 dark:bg-gray-800 rounded-full flex items-center justify-center mx-auto mb-4">
+                <svg className="w-8 h-8 text-gray-400 dark:text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197m13.5-9a2.5 2.5 0 11-5 0 2.5 2.5 0 015 0z" />
                 </svg>
               </div>
-              <div className="text-gray-700 text-lg mb-2">No employees found</div>
-              <div className="text-gray-500 text-sm">Start by onboarding new team members to your organization</div>
+              <div className="text-gray-700 dark:text-gray-200 text-lg mb-2">No employees found</div>
+              <div className="text-gray-500 dark:text-gray-400 text-sm">Start by onboarding new team members to your organization</div>
             </div>
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">

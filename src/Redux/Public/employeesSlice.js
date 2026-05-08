@@ -1,15 +1,27 @@
 import { createSlice, createAsyncThunk, nanoid } from '@reduxjs/toolkit'
 import { httpGetService, httpPostService } from '../../config/httphandler'
-import { selectAuthCompany } from './authSlice'
+import { selectAuthCompany, selectAuthUser } from './authSlice'
 
 // Fetch company employees (basic directory) – shape expected: { items: [...], pagination? }
+// Supports both ADMIN and USER endpoints
 export const fetchCompanyEmployees = createAsyncThunk('employees/fetchCompanyEmployees', async (_, { getState, rejectWithValue }) => {
   try {
     const state = getState()
     const company = selectAuthCompany(state)
+    const user = selectAuthUser(state)
     if (!company?.id) return rejectWithValue({ message: 'Missing company context' })
-    // Endpoint pattern consistent with temporary fetch in component: /companies/:companyId/employees
-    const endpoint = `companies/${company.id}/employees`
+    
+    // Build endpoint based on user role
+    let endpoint
+    if (user?.role === 'USER') {
+      // USER endpoint: /companies/:companyId/auth/:userId/employees
+      if (!user?.id) return rejectWithValue({ message: 'Missing user context' })
+      endpoint = `companies/${company.id}/auth/${user.id}/employees`
+    } else {
+      // ADMIN/IT endpoint: /companies/:companyId/employees
+      endpoint = `companies/${company.id}/employees`
+    }
+    
     const res = await httpGetService(endpoint)
     if (res.status >= 200 && res.status < 300) {
       const payload = res.data?.data || res.data || {}
@@ -34,14 +46,19 @@ const initialState = {
   version: nanoid(6)
 }
 
-// payload: { companyId, projectId, members: [ { userId, enabledRoutesStatus } ] }
-// The API appears to expect POST body for each member { projectId, userId, enabledRoutesStatus }
+// payload: { companyId, projectId, members: [ { userId, enabledRoutesStatus, attendanceType?, workShiftId? } ], userId? }
+// The API appears to expect POST body for each member { projectId, userId, enabledRoutesStatus, attendanceType, workShiftId }
 // We'll support sending an array; if backend only handles single, we iterate.
-export const assignEmployeesToProject = createAsyncThunk('employees/assignToProject', async ({ companyId, projectId, members }, { rejectWithValue }) => {
+// userId is only needed for USER role to build the correct endpoint
+export const assignEmployeesToProject = createAsyncThunk('employees/assignToProject', async ({ companyId, projectId, members, userId }, { getState, rejectWithValue }) => {
   if (!companyId || !projectId || !Array.isArray(members) || !members.length) {
     return rejectWithValue({ message: 'Missing companyId, projectId or members' })
   }
   try {
+    const state = getState()
+    const user = selectAuthUser(state)
+    const userRole = user?.role
+    
     // If API accepts batch, send array; if it expects single items, we can fallback sequentially.
     // Given provided sample (single object) we post each member individually.
     const results = []
@@ -53,7 +70,21 @@ export const assignEmployeesToProject = createAsyncThunk('employees/assignToProj
         attendanceType: m.attendanceType || 'OFFICE',
         workShiftId: m.workShiftId || null
       }
-      const endpoint = `${companyId}/projects/${projectId}/members`
+      
+      // Build endpoint based on user role
+      let endpoint
+      if (userRole === 'USER') {
+        // USER endpoint: /companies/:companyId/auth/:userId/projects/:projectId/members
+        const currentUserId = userId || user?.id
+        if (!currentUserId) {
+          return rejectWithValue({ message: 'Missing user context for USER role' })
+        }
+        endpoint = `companies/${companyId}/auth/${currentUserId}/projects/${projectId}/members`
+      } else {
+        // ADMIN/IT endpoint: /companies/:companyId/projects/:projectId/members
+        endpoint = `companies/${companyId}/projects/${projectId}/members`
+      }
+      
       const res = await httpPostService(endpoint, body)
       if (!(res.status >= 200 && res.status < 300)) {
         return rejectWithValue(res.data || { message: 'Failed to assign member' })

@@ -2,6 +2,7 @@ import React, { useEffect, useMemo, useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { useNavigate, useParams } from 'react-router-dom'
 import { fetchProjects, selectProjects, selectProjectsListLoading } from '../../Redux/Public/projectsSlice'
+import { selectAuthUser } from '../../Redux/Public/authSlice'
 import { RefreshCw, Search, Check, UserPlus, X, ToggleLeft, ToggleRight, Clock, Building2 } from 'lucide-react'
 import { fetchCompanyEmployees, selectEmployees, selectEmployeesLoading, selectEmployeesError, assignEmployeesToProject, selectEmployeesAssigning, selectEmployeesAssignError, selectEmployeesLastAssigned } from '../../Redux/Public/employeesSlice'
 import { fetchWorkShifts, selectWorkShifts } from '../../Redux/Public/WorkShiftsSlice'
@@ -137,6 +138,7 @@ export default function AdminAddProjectMember(){
   const dispatch = useDispatch()
   const navigate = useNavigate()
   const { projectId, companyUuid } = useParams()
+  const currentUser = useSelector(selectAuthUser)
   const projects = useSelector(selectProjects)
   const projectsLoading = useSelector(selectProjectsListLoading)
   const employees = useSelector(selectEmployees)
@@ -225,7 +227,12 @@ export default function AdminAddProjectMember(){
       workShiftId: assignmentOptions[s.user_id]?.workShiftId || null
     }))
     try {
-      await dispatch(assignEmployeesToProject({ companyId, projectId: currentProject.id, members })).unwrap()
+      const payload = { companyId, projectId: currentProject.id, members }
+      // Pass userId for USER role endpoints
+      if (currentUser?.role === 'USER') {
+        payload.userId = currentUser?.id
+      }
+      await dispatch(assignEmployeesToProject(payload)).unwrap()
       // Clear selection on success
       setSelected([])
       setFeatureOverrides({})

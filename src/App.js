@@ -265,7 +265,7 @@ function AppRoutes() {
           <Route path="leaves" element={<UserLeavesPage />} />
           <Route path="leaves/history" element={<UserLeavesHistoryPage />} />
           <Route path="leaves/apply" element={<UserLeaveApplyPage />} />
-          {/* <Route path="projects" element={<UserProjectList />} /> */}
+
           <Route path="projects" element={<UserProject />} />
           <Route path="projects/list" element={<UserProjectList />} />
           <Route path="projects/list/:projectId" element={<UserProjectList />} />
